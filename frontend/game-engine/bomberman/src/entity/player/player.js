@@ -28,6 +28,10 @@ export class Player extends Entity {
         this.animationId++;
         const id = parseInt(this.animationId / 8)
         switch (true) {
+            case this.SystemeData.inputkey[" "]:
+                this.SystemeData.inputkey[" "] = false;
+                console.log("BOOM");
+                break
             case this.SystemeData.inputkey["q"]:
                 if (!this.isGroundLeft) {
                     this.posx--
