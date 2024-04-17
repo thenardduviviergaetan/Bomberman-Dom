@@ -9,9 +9,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
-main {
+#root {
   height: 100%;
   width: 100%;
   display: flex;
@@ -19,14 +20,35 @@ main {
   justify-content: space-between;
 }
 
+#container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #game {
   width: 70%;
   height: 100%;
-  border: solid 1px grey;
+  background-color: blue;
 }
 
 #chat {
-  width: 20%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
   height: 100%;
-  border: solid 1px grey;
+  background-color: red;
+}
+#chat form {
+  width: 70%;
+  position: absolute;
+  bottom: 15px;
+}
+#chat form input[type=text] {
+  padding: 4px;
 }/*# sourceMappingURL=style.css.map */

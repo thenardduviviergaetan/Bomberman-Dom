@@ -6,6 +6,7 @@ import { vNode, render, diff, patch } from "./engine.js";
  */
 export default class Framework {
     constructor() {
+        this.socket;
         /**
          * An array of routes.
          * @type {Array}
@@ -77,5 +78,23 @@ export default class Framework {
         const patches = diff(this.oldNode, newNode);
         await patch(document.body.lastChild, patches);
         this.oldNode = newNode;
+    }
+
+    openSocket(){
+        this.socket = new WebSocket("ws://localhost:8080/api/ws");
+        this.socket.onopen = () => {
+            console.log("Conn opened");
+        }
+        this.socket.onmessage = (event) => {
+            try {
+                console.log(event.data);
+                
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        this.socket.onclose = () => {
+            console.log("Conn closed");
+        }
     }
 }
