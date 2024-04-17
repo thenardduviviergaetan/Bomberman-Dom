@@ -1,0 +1,47 @@
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  background-color: white;
+}
+
+#game {
+  position: absolute;
+  transform: scale(2);
+  top: 32px;
+  left: 32px;
+}
+
+.background {
+  position: absolute;
+  width: 460px;
+}
+.background .backline {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 32px;
+}
+.background .backline .case {
+  transform: scale(2);
+}
+
+#menu-paused {
+  display: flex;
+  flex-direction: column;
+}
+#menu-paused h1 {
+  text-align: center;
+  color: white;
+}
+
+#menu-main {
+  display: flex;
+  flex-direction: column;
+}
+#menu-main h2 {
+  text-align: center;
+  color: white;
+}/*# sourceMappingURL=style.css.map */

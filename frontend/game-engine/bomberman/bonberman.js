@@ -1,4 +1,6 @@
-// import { Level } from "./code/map/newmap.js";
+import { Tablevel } from "./src/data/level.js";
+import { Player } from "./src/entity/player/player.js";
+import { Level } from "./src/map/newmap.js";
 
 const SystemeData = {
     isPaused: false,
@@ -7,15 +9,17 @@ const SystemeData = {
     inputkey: {},
 }
 
-// const level = new Level()
-
+const level = new Level(Tablevel.Monde1.Level1);
+document.getElementById("game").appendChild(level.HTML);
+const player = new Player(SystemeData,"player1")
+document.getElementById("game").appendChild(player.HTML);
 
 function gameLoop() {
     if (!SystemeData.isPaused) {
-        // player.move();
-        console.log("play")
+        player.move();
+        // console.log("play")
     }else{
-        console.log("pause")
+        // console.log("pause")
     }
     requestAnimationFrame(gameLoop);
 }
@@ -35,10 +39,10 @@ document.addEventListener('keydown', (e) => {
             SystemeData.inputkey[e.key] = true;
             break;
     }
-    console.log("SystemeData :", SystemeData)
+    // console.log("keydown SystemeData :", SystemeData)
 }, false);
 
 document.addEventListener('keyup', (e) => {
     SystemeData.inputkey[e.key] = false;
-    console.log(SystemeData.inputkey);
+    // console.log("keyup SystemeData :", SystemeData)
 }, false);

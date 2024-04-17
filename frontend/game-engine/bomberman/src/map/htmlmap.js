@@ -1,5 +1,5 @@
 import { TabSprite } from "../sprite/sprite.js";
-import { SpriteAtlas } from "./constdatalevel.js";
+import { SpriteAtlas } from "../data/spriteatlas.js";
 export default class HtmlMap {
     constructor(levelData){
         this.LevelData = levelData;
@@ -14,11 +14,11 @@ export default class HtmlMap {
         // screenGame.style.backgroundColor = this.property.background.color;
         this.posx = 0;
         this.posy = 0;
-        this.HTML.style.position = "absolute"
-        this.HTML.style.top =  this.posy+"px";
-        this.HTML.style.left = this.posx+"px";
-        this.HTML.style.width = this.property.background.width;
-        this.HTML.style.height = this.property.background.height;
+        // this.HTML.style.position = "absolute"
+        // this.HTML.style.top =  this.posy+"px";
+        // this.HTML.style.left = this.posx+"px";
+        // this.HTML.style.width = this.property.background.width;
+        // this.HTML.style.height = this.property.background.height;
     }
     initSpriteTab(){
         this.tabSprite = {};

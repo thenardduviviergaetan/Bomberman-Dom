@@ -1,5 +1,5 @@
 import { TabSprite } from "../../sprite/sprite.js";
-import { SpriteAtlas } from "../../data/constdatalevel.js";
+import { SpriteAtlas } from "../../data/spriteatlas.js";
 import Entity from "../entity.js";
 
 export class Player extends Entity {
@@ -47,7 +47,7 @@ export class Player extends Entity {
         // let solidBlock = document.querySelectorAll('.solide');
         // let playerBorder = document.getElementById(this.id).getBoundingClientRect();
         let playerBorder = this.HTML.getBoundingClientRect();
-        this.isGround = this.isJump;
+        this.isGround = false;
         this.isGroundLeft = false;
         this.isGroundRight = false;
         this.isGroundTop = false
@@ -57,27 +57,49 @@ export class Player extends Entity {
         })
     }
     checkGround(type, playerBorder) {
-        let listBlock = document.querySelectorAll(type);
+        const listBlock = document.querySelectorAll(type);
+        // const block = document.getElementById("cases:4 raws:0 col:4")
+        // const block2 = document.getElementById("cases:5 raws:0 col:5")
+        // const block3 = document.getElementById("cases:32 raws:2 col:2")
+        // const block4 = document.getElementById("cases:34 raws:2 col:4")
+        // const listBlock = [block, block2, block3, block4]
         listBlock.forEach(block => {
-            let blockBorder = block.getBoundingClientRect();
-            let decallage = 3
-            let testX = (blockBorder.left <= playerBorder.left + decallage && playerBorder.left + decallage <= blockBorder.right) ||
-                (blockBorder.left <= playerBorder.right + decallage && playerBorder.right + decallage <= blockBorder.right);
-            let testBottom = playerBorder.bottom == blockBorder.top;
-            let testTop = playerBorder.top + decallage == blockBorder.bottom;
-            let testz = playerBorder.bottom >= blockBorder.top && playerBorder.top <= blockBorder.bottom;
-            let testLeft = playerBorder.left + decallage == blockBorder.right && testz
-            let testRight = playerBorder.right - decallage == blockBorder.left && testz
+            const blockBorder = block.getBoundingClientRect();
+            const quoteOffset = 10
+            const quoteTop = 12
+            const testX = (
+                (blockBorder.left < playerBorder.left + quoteOffset && playerBorder.left + quoteOffset < blockBorder.right) ||
+                (blockBorder.left < playerBorder.right + quoteOffset && playerBorder.right + quoteOffset < blockBorder.right)
+            );
+            const testBottom = playerBorder.bottom == blockBorder.top;
+            const testTop = playerBorder.top + quoteTop == blockBorder.bottom;
+            // let testz = playerBorder.bottom >= blockBorder.top && playerBorder.top + quoteTop <= blockBorder.bottom;
+            const testz = (
+                (playerBorder.bottom > blockBorder.top && playerBorder.bottom < blockBorder.bottom) ||
+                (playerBorder.top + quoteTop < blockBorder.bottom && playerBorder.top + quoteTop > blockBorder.top)
+            );
+            const testLeft = (
+                (playerBorder.left + quoteOffset >= blockBorder.right - 1) &&
+                (playerBorder.left + quoteOffset <= blockBorder.right + 1)
+            ) && testz
+            const testRight = (
+                (playerBorder.right - quoteOffset >= blockBorder.left - 1) &&
+                (playerBorder.right - quoteOffset <= blockBorder.left + 1)
+            ) && testz
             if (testLeft && !testBottom) {
                 this.isGroundLeft = true;
-            } else if (testRight && !testBottom) {
+            }
+            if (testRight && !testBottom) {
                 this.isGroundRight = true;
-            } else if (testBottom && testX && (!testRight && !testLeft)) {
-                this.lastGroundX = playerBorder.bottom;
+            }
+            if (testBottom && testX && (!testRight && !testLeft)) {
+                // this.lastGroundX = playerBorder.bottom;
                 this.isGround = true;
-            } else if (testTop && testX && (!testRight && !testLeft)) {
+            }
+            if (testTop && testX && (!testRight && !testLeft)) {
                 this.isGroundTop = true;
             }
+            // console.log(playerBorder.left, blockBorder.right, this.isGroundLeft, testLeft, !testBottom)
         });
     }
 }
