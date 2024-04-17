@@ -1,5 +1,5 @@
 // Component de bas extends de tout les component
-import { diff, patch, render } from '../framework/engine.js';
+import { diff, patch, render } from '../engine/engine.js';
 /**
  * Represents a component in the mini-framework.
  */

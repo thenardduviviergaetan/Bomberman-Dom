@@ -3,6 +3,7 @@ package livechat
 import (
 	"encoding/json"
 	"server/app"
+	middleware "server/app/middlewares"
 )
 
 type Hub struct {
@@ -24,7 +25,7 @@ type Message struct {
 }
 
 func InitHub(app *app.App) *Hub {
-	users := middleware.GetAllUsers()
+	users := middleware.GetAllUsers() //REFACTOR
 	offlineInit := make([]*Client, 0)
 	for _, user := range users {
 		client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}

@@ -13,9 +13,9 @@ const SystemeData = {
 function gameLoop() {
     if (!SystemeData.isPaused) {
         // player.move();
-        console.log("play")
+        // console.log("play")
     }else{
-        console.log("pause")
+        // console.log("pause")
     }
     requestAnimationFrame(gameLoop);
 }
