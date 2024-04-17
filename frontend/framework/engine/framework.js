@@ -35,7 +35,7 @@ export default class Framework {
      * @private
      */
     _init() {
-        this.oldNode = vNode("section", { id: "root", className: "todoapp" }, ...this._components);
+        this.oldNode = vNode("main", { id: "root"}, ...this._components);
         const initNode = render(this.oldNode);
         document.body.appendChild(initNode);
     }
@@ -73,7 +73,7 @@ export default class Framework {
      * @returns {Promise} A promise that resolves when the framework is rendered.
      */
     async render() {
-        const newNode = vNode("section", { id: "root" }, ...this._components);
+        const newNode = vNode("main", { id: "root" }, ...this._components);
         const patches = diff(this.oldNode, newNode);
         await patch(document.body.lastChild, patches);
         this.oldNode = newNode;

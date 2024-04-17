@@ -1,22 +1,31 @@
-body,section{
-    height: 95vh;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 main {
     height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 3px;
 }
 
 #game{
-    width: 60%;
+    width: 70%;
     height: 100%;
     border: solid 1px grey;
 }
 #chat{
-    width: 30%;
+    width: 20%;
     height: 100%;
     border: solid 1px grey;
 }
