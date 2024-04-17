@@ -19,7 +19,7 @@ export class Level extends HtmlMap{
                 element.style.height = sprite.height;
                 element.style.backgroundImage = sprite.image;
                 element.style.backgroundPosition = sprite.position;
-                console.log(element)
+                // console.log(element)
                 switch(true){
                     case this.property.solide.includes(idSprite):
                         element.classList.add("solide");

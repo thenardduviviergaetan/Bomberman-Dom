@@ -11,7 +11,8 @@ const SystemeData = {
 
 const level = new Level(Tablevel.Monde1.Level1);
 document.getElementById("game").appendChild(level.HTML);
-const player = new Player(SystemeData,"player1")
+const player = new Player(SystemeData,"player1");
+player.move(24,24);
 document.getElementById("game").appendChild(player.HTML);
 
 function gameLoop() {

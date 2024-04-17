@@ -6,42 +6,59 @@ export class Player extends Entity {
     constructor(SystemeData, spriteplayer) {
         super(SystemeData, "player");
         this.atlas = SpriteAtlas.entity[spriteplayer];
-        console.log(this.atlas)
+        this.spriteIdle = this.atlas.idle
+        this.spriteLeft = this.atlas.left
+        this.spriteRight = this.atlas.right
+        this.spriteUp = this.atlas.up
+        this.spriteDown = this.atlas.down
         this.TabSprite = new TabSprite(this.atlas.image, this.atlas.spriteSize, this.atlas.height, this.atlas.width).tab;
-        console.log(this.TabSprite, "TEST");
-        this.setSprite(this.HTML, this.TabSprite[0]);
-        this.id = "player";
-        this.HTML.id = this.id;
-        this.isJump = false;
+        console.log(this.TabSprite)
+        this.setSprite(this.TabSprite[this.spriteIdle[this.animationId]]);
+        // this.id = "player";
+        // this.HTML.id = this.id;
     }
-    move(direction) {
+    move(x, y) {
+        // console.log()
+        if (typeof x === "number" && typeof y === "number") {
+            this.posy = y;
+            this.posx = x;
+            this.setSprite(this.TabSprite[this.spriteIdle[this.animationId % 1]]);
+        }
         this.checkColision();
-        this.directionRight = direction;
-        if (this.SystemeData.inputkey["z"]) {
-            if (!this.isGroundTop) {
-                this.posy--
-            }
-        }
-        if (this.SystemeData.inputkey["s"]) {
-            if (!this.isGround) {
-                this.posy++
-            }
-        }
-        if (this.SystemeData.inputkey["q"]) {
-            if (!this.isGroundLeft) {
-                this.posx--
-            }
-        }
-        if (this.SystemeData.inputkey["s"]) {
-            // console.log("S")
-        }
-        if (this.SystemeData.inputkey["d"]) {
-            if (!this.isGroundRight) {
-                this.posx++
-            }
+        this.animationId++;
+        const id = parseInt(this.animationId / 8)
+        switch (true) {
+            case this.SystemeData.inputkey["q"]:
+                if (!this.isGroundLeft) {
+                    this.posx--
+                }
+                this.setSprite(this.TabSprite[this.spriteLeft[id % this.spriteLeft.length]]);
+                break;
+            case this.SystemeData.inputkey["d"]:
+                if (!this.isGroundRight) {
+                    this.posx++
+                }
+                // console.log()
+                this.setSprite(this.TabSprite[this.spriteRight[id % this.spriteRight.length]]);
+                break;
+            case this.SystemeData.inputkey["z"]:
+                if (!this.isGroundTop) {
+                    this.posy--
+                }
+                this.setSprite(this.TabSprite[this.spriteUp[id % this.spriteUp.length]]);
+                break;
+            case this.SystemeData.inputkey["s"]:
+                if (!this.isGround) {
+                    this.posy++
+                }
+                this.setSprite(this.TabSprite[this.spriteDown[id % this.spriteDown.length]]);
+                break;
+            default:
+                this.setSprite(this.TabSprite[this.spriteIdle[this.animationId % 1]]);
+                break;
+
         }
         this.HTML.style.transform = `translate(${this.posx}px,${this.posy}px)`
-
     }
     checkColision() {
         // let solidBlock = document.querySelectorAll('.solide');
@@ -55,52 +72,6 @@ export class Player extends Entity {
         groundTesting.forEach(typeBlock => {
             this.checkGround(typeBlock, playerBorder);
         })
-    }
-    checkGround(type, playerBorder) {
-        const listBlock = document.querySelectorAll(type);
-        // const block = document.getElementById("cases:4 raws:0 col:4")
-        // const block2 = document.getElementById("cases:5 raws:0 col:5")
-        // const block3 = document.getElementById("cases:32 raws:2 col:2")
-        // const block4 = document.getElementById("cases:34 raws:2 col:4")
-        // const listBlock = [block, block2, block3, block4]
-        listBlock.forEach(block => {
-            const blockBorder = block.getBoundingClientRect();
-            const quoteOffset = 10
-            const quoteTop = 12
-            const testX = (
-                (blockBorder.left < playerBorder.left + quoteOffset && playerBorder.left + quoteOffset < blockBorder.right) ||
-                (blockBorder.left < playerBorder.right + quoteOffset && playerBorder.right + quoteOffset < blockBorder.right)
-            );
-            const testBottom = playerBorder.bottom == blockBorder.top;
-            const testTop = playerBorder.top + quoteTop == blockBorder.bottom;
-            // let testz = playerBorder.bottom >= blockBorder.top && playerBorder.top + quoteTop <= blockBorder.bottom;
-            const testz = (
-                (playerBorder.bottom > blockBorder.top && playerBorder.bottom < blockBorder.bottom) ||
-                (playerBorder.top + quoteTop < blockBorder.bottom && playerBorder.top + quoteTop > blockBorder.top)
-            );
-            const testLeft = (
-                (playerBorder.left + quoteOffset >= blockBorder.right - 1) &&
-                (playerBorder.left + quoteOffset <= blockBorder.right + 1)
-            ) && testz
-            const testRight = (
-                (playerBorder.right - quoteOffset >= blockBorder.left - 1) &&
-                (playerBorder.right - quoteOffset <= blockBorder.left + 1)
-            ) && testz
-            if (testLeft && !testBottom) {
-                this.isGroundLeft = true;
-            }
-            if (testRight && !testBottom) {
-                this.isGroundRight = true;
-            }
-            if (testBottom && testX && (!testRight && !testLeft)) {
-                // this.lastGroundX = playerBorder.bottom;
-                this.isGround = true;
-            }
-            if (testTop && testX && (!testRight && !testLeft)) {
-                this.isGroundTop = true;
-            }
-            // console.log(playerBorder.left, blockBorder.right, this.isGroundLeft, testLeft, !testBottom)
-        });
     }
 }
 
