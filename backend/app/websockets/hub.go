@@ -2,8 +2,9 @@ package livechat
 
 import (
 	"encoding/json"
+	"fmt"
 	"server/app"
-	middleware "server/app/middlewares"
+	// middleware "server/app/middlewares"
 )
 
 type Hub struct {
@@ -25,18 +26,18 @@ type Message struct {
 }
 
 func InitHub(app *app.App) *Hub {
-	users := middleware.GetAllUsers() //REFACTOR
-	offlineInit := make([]*Client, 0)
-	for _, user := range users {
-		client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}
-		offlineInit = append(offlineInit, client)
-	}
+	// users := middleware.GetAllUsers() //REFACTOR
+	// offlineInit := make([]*Client, 0)
+	// for _, user := range users {
+	// 	client := &Client{UUID: user[0], Username: user[1], send: make(chan []byte)}
+	// 	offlineInit = append(offlineInit, client)
+	// }
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[string]*Client),
-		status:     offlineInit,
+		// status:     offlineInit,
 	}
 }
 
@@ -46,8 +47,6 @@ func (h *Hub) Run(app *app.App) {
 		case client := <-h.register:
 			client.Online = true
 			h.clients[client.UUID] = client
-			h.status = Remove(h.status, client)
-			h.status = append(h.status, client)
 		case client := <-h.unregister:
 			if _, ok := h.clients[client.UUID]; ok {
 				client.Online = false
@@ -57,11 +56,14 @@ func (h *Hub) Run(app *app.App) {
 		case message := <-h.broadcast:
 			msg := &Message{}
 			json.Unmarshal(message, msg)
+			fmt.Println("Broadcast")
 			switch msg.Msg_type {
 
 			case "chat":
-				h.SendMessageToTarget(app, msg.Target, message)
+				fmt.Println("chat")
+				h.BroadcastMessage(app, msg.Target, message)
 			case "typing":
+				fmt.Println("typing")
 				typing := &Message{Msg_type: "typing", Target: msg.Target, Sender: msg.Sender}
 				if msg.Content == "typing" {
 					typing.Content = "typing"
@@ -69,25 +71,27 @@ func (h *Hub) Run(app *app.App) {
 					typing.Content = "stop"
 				}
 				jsonTyping, _ := json.Marshal(typing)
-				h.SendMessageToTarget(app, msg.Target, jsonTyping)
+				h.BroadcastMessage(app, msg.Target, jsonTyping)
 			}
 		}
 	}
 }
 
-func (h *Hub) SendMessageToTarget(app *app.App, UUID string, message []byte) {
+func (h *Hub) BroadcastMessage(app *app.App, UUID string, message []byte) {
+	fmt.Println("coucou")
 	msg := &Message{}
 	json.Unmarshal(message, msg)
 	// msg.SenderName = middleware.GetUsersname(app.DB.DB, msg.Sender)
 	message, _ = json.Marshal(msg)
 	if msg.Msg_type == "chat" {
+		fmt.Println("brodcast chat")
 		for _, client := range h.clients {
-			if client.UUID == msg.Target || client.UUID == msg.Sender {
-				client.send <- message
-			}
+			fmt.Println(string(message))
+			client.send <- message
 		}
 	}
 	if msg.Msg_type == "typing" {
+		fmt.Println("brodcast typing")
 		if client, ok := h.clients[UUID]; ok {
 			if client.UUID == msg.Target {
 				client.send <- message
