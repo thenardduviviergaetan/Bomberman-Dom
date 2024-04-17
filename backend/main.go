@@ -12,8 +12,8 @@ import (
 func main() {
 	app := app.NewApp()
 	server := server.NewServer(app)
-	hub := livechat.InitHub(app)
-	go hub.Run(app)
+	hub := livechat.InitHub()
+	go hub.Run()
 	server.Start(hub)
 	// server.Start(database.DB)
 }
