@@ -3,9 +3,9 @@ import { SpriteAtlas } from "../../data/spriteatlas.js";
 import Entity from "../entity.js";
 
 export class Player extends Entity {
-    constructor(SystemeData, spriteplayer) {
+    constructor(SystemeData, spriteplayer,pseudo) {
         super(SystemeData, "player");
-        this.atlas = SpriteAtlas.entity[spriteplayer];
+        this.atlas = SpriteAtlas.entity.player[spriteplayer];
         this.spriteIdle = this.atlas.idle
         this.spriteLeft = this.atlas.left
         this.spriteRight = this.atlas.right
@@ -14,8 +14,8 @@ export class Player extends Entity {
         this.TabSprite = new TabSprite(this.atlas.image, this.atlas.spriteSize, this.atlas.height, this.atlas.width).tab;
         console.log(this.TabSprite)
         this.setSprite(this.TabSprite[this.spriteIdle[this.animationId]]);
-        // this.id = "player";
-        // this.HTML.id = this.id;
+        this.id = pseudo;
+        this.HTML.id = this.id;
     }
     move(x, y) {
         // console.log()

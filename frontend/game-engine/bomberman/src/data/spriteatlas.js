@@ -1,11 +1,11 @@
 export const SpriteAtlas = {
-    maping:{
-        "World1":{
+    maping: {
+        "World1": {
             // image:"./assets/image/atlas/world/world1-32x32.png",
-            image:"../frontend/game-engine/bomberman/assets/image/atlas/world/world1.png",
-            height:48,
-            width:48,
-            spriteSize:16
+            image: "../frontend/game-engine/bomberman/assets/image/atlas/world/world1.png",
+            height: 48,
+            width: 48,
+            spriteSize: 16
         },
         // "World1":{
         //     image:"./assets/image/atlas/world/world1.png",
@@ -74,52 +74,59 @@ export const SpriteAtlas = {
         //     spriteSize:16
         // },
     },
-    entity:{
-        "player1":{
-            image:"../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player1.png",
-            height:128,
-            width:192,
-            spriteSize:32,
-            idle:[0],
-            right:[3,4,5],
-            left:[11,10,9],
-            up:[6,7,8],
-            down:[0,1,2],
+    entity: {
+        player: {
+            "player1": {
+                image: "../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player1.png",
+                height: 128,
+                width: 192,
+                spriteSize: 32,
+                idle: [0],
+                right: [3, 4, 5],
+                left: [11, 10, 9],
+                up: [6, 7, 8],
+                down: [0, 1, 2],
+            },
+            "player2": {
+                image: "../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player2.png",
+                height: 128,
+                width: 192,
+                spriteSize: 32,
+                idle: [0],
+                right: [3, 4, 5],
+                left: [11, 10, 9],
+                up: [6, 7, 8],
+                down: [0, 1, 2],
+            },
+            "player3": {
+                image: "../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player3.png",
+                height: 128,
+                width: 192,
+                spriteSize: 32,
+                idle: [0],
+                right: [3, 4, 5],
+                left: [11, 10, 9],
+                up: [6, 7, 8],
+                down: [0, 1, 2],
+            },
+            "player4": {
+                image: "../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player4.png",
+                height: 128,
+                width: 192,
+                spriteSize: 32,
+                idle: [0],
+                right: [3, 4, 5],
+                left: [11, 10, 9],
+                up: [6, 7, 8],
+                down: [0, 1, 2],
+            }
         },
-        "player2":{
-            image:"../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player2.png",
-            height:128,
-            width:192,
-            spriteSize:32,
-            idle:[0],
-            right:[3,4,5],
-            left:[11,10,9],
-            up:[6,7,8],
-            down:[0,1,2],
+        props: {
+            "bomb":{
+                image: "../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player4.png",
+            }
         },
-        "player3":{
-            image:"../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player3.png",
-            height:128,
-            width:192,
-            spriteSize:32,
-            idle:[0],
-            right:[3,4,5],
-            left:[11,10,9],
-            up:[6,7,8],
-            down:[0,1,2],
-        },
-        "player4":{
-            image:"../frontend/game-engine/bomberman/assets/image/atlas/entity/bomberman/player4.png",
-            height:128,
-            width:192,
-            spriteSize:32,
-            idle:[0],
-            right:[3,4,5],
-            left:[11,10,9],
-            up:[6,7,8],
-            down:[0,1,2],
-        },
-        ennemy:{
+        ennemy: {
             // "test":{
             //     image:"./assets/image/entity/ennemy/test/atlas-mario.png",
             //     height:16,

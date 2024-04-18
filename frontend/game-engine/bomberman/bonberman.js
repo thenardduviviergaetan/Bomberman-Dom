@@ -7,17 +7,31 @@ const SystemeData = {
     isMenuPaused: false,
     isMainMenu: false,
     inputkey: {},
+    playerBomb:{}
 }
 
 const level = new Level(Tablevel.Monde1.Level1);
 document.getElementById("game").appendChild(level.HTML);
-const player = new Player(SystemeData,"player1");
+const player = new Player(SystemeData,"player1","funny");
 player.move(24,24);
 document.getElementById("game").appendChild(player.HTML);
+// const player2 = new Player(SystemeData,"player2");
+// player2.move(24,312);
+// document.getElementById("game").appendChild(player2.HTML);
+// const player3 = new Player(SystemeData,"player3");
+// player3.move(404,-40);
+// document.getElementById("game").appendChild(player3.HTML);
+// const player4 = new Player(SystemeData,"player4");
+// player4.move(404,248);
+// document.getElementById("game").appendChild(player4.HTML);
 
 function gameLoop() {
     if (!SystemeData.isPaused) {
         player.move();
+        // player.checkTrigger(player2)
+        // player2.move();
+        // player3.move();
+        // player4.move();
         // console.log("play")
     }else{
         // console.log("pause")
