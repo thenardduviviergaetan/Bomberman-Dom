@@ -8,36 +8,38 @@ import Chat from "../../framework/components/chat.js"
 export default class GameManager{
     constructor() {
         this.app = new Framework()
+        this.username = 'bob'
         this.ws;
-        this.boot = false
-        this.startgame = false
     }
 
     async launchMenu() {
         const bootMenu = new BootMenu()
+        const ready = new Promise(resolve => {
+            bootMenu.init2(resolve)
+        })
+
         this.app.addComponent(bootMenu)
         this.render()
-        if (bootMenu.t){
-            console.log("test");
-            // this.launchWaitingRoom()
-            this.ws = new WS("ws://localhost:8080/api/ws");
-        }
+
+        ready.then((username) => {
+            this.username = username
+            this.launchgame()
+        })
     }
 
-    // launchWaitingRoom() {
-    //     new Waiting()._init().then()
-    // }
-
     launchgame() {
-        // new Game()._init().then()
         const container = new Component("div", { id: "container" });
-        const game = new Game({ id: "game" }, ws);
-        const chat = new Chat({ id: "chat" }, ws);
+        const title = new Component("h1", { id:"test"}, [this.username])
+
+        // const game = new Game({ id: "game" }, ws);
+        // const chat = new Chat({ id: "chat" }, ws);
 
         // container.addElement(bootMenu);
         // container.addElement(game, chat);
 
-        this.app.addComponent(container);
+        container.addElement(title)
+        this.app.addComponent(container)
+        this.render()
     }
 
     launchFinalScreen() {
