@@ -13,8 +13,15 @@ func HandlerJoin(w http.ResponseWriter, r *http.Request, h *livechat.Hub) {
 	// 	w.WriteHeader(http.StatusMethodNotAllowed)
 	// 	return
 	// }
-	var username string
-	json.NewDecoder(r.Body).Decode(&username)
-	fmt.Println("username :", username)
-	fmt.Println(h.CheckUsername(username))
+	// var username string
+	var msg struct {
+		Username string `json:"username"`
+	}
+
+	fmt.Println("BODY == ", r.Body)
+
+	json.NewDecoder(r.Body).Decode(&msg)
+	// fmt.Println("username :", msg.Username)
+	fmt.Printf("Username = %q\n", msg.Username)
+	fmt.Println(h.CheckUsername(msg.Username))
 }
