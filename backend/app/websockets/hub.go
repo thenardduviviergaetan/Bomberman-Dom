@@ -27,6 +27,12 @@ func InitHub() *Hub {
 	}
 }
 
+func (h *Hub) CheckUsername(username string) bool {
+	_, ok := h.clients[username]
+
+	return ok
+}
+
 func (h *Hub) Run() {
 	for {
 		select {

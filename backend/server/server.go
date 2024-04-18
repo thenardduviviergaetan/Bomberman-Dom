@@ -25,7 +25,7 @@ func (s *Server) Start(hub *livechat.Hub) {
 		fmt.Println("Starting websocket connection...")
 		livechat.WebsocketHandler(hub, w, r)
 	})
-	s.app.ServeHTTP()
+	s.app.ServeHTTP(hub)
 	log.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }
