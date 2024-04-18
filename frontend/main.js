@@ -1,22 +1,25 @@
-import Component from './framework/components/component.js';
-import Framework from './framework/engine/framework.js';
-import WS from './framework/websocket/websocket.js';
-import Game from './framework/components/game.js';
-import Chat from './framework/components/chat.js';
-import { BootMenu } from './bootMenu.js/BootMenu.js';
+import GameManager from './framework/components/game-manager.js';
 
-const app = new Framework();
-const ws = new WS("ws://localhost:8080/api/ws");
+// const app = new Framework();
 
-const bootMenu = new BootMenu()
+const start = new GameManager()
+start.launchMenu()
 
-const container = new Component("div", { id: "container" });
-const game = new Game({ id: "game" }, ws);
-const chat = new Chat({ id: "chat" }, ws);
+// const ws = new WS("ws://localhost:8080/api/ws");
 
-container.addElement(bootMenu);
-// container.addElement(game, chat);
 
-app.addComponent(container);
+// const bootMenu = new BootMenu()
+// const waitingRoom = new WaitingRoom()
 
-app.render()
+//REFACTOR Better namm
+// bootMenu.waitForUsername()
+// const container = new Component("div", { id: "container" });
+// const game = new Game({ id: "game" }, ws);
+// const chat = new Chat({ id: "chat" }, ws);
+
+// container.addElement(bootMenu);
+// // container.addElement(game, chat);
+
+// app.addComponent(container);
+
+// app.render()

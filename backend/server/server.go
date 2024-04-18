@@ -27,5 +27,5 @@ func (s *Server) Start(hub *livechat.Hub) {
 	})
 	s.app.ServeHTTP(hub)
 	log.Println("Server is listening on port 8080...")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("localhost:8080", nil)
 }
