@@ -1,32 +1,54 @@
 html,
 body {
-  overflow-x: hidden;
+  background-color: white;
+  height: 100vh;
+  width: 100vh;
 }
 
-body {
-  background-color: white;
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 60px;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
 }
 
 #game {
-  position: absolute;
   transform: scale(2);
-  top: 32px;
-  left: 512px;
-  width: 960px;
+  width: 100%;
 }
 
 .background {
   position: absolute;
   width: 460px;
 }
+.background #back {
+  position: absolute;
+  width: 480px;
+  z-index: -1;
+}
+.background #props {
+  position: absolute;
+  width: 480px;
+  z-index: 2;
+}
 .background .backline {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   height: 32px;
 }
 .background .backline .case {
   transform: scale(2);
+}
+
+.player {
+  position: relative;
+  z-index: 99;
 }
 
 #menu-paused {

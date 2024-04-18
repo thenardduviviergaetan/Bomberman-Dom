@@ -3,7 +3,7 @@ import { SpriteAtlas } from "../../data/spriteatlas.js";
 import Entity from "../entity.js";
 
 export class Player extends Entity {
-    constructor(SystemeData, spriteplayer,pseudo) {
+    constructor(SystemeData, spriteplayer, pseudo) {
         super(SystemeData, "player");
         this.atlas = SpriteAtlas.entity.player[spriteplayer];
         this.spriteIdle = this.atlas.idle
@@ -16,6 +16,8 @@ export class Player extends Entity {
         this.setSprite(this.TabSprite[this.spriteIdle[this.animationId]]);
         this.id = pseudo;
         this.HTML.id = this.id;
+        this.SystemeData.inputkey[this.id] = {};
+        this.SystemeData.playerBomb[this.id] = { onBomb: false, bomb: 0 };
     }
     move(x, y) {
         // console.log()
@@ -28,30 +30,37 @@ export class Player extends Entity {
         this.animationId++;
         const id = parseInt(this.animationId / 8)
         switch (true) {
-            case this.SystemeData.inputkey[" "]:
-                this.SystemeData.inputkey[" "] = false;
-                console.log("BOOM");
+            case this.SystemeData.inputkey[this.id][" "]:
+                if (!this.SystemeData.playerBomb[this.id].onBomb) {
+                    this.SystemeData.playerBomb[this.id] = {
+                        onBomb: true,
+                        bomb: (this.SystemeData.playerBomb[this.id].bomb + 1)
+                    }
+                }
+                // this.SystemeData.inputkey[this.id][" "] = false;
+                // console.log("BOOM");
+                // console.log(this.SystemeData.playerBomb)
                 break
-            case this.SystemeData.inputkey["q"]:
+            case this.SystemeData.inputkey[this.id]["q"]:
                 if (!this.isGroundLeft) {
                     this.posx--
                 }
                 this.setSprite(this.TabSprite[this.spriteLeft[id % this.spriteLeft.length]]);
                 break;
-            case this.SystemeData.inputkey["d"]:
+            case this.SystemeData.inputkey[this.id]["d"]:
                 if (!this.isGroundRight) {
                     this.posx++
                 }
                 // console.log()
                 this.setSprite(this.TabSprite[this.spriteRight[id % this.spriteRight.length]]);
                 break;
-            case this.SystemeData.inputkey["z"]:
+            case this.SystemeData.inputkey[this.id]["z"]:
                 if (!this.isGroundTop) {
                     this.posy--
                 }
                 this.setSprite(this.TabSprite[this.spriteUp[id % this.spriteUp.length]]);
                 break;
-            case this.SystemeData.inputkey["s"]:
+            case this.SystemeData.inputkey[this.id]["s"]:
                 if (!this.isGround) {
                     this.posy++
                 }

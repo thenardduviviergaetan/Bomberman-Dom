@@ -2,6 +2,7 @@ import { TabSprite } from "../sprite/sprite.js";
 import { SpriteAtlas } from "../data/spriteatlas.js";
 export default class HtmlMap {
     constructor(levelData){
+        console.log(levelData)
         this.LevelData = levelData;
         this.property = levelData.property;
 
