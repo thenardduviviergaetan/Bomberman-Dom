@@ -38,16 +38,35 @@ export default class Component {
     async render() {
         return '';
     }
+
+
+    async updateDOM(callback = () => { }) {
+        console.log("inside updateDOM");
+        this.oldNode = this.domNode
+        callback()
+        console.log("-----");
+        const patches = diff(this.oldNode, this)
+        console.log("$$$$$$$$$$$$");
+        const rootNode = document.getElementById(this.props.id)
+        console.log("))))))))))))))))))))))");
+        console.log("ROOTNODE:",rootNode);
+        console.log("PATCH CONTENT:",patches);
+        await patch(rootNode, patches);
+        console.log("xxxxxxxxxxxxxxxxxxxxxxxx");
+        this.domNode = render(this);
+    }
+
     /**
      * Updates the component with new data.
      * @param {any} data - The new data to update the component with.
      * @returns {Promise<void>} A promise that resolves when the update is complete.
      */
-    async update(data) {
-        const oldVNode = this.vNode;
-        this.vNode = await this.render();
-        const patches = diff(oldVNode, this.vNode);
-        await patch(this.domNode, patches);
+    async update() {
+        // const oldVNode = this.vNode;
+        // this.vNode = await this.render();
+        // const patches = diff(oldVNode, this.vNode);
+        // await patch(this.domNode, patches);
+        this.updateDOM()
     }
     /**
      * Sets an event listener for the specified event type.

@@ -37,7 +37,6 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.clients[client.Username] = client
-			fmt.Println(client.Username + " joined the chat")
 			message := &Message{
 				Type:   "join",
 				Body:   client.Username + "joined the chat",
@@ -67,7 +66,6 @@ func (h *Hub) Run() {
 				for _, c := range h.clients {
 					c.send <- leftMessage
 				}
-				fmt.Println(client.Username + " left the chat")
 				close(h.clients[client.Username].send)
 				delete(h.clients, client.Username)
 			}

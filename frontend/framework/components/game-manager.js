@@ -36,10 +36,7 @@ export default class GameManager {
             this.app.clear()
             this.launchgame();
         }).catch((e) => {
-            console.log(e);
-            this.app.replaceComponent(e)
             this.render()
-            // this.launchMenu();
         });
     }
 

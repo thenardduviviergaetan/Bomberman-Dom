@@ -11,14 +11,11 @@ export default class BootMenu extends Component {
     async initialize(resolve, reject) {
         const maxCharacters = 10;
         const errorMessage = new Component('p', { id: "error-msg", style: "color: red" });
-        //     const errorMessage = new Component('p', { className: 'errorMessage' })
-
         const text = `Please enter a Username under ${maxCharacters} characters to enter lobby.`;
-        // const window = new Component('div')
         const queryText = new Component('p', {}, [text])
         const username = new Input({ type: 'text', placeholder: 'Username', name: 'boot-menu-username', value: "" })
         const submit = new Input({ type: 'submit', name: 'boot-menu-submit' })
-        const bootForm = new Form({}, queryText, errorMessage,username, submit)
+        const bootForm = new Form({id:"form"}, queryText, errorMessage,username, submit)
 
 
         bootForm.actionListener('submit', (event) => {
@@ -29,7 +26,7 @@ export default class BootMenu extends Component {
                     else {
                         const errorText = await res.text()
                         errorMessage.children.push(errorText)
-                        reject(bootForm)
+                        errorMessage.update()
                     }
                 })
         })
