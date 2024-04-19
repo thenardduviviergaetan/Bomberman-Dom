@@ -41,18 +41,11 @@ export default class Component {
 
 
     async updateDOM(callback = () => { }) {
-        console.log("inside updateDOM");
         this.oldNode = this.domNode
         callback()
-        console.log("-----");
         const patches = diff(this.oldNode, this)
-        console.log("$$$$$$$$$$$$");
         const rootNode = document.getElementById(this.props.id)
-        console.log("))))))))))))))))))))))");
-        console.log("ROOTNODE:",rootNode);
-        console.log("PATCH CONTENT:",patches);
         await patch(rootNode, patches);
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxx");
         this.domNode = render(this);
     }
 

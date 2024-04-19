@@ -3,27 +3,48 @@ import Input from "./input.js";
 import Form from "./form.js";
 import { getFormValues } from "../engine/engine.js";
 export default class Chat extends Component {
-    constructor(props, ws) {
+    constructor(props, ws, username) {
         super("section", props);
         this.ws = ws;
-        this.#init()
-        this.#receive()
+        this.username = username;
+        this.messages = [];
+        this.#init();
+        this.#receive();
         return this;
     }
 
-    #init(){
+    #init() {
         const input = new Input({ id: "chat-input", placeholder: "Enter message", type: "text", name: "input" });
         const form = new Form({ id: "chat-form" }, input);
         form.actionListener('submit', (e) => {
             const data = getFormValues(e).input;
-            this.ws.sendMessage({type: "chat", body: data , sender:"user" });
+            this.ws.sendMessage({ type: "chat", body: data, sender: this.username });
         })
         this.addElement(form);
     }
 
-    #receive(){
+    #receive() {
+        const chatBox = new Component("div", { id: "chat-box" });
+        chatBox.children = this.messages;
         this.ws.onMessage((data) => {
-            console.log(data);
+            let chatElement;
+            console.log("this.messages", this.messages);
+            switch (data.type) {
+                case 'join':
+                    chatElement = new Component("p", { id: "chat-element", style: "color: white;" });
+                    this.messages.push(data.body)
+                    chatElement.children.push(data.body);
+                    break
+                case 'chat':
+                    chatElement = new Component("p", { id: "chat-element", style: "color: white;" });
+                    this.messages.push(`${data.sender} : ${data.body}`)
+                    chatElement.children.push(`${data.sender} : ${data.body}`); 
+                    break
+            }
+
+            chatBox.addElement(chatElement);
+            chatBox.update();
         })
+        this.addElement(chatBox);
     }
 }

@@ -39,9 +39,10 @@ func (h *Hub) Run() {
 			h.clients[client.Username] = client
 			message := &Message{
 				Type:   "join",
-				Body:   client.Username + "joined the chat",
+				Body:   client.Username + " joined the chat",
 				Sender: client.Username,
 			}
+			fmt.Printf("%s Joined the chat !\n", client.Username)
 			joinedMessage, err := json.Marshal(message)
 			if err != nil {
 				fmt.Println(err)
@@ -55,9 +56,11 @@ func (h *Hub) Run() {
 			if _, ok := h.clients[client.Username]; ok {
 				message := &Message{
 					Type:   "leave",
-					Body:   client.Username + "left the chat",
+					Body:   client.Username + " left the chat",
 					Sender: client.Username,
 				}
+				fmt.Printf("%s left the chat !\n", client.Username)
+
 				leftMessage, err := json.Marshal(message)
 				if err != nil {
 					fmt.Println(err)

@@ -34,16 +34,16 @@ export default class GameManager {
                 this.ws.sendMessage({ type: 'leave', username: this.username });
             })
             this.app.clear()
-            this.launchgame();
+            this.launchgame(this.username);
         }).catch((e) => {
             this.render()
         });
     }
 
-    launchgame() {
+    launchgame(username) {
         const container = new Component("div", { id: "container" });
-        const game = new Game({id: "game"},this.ws);
-        const chat = new Chat({id: "chat"},this.ws);
+        const game = new Game({id: "game"},this.ws,username);
+        const chat = new Chat({id: "chat"},this.ws,username);
         container.addElement(game, chat);
 
         // container.addElement(title);

@@ -35,14 +35,22 @@ body {
     background-color: #ccc;
 }
 
+#waintingRoom {
+    width: 70%;
+    height: 100%;
+    background-color: #ccc;
+}
+
 #chat {
+    padding: 10px;
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center;  
     width: 30%;
     height: 100%;
     background-color: #000;
+    overflow-y: scroll;
 
     form {
         position: absolute;
