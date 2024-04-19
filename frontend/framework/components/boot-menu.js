@@ -43,5 +43,5 @@ export default class BootMenu extends Component {
             method: 'POST',
             body: JSON.stringify({ username }),
         })
-    }
+    } 
 }
