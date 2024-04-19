@@ -28,9 +28,8 @@ func InitHub() *Hub {
 }
 
 func (h *Hub) CheckUsername(username string) bool {
-	_, ok := h.clients[username]
-
-	return ok
+	_, exist := h.clients[username]
+	return exist
 }
 
 func (h *Hub) Run() {
@@ -38,6 +37,7 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.clients[client.Username] = client
+			fmt.Println(client.Username + " joined the chat")
 			message := &Message{
 				Type:   "join",
 				Body:   client.Username + "joined the chat",
@@ -67,6 +67,7 @@ func (h *Hub) Run() {
 				for _, c := range h.clients {
 					c.send <- leftMessage
 				}
+				fmt.Println(client.Username + " left the chat")
 				close(h.clients[client.Username].send)
 				delete(h.clients, client.Username)
 			}

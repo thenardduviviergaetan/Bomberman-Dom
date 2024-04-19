@@ -68,6 +68,17 @@ export default class Framework {
         this._components.push(component);
         await this.render(component);
     }
+
+
+    async clear() {
+        this._components.length = 0
+        await this.render()
+    }
+    async replaceComponent(component) {
+        this.clear();
+        this.addComponent(component)
+    }
+
     /**
      * Renders the framework.
      * @returns {Promise} A promise that resolves when the framework is rendered.
@@ -79,3 +90,4 @@ export default class Framework {
         this.oldNode = newNode;
     }
 }
+

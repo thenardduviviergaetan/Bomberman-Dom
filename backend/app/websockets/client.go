@@ -1,7 +1,6 @@
 package livechat
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -64,8 +63,7 @@ func WebsocketHandler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var username string
-	json.NewDecoder(r.Body).Decode(&username)
+	username := r.URL.Query().Get("username")
 
 	client := &Client{
 		hub:      hub,
