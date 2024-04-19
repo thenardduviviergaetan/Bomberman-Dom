@@ -1,8 +1,16 @@
+$primary-color: #ffc746;
+$secondary-color: #00d5ff;
+$accent-color: #ff5abb;
+$text-color: #363636;
+$background-color: #f5f5f5;
+$shadow-color: rgba(0, 0, 0, 0.3);
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 
 body {
     font-family: 'Roboto', sans-serif;
@@ -10,6 +18,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-image: url('./img/pixel-art-sky-background-with-clouds-cloudy-blue-sky-for-8bit-game-on-white-background-vector.jpg');
 }
 
 #root {
@@ -19,6 +28,74 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
+
+.bootMenu {
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 50%;
+    background-color: rgba($color: $background-color, $alpha: .9);
+    box-shadow: 0 0 10px $shadow-color;
+    border-radius: 20px;
+
+    #title {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: $primary-color;
+        text-shadow: 3px 3px 0$shadow-color;
+    }
+
+    p {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        color: $text-color;
+        font-weight: bold;
+    }
+    span {
+        font-size: 0.9rem;
+        color: $text-color;
+        margin-bottom: 10px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        #field {
+            padding: 5px;
+            width: 60%;
+            margin-bottom: 10px;
+            // border: none;
+            border-radius: 5px;
+            border:$primary-color 1px solid;
+            margin-bottom: 20px;
+        }
+
+        #submitBtn {
+            padding: 5px;
+            width: 100px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: $secondary-color;
+            color: $text-color;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 20px;
+            color: $background-color;
+
+            &:hover {
+                background-color: #00b5da;
+            }
+        }
+    }
+}
+
+
 
 #container {
     width: 100%;
@@ -46,11 +123,15 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;  
+    align-items: center;
     width: 30%;
     height: 100%;
-    background-color: #000;
+    background-color: rgba($color: #000000, $alpha: .6);
     overflow-y: scroll;
+
+    #chat-box {
+        width: 100%;
+    }
 
     form {
         position: absolute;
@@ -64,6 +145,7 @@ body {
             height: 30px;
             border: none;
             border-radius: 5px;
+            box-shadow: 0 0 5px rgba($color: #000000, $alpha: .6);
         }
     }
 }

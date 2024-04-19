@@ -10,12 +10,14 @@ export default class BootMenu extends Component {
 
     async initialize(resolve, reject) {
         const maxCharacters = 10;
+        const title = new Component('h1', { id: "title" }, ["Bomberman DOM!"])
         const errorMessage = new Component('p', { id: "error-msg", style: "color: red" });
-        const text = `Please enter a Username under ${maxCharacters} characters to enter lobby.`;
+        const text = `Please enter a Username:`;
         const queryText = new Component('p', {}, [text])
-        const username = new Input({ type: 'text', placeholder: 'Username', name: 'boot-menu-username', value: "" })
-        const submit = new Input({ type: 'submit', name: 'boot-menu-submit' })
-        const bootForm = new Form({id:"form"}, queryText, errorMessage,username, submit)
+        const message = new Component('span', {}, [`(max.${maxCharacters} characters)`])
+        const username = new Input({ id:'field', type: 'text', placeholder: 'Username', name: 'boot-menu-username', value: "" })
+        const submit = new Input({ id: 'submitBtn', type: 'submit', name: 'boot-menu-submit', value: 'Submit'})
+        const bootForm = new Form({id:"form"},title, queryText,message, errorMessage,username, submit)
 
 
         bootForm.actionListener('submit', (event) => {

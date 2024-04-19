@@ -10,6 +10,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background-image: url("./img/pixel-art-sky-background-with-clouds-cloudy-blue-sky-for-8bit-game-on-white-background-vector.jpg");
 }
 
 #root {
@@ -18,6 +19,65 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.bootMenu {
+  display: flex;
+  margin: auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 50%;
+  background-color: rgba(245, 245, 245, 0.9);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+}
+.bootMenu #title {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #ffc746;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+.bootMenu p {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #363636;
+  font-weight: bold;
+}
+.bootMenu span {
+  font-size: 0.9rem;
+  color: #363636;
+  margin-bottom: 10px;
+}
+.bootMenu form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bootMenu form #field {
+  padding: 5px;
+  width: 60%;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: #ffc746 1px solid;
+  margin-bottom: 20px;
+}
+.bootMenu form #submitBtn {
+  padding: 5px;
+  width: 100px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #00d5ff;
+  color: #363636;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 20px;
+  color: #f5f5f5;
+}
+.bootMenu form #submitBtn:hover {
+  background-color: #00b5da;
 }
 
 #container {
@@ -49,8 +109,11 @@ body {
   align-items: center;
   width: 30%;
   height: 100%;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.6);
   overflow-y: scroll;
+}
+#chat #chat-box {
+  width: 100%;
 }
 #chat form {
   position: absolute;
@@ -64,4 +127,5 @@ body {
   height: 30px;
   border: none;
   border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
 }/*# sourceMappingURL=style.css.map */
