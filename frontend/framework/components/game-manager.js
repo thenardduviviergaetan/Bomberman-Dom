@@ -41,12 +41,22 @@ export default class GameManager {
     }
 
     launchgame() {
+        /////////////////////BEGINNING OF CHANGE/////////////////////////////////
+        const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
+        leaveButton.actionListener('click', () => {
+            this.ws.close();
+            this.app.clear();
+            this.launchMenu();
+        })
+        /////////////////////ENDING OF CHANGE/////////////////////////////////
         const container = new Component("div", { id: "container" });
         const game = new Game({id: "game"},this.ws,this.username);
         const chat = new Chat({id: "chat"},this.ws,this.username);
         container.addElement(chat, game);
 
-        // container.addElement(title);
+        /////////////////////BEGINNING OF CHANGE/////////////////////////////////
+        this.app.addComponent(leaveButton);
+        /////////////////////ENDING OF CHANGE/////////////////////////////////
         this.app.addComponent(container);
         this.render();
     }

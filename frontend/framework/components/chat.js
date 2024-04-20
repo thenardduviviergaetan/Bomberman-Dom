@@ -32,19 +32,19 @@ export default class Chat extends Component {
             switch (data.type) {
                 case 'join':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element-join"});
-                    this.messages.push(data.body)
                     chatElement.children.push(data.body);
+                    //this.messages.push(chatElement)
                     break
                 case 'leave':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element-leave"});
-                    this.messages.push(data.body)
                     chatElement.children.push(data.body);
+                    //this.messages.push(chatElement)
                     break
                 case 'chat':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element"});
                     const sender = new Component("span", {className: "chat-sender"},[`<${data.sender}> : `])
                     chatElement.addElement(sender,data.body); 
-                    this.messages.push(chatElement)
+                    // this.messages.push(chatElement)
                     break
             }
 
