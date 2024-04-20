@@ -25,25 +25,26 @@ export default class Chat extends Component {
 
     #receive() {
         const chatBox = new Component("div", { id: "chat-box" });
-        // chatBox.children = this.messages; test for history
+        // chatBox.children = this.messages; //test for history
         this.ws.onMessage((data) => {
             let chatElement;
             console.log("this.messages", this.messages);
             switch (data.type) {
                 case 'join':
-                    chatElement = new Component("p", { id: "chat-element", style: "color: white;" });
+                    chatElement = new Component("p", { id: "chat-element",className: "chat-element-join"});
                     this.messages.push(data.body)
                     chatElement.children.push(data.body);
                     break
                 case 'leave':
-                    chatElement = new Component("p", { id: "chat-element", style: "color: white;" });
+                    chatElement = new Component("p", { id: "chat-element",className: "chat-element-leave"});
                     this.messages.push(data.body)
                     chatElement.children.push(data.body);
                     break
                 case 'chat':
-                    chatElement = new Component("p", { id: "chat-element", style: "color: white;" });
-                    this.messages.push(`${data.sender} : ${data.body}`)
-                    chatElement.children.push(`${data.sender} : ${data.body}`); 
+                    chatElement = new Component("p", { id: "chat-element",className: "chat-element"});
+                    const sender = new Component("span", {className: "chat-sender"},[`<${data.sender}> : `])
+                    chatElement.addElement(sender,data.body); 
+                    this.messages.push(chatElement)
                     break
             }
 

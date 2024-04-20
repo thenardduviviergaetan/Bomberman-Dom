@@ -32,12 +32,14 @@ body {
   background-color: rgba(245, 245, 245, 0.9);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   border-radius: 20px;
+  animation: stagger-up 0.5s ease-in;
 }
 .bootMenu #title {
   font-size: 3rem;
   margin-bottom: 20px;
   color: #ffc746;
   text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  animation: stagger-right 0.7s ease-in;
 }
 .bootMenu p {
   font-size: 1rem;
@@ -156,7 +158,7 @@ body {
   border-radius: 8px;
 }
 #chat #chat-box .chat-element:last-child {
-  animation: fadeIn 0.5s ease-in, stagger 0.5s ease-in;
+  animation: fadeIn 0.5s ease-in, stagger-right 0.5s ease-in;
 }
 #chat #chat-box .chat-element:last-child .chat-sender {
   color: #00d5ff;
@@ -178,22 +180,30 @@ body {
   height: 30px;
   border: 1px solid #ffc746;
   border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+  background-color: #f5f5f5;
+}
+#chat form #chat-input:focus {
+  outline: none;
+  overflow-wrap: break-word;
 }
 
-@keyframes fadeIn {
+@keyframes stagger-right {
   from {
     opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes stagger {
-  from {
     transform: translateX(50px);
   }
   to {
+    opacity: 1;
     transform: translateX(0);
+  }
+}
+@keyframes stagger-up {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }/*# sourceMappingURL=style.css.map */

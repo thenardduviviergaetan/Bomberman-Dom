@@ -13,8 +13,8 @@ func HandlerJoin(w http.ResponseWriter, r *http.Request, h *livechat.Hub) {
 	}
 	json.NewDecoder(r.Body).Decode(&msg)
 
-	if h.CheckUsername(msg.Username) {
-		http.Error(w, "Username already taken", 400)
+	if h.CheckUsername(msg.Username) || len(msg.Username) == 0 || len(msg.Username) > 10 {
+		http.Error(w, "Username not valid", 400)
 		return
 	}
 }
