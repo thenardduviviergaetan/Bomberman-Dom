@@ -112,18 +112,62 @@ body {
   padding: 10px;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
-  width: 20%;
+  width: 30%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  overflow-y: scroll;
+  background-color: rgba(0, 0, 0, 0.6);
 }
 #chat #chat-box {
+  overflow-y: scroll;
+  overflow-x: hidden;
   width: 100%;
+  text-align: start;
+}
+#chat #chat-box p {
+  width: 100%;
+  overflow-wrap: break-word;
+}
+#chat #chat-box .chat-element-join {
+  background-color: rgba(63, 240, 0, 0.3);
+  color: #3FF000;
+  padding: 3px;
+  border-radius: 3px;
+  text-align: center;
+  margin-bottom: 3px;
+  margin-top: 2px;
+}
+#chat #chat-box .chat-element-leave {
+  background-color: rgba(255, 90, 187, 0.3);
+  color: #ff5abb;
+  padding: 3px;
+  border-radius: 3px;
+  text-align: center;
+  margin-bottom: 3px;
+  margin-top: 2px;
+}
+#chat #chat-box .chat-element {
+  padding: 4px;
+  color: white;
+  line-height: 25px;
+  background-color: rgba(54, 54, 54, 0.5);
+  margin-bottom: 3px;
+  margin-top: 2px;
+  border-radius: 8px;
+}
+#chat #chat-box .chat-element:last-child {
+  animation: fadeIn 0.5s ease-in, stagger 0.5s ease-in;
+}
+#chat #chat-box .chat-element:last-child .chat-sender {
+  color: #00d5ff;
+}
+#chat #chat-box .chat-element .chat-sender {
+  color: #ffc746;
+  padding-bottom: 8px;
+  padding-top: 8px;
 }
 #chat form {
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
   padding: 10px 20px;
@@ -134,4 +178,22 @@ body {
   height: 30px;
   border: 1px solid #ffc746;
   border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes stagger {
+  from {
+    transform: translateX(50px);
+  }
+  to {
+    transform: translateX(0);
+  }
 }/*# sourceMappingURL=style.css.map */
