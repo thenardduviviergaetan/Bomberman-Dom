@@ -15,7 +15,7 @@ export default class GameManager {
     async launchMenu() {
         const bootMenu = new BootMenu();
         const ready = new Promise((resolve, reject) => {
-            bootMenu.initialize(resolve, reject);
+            bootMenu.initialize(resolve, reject);            
         });
 
         this.app.addComponent(bootMenu);
@@ -31,9 +31,10 @@ export default class GameManager {
             this.ws.onClose(() => {
                 console.log('Disconnected from server');
                 this.ws.sendMessage({ type: 'leave', username: this.username });
+                
             })
             this.app.clear()
-            this.launchgame();
+            this.launchgame()
         }).catch((e) => {
             this.render()
         });
@@ -45,10 +46,7 @@ export default class GameManager {
         const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
-            waitRoom.stopCountDown();
-            this.ws.close();
-            this.app.clear();
-            this.launchMenu();
+            location.reload(); 
         })
 
         const ready = new Promise((resolve, reject) => {
@@ -58,21 +56,16 @@ export default class GameManager {
         ready.then(() => {
             const game = new Game({ id: "game" }, this.ws, this.username);
             container.replaceChildren(waitRoom, game);
+            // const script = new Component("script", { src: "./test.js" });
+            // this.app.addComponent(script);
             container.update();
         });
 
         container.addElement(chat, waitRoom);
-        // const script = new Component("script", { src: "./test.js" });
-        // ths.app.addComponent(script);
         this.app.addComponent(leaveButton);
         this.app.addComponent(container);
-        this.render();
-    }
 
-    denial() {
-        this.ws.close();
-        this.app.clear();
-        this.launchMenu();
+        this.render();
     }
 
     render() {

@@ -5,6 +5,7 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
+        console.log("Game constructor: ");
         return this;
     }
 }
