@@ -114,6 +114,8 @@ body {
     margin-right: 15px;
     padding:10px;
     transition: background-color 0.3s;
+    color: white;
+    font-weight: bold;
     &:hover{
     background-color: rgba($color: $chat-color2, $alpha: .7);
     }
@@ -197,7 +199,7 @@ body {
             margin-top: 2px;
             border-radius: 8px;
             &:last-child {
-            animation: fadeIn 0.5s ease-in, stagger-right 0.5s ease-in;
+            // animation: fadeIn 0.5s ease-in, stagger-right 0.5s ease-in;
             
                 .chat-sender {
                     color: $chat-color3
