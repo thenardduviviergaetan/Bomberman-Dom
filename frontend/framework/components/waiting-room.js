@@ -4,8 +4,8 @@ export default class WaitingRoom extends Component {
     constructor(ws, currentPlayer) {
         super("section", { id: "waitingRoom" });
         this.ws = ws;
-        this.started = false;
         this.playerList = new Component("ul", { id: "playerList" });
+        this.playersCount = new Component("div", { id: "playersCount" });
         this.countDownID;
         this.countDown = 0;
         this.resolve;
@@ -13,7 +13,7 @@ export default class WaitingRoom extends Component {
         this.currentPlayer = currentPlayer;
         this.counter = new Component("div", { className: "countDown" }, [""]);
         this.ws.onMessage((message) => {
-            if ((message.type === "join" || message.type === "leave") && !this.started) {
+            if ((message.type === "join" || message.type === "leave")) {
                 this.countDown = 8;
                 this.newPlayerJoin(message.connected);
                 
@@ -29,6 +29,7 @@ export default class WaitingRoom extends Component {
     initialize(resolve, reject) {
         this.resolve = resolve;
         this.reject = reject;
+        this.addElement(this.playersCount);
         this.addElement(this.playerList);
         this.addElement(this.counter);
     }
@@ -38,7 +39,7 @@ export default class WaitingRoom extends Component {
         this.countDownID = setInterval(() => {
             this.countDown--;
             if (this.countDown <= 0) {
-                this.started = true;
+                // this.started = true;
                 this.resolve();
                 clearInterval(this.countDownID);
             } else {
@@ -69,6 +70,8 @@ export default class WaitingRoom extends Component {
             this.playerList.addElement(player);
             this.playerList.update();
         });
+        this.playersCount.children = [`Players: ${this.playerList.children.length}`];
+        this.playersCount.update();
         //Launch countdown that will start the game.
         // if (this.playerList.children.length >= 2) {
         //     if (this.playerList.children.length >= 2 && !this.countDownID) {
