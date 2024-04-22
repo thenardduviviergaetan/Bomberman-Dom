@@ -8,9 +8,9 @@ export default class WS extends WebSocket{
     }
 
     onMessage(callback){
-        this.onmessage = function(event){
+        this.addEventListener('message', function(event){
             callback(JSON.parse(event.data));
-        }
+        });
     }
 
     onOpen(callback){

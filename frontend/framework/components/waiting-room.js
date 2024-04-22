@@ -1,27 +1,21 @@
-class WaitingRoom extends Component {
-    constructor(mainPlayer, chat) {
-        super('div', { className: 'waitingRoom'})
-        this.chat = chat
-        this.playerList = new Component('ul', { id: 'playerList'})
+import Component from "./component.js";
+
+export default class WaitingRoom extends Component {
+    constructor(ws, currentPlayer) {
+        // constructor(currentPlayer, chat) {
+        super('section', { id: 'waitingRoom' })
+        // this.chat = chat
+        this.ws = ws;
+        this.playerList = new Component('ul', { id: 'playerList' })
+        this.addElement(this.playerList)
         this.countDownID
         this.countDown = 0
-        this.resolve
-        this.mainPlayer = mainPlayer //REFACTOR use a Player classe
-    }
-
-    async init(resolve) {
-        //Waits for at least 2 people in the room to start a countdown that will
-        //launch the game
-        this.resolve = resolve
-
-        const container = new Component('div', { className: "container" })
-        const player = new Component('li', { className: 'mainPlayer'} [this.mainPlayer.username])
-        const chatComp = new Chat()
-
-        this.playerList.addElement(player)
-        container.addElement(this.playerList)
-        this.addElement(container, chatComp)
-        this.updade()
+        this.resolve;
+        this.reject;
+        this.currentPlayer = currentPlayer
+        this.ws.onMessage((message) => {
+            if (message.type === "join" || message.type === "leave") this.newPlayerJoin(message.connected)
+        })
     }
 
     setCountDown() {
@@ -31,19 +25,21 @@ class WaitingRoom extends Component {
             if (this.countDown >= 10) this.resolve()
             else console.log() // TODO update the countdown and render the room
         }, 1000);
-        
+
     }
 
-    newPlayerJoin(user) {
+    newPlayerJoin(...players) {
         //Each time a new player is added this function is called
-        const player = new Component('li', { className: 'player'} [this.mainPlayer.username])
-        this.playerList.push(user)
-
-        
-
+        this.playerList.children = []
+        players.flat().forEach((playerUsername) => {
+            console.log("PLAYERS NAME:", playerUsername);
+            const player = new Component('li', { className: 'player' }, [playerUsername])
+            this.playerList.addElement(player)
+            this.playerList.update()
+        })
         //Launch countdown that will start the game.
-        if (this.playerList.children.length >= 2 && !countDownID) {
-            this.setCountDown()
-        }
+        // if (this.playerList.children.length >= 2 && !countDownID) {
+        //     this.setCountDown()
+        // }
     }
 }

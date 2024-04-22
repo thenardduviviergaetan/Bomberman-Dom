@@ -21,7 +21,6 @@ func NewServer(app *app.App) *Server {
 // func (s *Server) Start(database *sql.DB) {
 func (s *Server) Start(hub *livechat.Hub) {
 	http.HandleFunc("/api/ws", func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Println("Starting websocket connection...")
 		livechat.WebsocketHandler(hub, w, r)
 	})
 	s.app.ServeHTTP(hub)

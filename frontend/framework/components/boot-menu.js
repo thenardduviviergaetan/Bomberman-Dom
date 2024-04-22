@@ -27,7 +27,7 @@ export default class BootMenu extends Component {
                     if (res.ok) resolve(username)
                     else {
                         const errorText = await res.text()
-                        errorMessage.children.push(errorText)
+                        errorMessage.children = [errorText]
                         errorMessage.update()
                     }
                 })

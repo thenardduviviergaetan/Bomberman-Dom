@@ -83,6 +83,7 @@ body {
 }
 
 #leave-button {
+  z-index: 2;
   position: absolute;
   height: -moz-fit-content;
   height: fit-content;
@@ -125,10 +126,45 @@ body {
   border-radius: 20px;
 }
 
-#waintingRoom {
+#waitingRoom {
   width: 70%;
+  height: 80%;
+}
+#waitingRoom ul {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#waitingRoom ul li {
+  padding: 10px;
+  border-radius: 6px;
+  width: 90%;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  background-color: rgba(255, 199, 70, 0.8);
+  color: white;
+}
+#waitingRoom ul li span {
+  font-size: 1.5rem;
+}
+
+.player {
+  background-color: rgba(245, 245, 245, 0.6);
+}
+
+#room-container {
+  width: 100%;
   height: 100%;
-  background-color: #ccc;
+}
+
+#playerList {
+  width: 100%;
 }
 
 #chat {

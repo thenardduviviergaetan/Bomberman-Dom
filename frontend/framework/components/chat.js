@@ -25,7 +25,6 @@ export default class Chat extends Component {
 
     #receive() {
         const chatBox = new Component("div", { id: "chat-box" });
-        // chatBox.children = this.messages; //test for history
         this.ws.onMessage((data) => {
             let chatElement;
             console.log("this.messages", this.messages);
@@ -33,18 +32,15 @@ export default class Chat extends Component {
                 case 'join':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element-join"});
                     chatElement.children.push(data.body);
-                    //this.messages.push(chatElement)
                     break
                 case 'leave':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element-leave"});
                     chatElement.children.push(data.body);
-                    //this.messages.push(chatElement)
                     break
                 case 'chat':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element"});
                     const sender = new Component("span", {className: "chat-sender"},[`<${data.sender}> : `])
                     chatElement.addElement(sender,data.body); 
-                    // this.messages.push(chatElement)
                     break
             }
 

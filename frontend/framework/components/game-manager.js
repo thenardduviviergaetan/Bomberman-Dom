@@ -4,7 +4,7 @@ import BootMenu from "./boot-menu.js"
 import WS from "../../framework/websocket/websocket.js"
 import Game from "../../framework/components/game.js"
 import Chat from "../../framework/components/chat.js"
-
+import WaitingRoom from "./waiting-room.js"
 export default class GameManager {
     constructor() {
         this.app = new Framework();
@@ -41,26 +41,25 @@ export default class GameManager {
     }
 
     launchgame() {
-        /////////////////////BEGINNING OF CHANGE/////////////////////////////////
         const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
         leaveButton.actionListener('click', () => {
             this.ws.close();
             this.app.clear();
             this.launchMenu();
         })
-        /////////////////////ENDING OF CHANGE/////////////////////////////////
         const container = new Component("div", { id: "container" });
-        const game = new Game({id: "game"},this.ws,this.username);
+        // const game = new Game({id: "game"},this.ws,this.username);
         const chat = new Chat({id: "chat"},this.ws,this.username);
-        container.addElement(chat, game);
+        const waitRoom = new WaitingRoom(this.ws, this.username)
 
-        /////////////////////BEGINNING OF CHANGE/////////////////////////////////
+        container.addElement(chat, waitRoom);
+        // container.addElement(chat, game);
+        // const script = new Component("script", { src: "./test.js" });
+        // ths.app.addComponent(script);
         this.app.addComponent(leaveButton);
-        /////////////////////ENDING OF CHANGE/////////////////////////////////
         this.app.addComponent(container);
         this.render();
     }
-
     render() {
         this.app.render(this);
     }
