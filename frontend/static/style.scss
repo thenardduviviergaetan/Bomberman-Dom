@@ -170,6 +170,18 @@ body {
         }
     }
 }
+
+.countDown{
+    text-align: center;
+    margin-top: 30%;
+    font-size: 5rem;
+    color: $primary-color;
+    text-shadow: 3px 3px 0 $shadow-color;
+    animation: stagger-up 0.5s ease-in;
+}
+
+
+
 .player{
     background-color: rgba($color: $background-color, $alpha: .6);
 }

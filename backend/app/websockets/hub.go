@@ -36,6 +36,7 @@ func InitHub() *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
+		// connected:  make([]string, 0),
 	}
 }
 
@@ -50,9 +51,11 @@ func (h *Hub) CheckUsername(username string) bool {
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
 // This method runs in a separate goroutine and should be called after initializing the Hub.
 func (h *Hub) Run() {
+	// var started bool
 	for {
 		select {
 		case client := <-h.register:
+
 			h.clients[client.Username] = client
 
 			connectedList := make([]string, 0)
@@ -121,7 +124,7 @@ func (h *Hub) Run() {
 
 // removeElement removes the specified clientDisconnected from the connected slice and returns the updated slice.
 func removeElement(connected []string, clientDisconnected string) []string {
-	fmt.Println("connected : ", connected)
+	fmt.Println("connected before: ", connected)
 	var newTab []string
 	for _, user := range connected {
 		if clientDisconnected != user {
@@ -130,5 +133,6 @@ func removeElement(connected []string, clientDisconnected string) []string {
 	}
 	newConnected := []string{}
 	newConnected = append(newConnected, newTab...)
+	fmt.Println("connected after: ", newConnected)
 	return newConnected
 }

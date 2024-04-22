@@ -28,7 +28,6 @@ export default class GameManager {
                 console.log('Connected to server:', this.username);
                 this.ws.sendMessage({ type: 'join', username: this.username });
             });
-
             this.ws.onClose(() => {
                 console.log('Disconnected from server');
                 this.ws.sendMessage({ type: 'leave', username: this.username });
@@ -42,24 +41,40 @@ export default class GameManager {
 
     launchgame() {
         const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
+        const container = new Component("div", { id: "container" });
+        const chat = new Chat({ id: "chat" }, this.ws, this.username);
+        const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
+            waitRoom.stopCountDown();
             this.ws.close();
             this.app.clear();
             this.launchMenu();
         })
-        const container = new Component("div", { id: "container" });
-        // const game = new Game({id: "game"},this.ws,this.username);
-        const chat = new Chat({id: "chat"},this.ws,this.username);
-        const waitRoom = new WaitingRoom(this.ws, this.username)
+
+        const ready = new Promise((resolve, reject) => {
+            waitRoom.initialize(resolve, reject);
+        });
+
+        ready.then(() => {
+            const game = new Game({ id: "game" }, this.ws, this.username);
+            container.replaceChildren(waitRoom, game);
+            container.update();
+        });
 
         container.addElement(chat, waitRoom);
-        // container.addElement(chat, game);
         // const script = new Component("script", { src: "./test.js" });
         // ths.app.addComponent(script);
         this.app.addComponent(leaveButton);
         this.app.addComponent(container);
         this.render();
     }
+
+    denial() {
+        this.ws.close();
+        this.app.clear();
+        this.launchMenu();
+    }
+
     render() {
         this.app.render(this);
     }

@@ -14,11 +14,15 @@ export default class WS extends WebSocket{
     }
 
     onOpen(callback){
-        this.onopen = callback;
+        this.addEventListener('open', function(event){
+            callback();
+        });
     }
 
     onClose(callback){
-        this.onclose = callback;
+        this.addEventListener('close', function(event){
+            callback();
+        });
     }
 
 }

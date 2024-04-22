@@ -30,6 +30,12 @@ export default class Component {
     addElement(...children) {
         this.children.push(...children);
     }
+
+    async replaceChildren(c1, c2){
+        this.children = this.children.filter((c) => c !== c1)
+        this.addElement(c2)
+    }
+
     /**
      * Renders the component.
      * Override this method in subclasses to define what the component renders.

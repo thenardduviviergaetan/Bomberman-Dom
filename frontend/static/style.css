@@ -154,6 +154,15 @@ body {
   font-size: 1.5rem;
 }
 
+.countDown {
+  text-align: center;
+  margin-top: 30%;
+  font-size: 5rem;
+  color: #ffc746;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  animation: stagger-up 0.5s ease-in;
+}
+
 .player {
   background-color: rgba(245, 245, 245, 0.6);
 }
