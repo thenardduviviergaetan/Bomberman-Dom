@@ -137,12 +137,13 @@ body {
 }
 
 #game {
-    width: 70%;
-    height: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 650px;
+    height: 650px;
     min-width: 300px;
     min-height: 300px;
-    max-width: 800px;
-    max-height: 800px;
     margin: auto;
     background-color: $background-color;
     box-shadow: 0 0 10px $shadow-color;

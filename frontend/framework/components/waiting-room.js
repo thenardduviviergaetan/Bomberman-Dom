@@ -14,14 +14,15 @@ export default class WaitingRoom extends Component {
         this.currentPlayer = currentPlayer;
         this.counter = new Component("div", { className: "countDown" }, [""]);
         this.ws.onMessage((message) => {
-            if ((message.type === "join" || message.type === "leave") && !this.started) {
-                this.newPlayerJoin(message.connected);
-                if(this.playerList.children.length >= 2 && !this.countDownID) {
-                    this.setCountDown();
-                } else if (this.playerList.children.length < 2) {
-                    this.stopCountDown();
-                }
-            }
+            this.setCountDown()
+            // if ((message.type === "join" || message.type === "leave") && !this.started) {
+            //     this.newPlayerJoin(message.connected);
+            //     if(this.playerList.children.length >= 2 && !this.countDownID) {
+            //         this.setCountDown();
+            //     } else if (this.playerList.children.length < 2) {
+            //         this.stopCountDown();
+            //     }
+            // }
         });
     }
 
@@ -36,15 +37,15 @@ export default class WaitingRoom extends Component {
     setCountDown() {
         //TODO check for the 1s delay when joining a party with already 3 players
         // sets the count down that will start the game.
-        this.countDown = 20; // change this to 30
+        this.countDown = 1; // change this to 30
         let check = false;
         this.countDownID = setInterval(() => {
-            if (this.playerList.children.length === 4 && !check) {
-                check = true;
-                this.countDown = 10;
-            } else if (this.playerList.children.length !== 4) {
-                check = false
-            }
+            // if (this.playerList.children.length === 4 && !check) {
+            //     check = true;
+            //     this.countDown = 1;
+            // } else if (this.playerList.children.length !== 4) {
+            //     check = false
+            // }
             this.countDown--;
             if (this.countDown <= 10) {
                 if (this.countDown <= 0) {
