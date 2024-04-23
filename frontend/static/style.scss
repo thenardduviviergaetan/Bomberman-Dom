@@ -50,6 +50,7 @@ body {
     animation: stagger-up 0.5s ease-in;
 
     #title {
+        text-align: center;
         font-size: 3rem;
         margin-bottom: 20px;
         color: $primary-color;
