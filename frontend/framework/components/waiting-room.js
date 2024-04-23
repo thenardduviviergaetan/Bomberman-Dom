@@ -15,11 +15,8 @@ export default class WaitingRoom extends Component {
         this.counter = new Component("div", { className: "countDown" }, [""]);
         this.ws.onMessage((message) => {
             if ((message.type === "join" || message.type === "leave") && !this.started) {
-                this.countDown = 20; // change this to 30
-
                 this.newPlayerJoin(message.connected);
-
-                if (message.type === "join" && this.playerList.children.length >= 2 && !this.countDownID) {
+                if(this.playerList.children.length >= 2 && !this.countDownID) {
                     this.setCountDown();
                 } else if (this.playerList.children.length < 2) {
                     this.stopCountDown();
@@ -39,6 +36,7 @@ export default class WaitingRoom extends Component {
     setCountDown() {
         //TODO check for the 1s delay when joining a party with already 3 players
         // sets the count down that will start the game.
+        this.countDown = 20; // change this to 30
         let check = false;
         this.countDownID = setInterval(() => {
             if (this.playerList.children.length === 4 && !check) {
@@ -89,11 +87,5 @@ export default class WaitingRoom extends Component {
         });
         this.playersCount.children = [`Players: ${this.playerList.children.length}`];
         this.playersCount.update();
-        //Launch countdown that will start the game.
-        // if (this.playerList.children.length >= 2) {
-        //     if (this.playerList.children.length >= 2 && !this.countDownID) {
-        //         this.setCountDown()
-        //     }
-        // }
     }
 }
