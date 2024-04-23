@@ -1,4 +1,5 @@
 import Gui from "./gui.js";
+import { createElementH,createButton,createElementp,createSpace } from "../utils/element.js";
 
 export default class MenuPause extends Gui{
     constructor(systemeData){

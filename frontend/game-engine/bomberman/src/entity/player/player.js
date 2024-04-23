@@ -1,53 +1,83 @@
 import { TabSprite } from "../../sprite/sprite.js";
-import { SpriteAtlas } from "../../data/constdatalevel.js";
+import { SpriteAtlas } from "../../data/spriteatlas.js";
 import Entity from "../entity.js";
 
 export class Player extends Entity {
-    constructor(SystemeData, spriteplayer) {
+    constructor(SystemeData, spriteplayer, pseudo) {
         super(SystemeData, "player");
-        this.atlas = SpriteAtlas.entity[spriteplayer];
-        console.log(this.atlas)
+        this.atlas = SpriteAtlas.entity.player[spriteplayer];
+        this.spriteIdle = this.atlas.idle
+        this.spriteLeft = this.atlas.left
+        this.spriteRight = this.atlas.right
+        this.spriteUp = this.atlas.up
+        this.spriteDown = this.atlas.down
         this.TabSprite = new TabSprite(this.atlas.image, this.atlas.spriteSize, this.atlas.height, this.atlas.width).tab;
-        console.log(this.TabSprite, "TEST");
-        this.setSprite(this.HTML, this.TabSprite[0]);
-        this.id = "player";
+        console.log(this.TabSprite)
+        this.setSprite(this.TabSprite[this.spriteIdle[this.animationId]]);
+        this.id = pseudo;
         this.HTML.id = this.id;
-        this.isJump = false;
+        this.SystemeData.inputkey[this.id] = {};
+        this.SystemeData.playerBomb[this.id] = { onBomb: false, bomb: 0 };
     }
-    move(direction) {
+    move(x, y) {
+        // console.log()
+        if (typeof x === "number" && typeof y === "number") {
+            this.posy = y;
+            this.posx = x;
+            this.setSprite(this.TabSprite[this.spriteIdle[this.animationId % 1]]);
+        }
         this.checkColision();
-        this.directionRight = direction;
-        if (this.SystemeData.inputkey["z"]) {
-            if (!this.isGroundTop) {
-                this.posy--
-            }
-        }
-        if (this.SystemeData.inputkey["s"]) {
-            if (!this.isGround) {
-                this.posy++
-            }
-        }
-        if (this.SystemeData.inputkey["q"]) {
-            if (!this.isGroundLeft) {
-                this.posx--
-            }
-        }
-        if (this.SystemeData.inputkey["s"]) {
-            // console.log("S")
-        }
-        if (this.SystemeData.inputkey["d"]) {
-            if (!this.isGroundRight) {
-                this.posx++
-            }
+        this.animationId++;
+        const id = parseInt(this.animationId / 8)
+        switch (true) {
+            case this.SystemeData.inputkey[this.id][" "]:
+                if (!this.SystemeData.playerBomb[this.id].onBomb) {
+                    this.SystemeData.playerBomb[this.id] = {
+                        onBomb: true,
+                        bomb: (this.SystemeData.playerBomb[this.id].bomb + 1)
+                    }
+                }
+                // this.SystemeData.inputkey[this.id][" "] = false;
+                // console.log("BOOM");
+                // console.log(this.SystemeData.playerBomb)
+                break
+            case this.SystemeData.inputkey[this.id]["q"]:
+                if (!this.isGroundLeft) {
+                    this.posx--
+                }
+                this.setSprite(this.TabSprite[this.spriteLeft[id % this.spriteLeft.length]]);
+                break;
+            case this.SystemeData.inputkey[this.id]["d"]:
+                if (!this.isGroundRight) {
+                    this.posx++
+                }
+                // console.log()
+                this.setSprite(this.TabSprite[this.spriteRight[id % this.spriteRight.length]]);
+                break;
+            case this.SystemeData.inputkey[this.id]["z"]:
+                if (!this.isGroundTop) {
+                    this.posy--
+                }
+                this.setSprite(this.TabSprite[this.spriteUp[id % this.spriteUp.length]]);
+                break;
+            case this.SystemeData.inputkey[this.id]["s"]:
+                if (!this.isGround) {
+                    this.posy++
+                }
+                this.setSprite(this.TabSprite[this.spriteDown[id % this.spriteDown.length]]);
+                break;
+            default:
+                this.setSprite(this.TabSprite[this.spriteIdle[this.animationId % 1]]);
+                break;
+
         }
         this.HTML.style.transform = `translate(${this.posx}px,${this.posy}px)`
-
     }
     checkColision() {
         // let solidBlock = document.querySelectorAll('.solide');
         // let playerBorder = document.getElementById(this.id).getBoundingClientRect();
         let playerBorder = this.HTML.getBoundingClientRect();
-        this.isGround = this.isJump;
+        this.isGround = false;
         this.isGroundLeft = false;
         this.isGroundRight = false;
         this.isGroundTop = false
@@ -55,30 +85,6 @@ export class Player extends Entity {
         groundTesting.forEach(typeBlock => {
             this.checkGround(typeBlock, playerBorder);
         })
-    }
-    checkGround(type, playerBorder) {
-        let listBlock = document.querySelectorAll(type);
-        listBlock.forEach(block => {
-            let blockBorder = block.getBoundingClientRect();
-            let decallage = 3
-            let testX = (blockBorder.left <= playerBorder.left + decallage && playerBorder.left + decallage <= blockBorder.right) ||
-                (blockBorder.left <= playerBorder.right + decallage && playerBorder.right + decallage <= blockBorder.right);
-            let testBottom = playerBorder.bottom == blockBorder.top;
-            let testTop = playerBorder.top + decallage == blockBorder.bottom;
-            let testz = playerBorder.bottom >= blockBorder.top && playerBorder.top <= blockBorder.bottom;
-            let testLeft = playerBorder.left + decallage == blockBorder.right && testz
-            let testRight = playerBorder.right - decallage == blockBorder.left && testz
-            if (testLeft && !testBottom) {
-                this.isGroundLeft = true;
-            } else if (testRight && !testBottom) {
-                this.isGroundRight = true;
-            } else if (testBottom && testX && (!testRight && !testLeft)) {
-                this.lastGroundX = playerBorder.bottom;
-                this.isGround = true;
-            } else if (testTop && testX && (!testRight && !testLeft)) {
-                this.isGroundTop = true;
-            }
-        });
     }
 }
 

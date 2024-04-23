@@ -1,4 +1,3 @@
-import { createElementH,createButton,createElementp,createSpace } from "../utils/element.js";
 const backgroundColor = "rgba(99,97,97,0.5)"
 export default class Gui{
     constructor(id,name,width,height,posx,posy,systemeData) {

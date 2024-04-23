@@ -1,0 +1,77 @@
+html,
+
+body {
+    background-color: white;
+    height: 100vh;
+    width: 100vh;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 60px;
+    width: fit-content;
+    height: fit-content;
+}
+#game {
+    transform: scale(2);
+    width: 100%;
+}
+
+.background{
+    //TODO FIX ABSOLUTE ??
+    position: absolute;
+    width: 460px;
+    
+    #back {
+        position: absolute;
+        //FIXME voir pour remplacer ce calc degueu
+        width: calc(15*32px);
+        z-index: -1;
+    }
+    #props{
+        // display: flex;
+        position: absolute;
+        //FIXME voir pour remplacer ce calc degueu
+        width: calc(15*32px);
+        // margin-top: 0;
+        // top: 0px;
+        // left: 0px;
+        z-index: 2;
+    }
+    .backline {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        height: 32px;
+        .case {
+            transform: scale(2);
+        }
+    }
+}
+
+.player {
+    position: relative;
+    z-index: 99;
+}
+
+#menu-paused {
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+        text-align: center;
+        color: white;
+    }
+}
+
+#menu-main {
+    display: flex;
+    flex-direction: column;
+
+    h2 {
+        text-align: center;
+        color: white;
+    }
+}
