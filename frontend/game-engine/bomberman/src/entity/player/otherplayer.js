@@ -10,6 +10,7 @@ export default class OtherPlayer extends Player {
             this.posy = y;
             this.posx = x;
             this.setSprite(this.TabSprite[this.spriteIdle[this.animationId % 1]]);
+            return;
         }
         this.checkColision();
         this.animationId++;

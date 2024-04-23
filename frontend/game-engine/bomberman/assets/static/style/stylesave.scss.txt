@@ -1,8 +1,7 @@
 html,
 
 body {
-    // background-color: white;
-    background-color: #105830;
+    background-color: white;
     height: 100vh;
     width: 100vh;
 }
@@ -15,42 +14,48 @@ body {
     width: fit-content;
     height: fit-content;
 }
+#game {
+    transform: scale(2);
+    width: 100%;
+}
 
 .background{
+    //TODO FIX ABSOLUTE ??
+    position: absolute;
+    width: 460px;
+    
     #back {
         position: absolute;
-        top: 64px;
-        left: 64px;
-        z-index: 1;
+        //FIXME voir pour remplacer ce calc degueu
+        width: calc(15*32px);
+        z-index: -1;
     }
     #props{
+        // display: flex;
         position: absolute;
-        top: 64px;
-        left: 64px;
+        //FIXME voir pour remplacer ce calc degueu
+        width: calc(15*32px);
+        // margin-top: 0;
+        // top: 0px;
+        // left: 0px;
         z-index: 2;
     }
     .backline {
         display: flex;
         flex-direction: row;
+        justify-content: space-around;
+        height: 32px;
+        .case {
+            transform: scale(2);
+        }
     }
 }
-.bomb{
-    transform: scale(5);
-    position: relative;
-    z-index: 100;
-}
-#atlas{
-    border: 1px solid;
-    transform: scale(2);
-    position: absolute;
-    top: 100px;
-    left: 100px;
-    z-index: 100;
+#bomb{
+    transform: scale(2.5);
 }
 
 .player {
-    // scale: 2;
-    position: absolute;
+    position: relative;
     z-index: 99;
 }
 

@@ -71,13 +71,13 @@ export default class Entity {
     //checkTrigger
     checkTrigger(propsTriger) {
         const entityBorder = this.HTML.getBoundingClientRect();
-        const propsBorder = propsTriger.HTML.getBoundingClientRect();
+        const propsBorder = propsTriger.HTML !== undefined ? propsTriger.HTML.getBoundingClientRect() : propsTriger.getBoundingClientRect() ;
         const trigerTop = propsBorder.top <= entityBorder.top && entityBorder.top <= propsBorder.bottom;
         const trigerBottom = propsBorder.top <= entityBorder.bottom && entityBorder.bottom <= propsBorder.bottom;
         const trigerLeft = propsBorder.left <= entityBorder.left && entityBorder.left <= propsBorder.right;
         const trigerRight = propsBorder.left <= entityBorder.right && entityBorder.right <= propsBorder.right;
-        // console.log("(trigerTop || trigerBottom) && (trigerLeft || trigerRight)")
-        // console.log(trigerTop, trigerBottom, trigerLeft, trigerRight)
+        console.log("(trigerTop || trigerBottom) && (trigerLeft || trigerRight)")
+        console.log(trigerTop, trigerBottom, trigerLeft, trigerRight)
         if (
             (trigerTop || trigerBottom) &&
             (trigerLeft || trigerRight)

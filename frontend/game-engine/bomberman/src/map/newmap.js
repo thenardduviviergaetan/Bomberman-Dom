@@ -10,6 +10,9 @@ export class Level extends HtmlMap {
         this.initSpriteTab();
         this.initMap()
     }
+    updateCase(typeLayer,raws,col){
+        
+    }
     draw(layer) {
         for (let line = 0; line < this.tab[layer].length; line++) {
             for (let col = 0; col < this.tab[layer][line].length; col++) {
@@ -60,7 +63,8 @@ export class Level extends HtmlMap {
                     let cases = document.createElement("div");
                     cases.classList.add("case");
                     // enlever raws: et col avant audit
-                    cases.id = `cases:${id} raws:${posx} col:${posy}`;
+                    // cases.id = `cases:${id} raws:${posx} col:${posy}`;
+                    cases.id = `raws:${posx} col:${posy}`;
                     id++;
                     posy++;
                     divLine.appendChild(cases);

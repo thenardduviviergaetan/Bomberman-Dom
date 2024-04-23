@@ -1,6 +1,7 @@
 import { TabSprite } from "../../sprite/sprite.js";
 import { SpriteAtlas } from "../../data/spriteatlas.js";
 import Entity from "../entity.js";
+import Bomb from "../props/bomb/bomb.js";
 
 export class Player extends Entity {
     constructor(SystemeData, spriteplayer, pseudo) {
@@ -12,7 +13,7 @@ export class Player extends Entity {
         this.spriteUp = this.atlas.up
         this.spriteDown = this.atlas.down
         this.TabSprite = new TabSprite(this.atlas.image, this.atlas.spriteSize, this.atlas.height, this.atlas.width).tab;
-        console.log(this.TabSprite)
+        // console.log(this.TabSprite)
         this.setSprite(this.TabSprite[this.spriteIdle[this.animationId]]);
         this.id = pseudo;
         this.HTML.id = this.id;
@@ -30,13 +31,14 @@ export class Player extends Entity {
         this.animationId++;
         const id = parseInt(this.animationId / 8)
         switch (true) {
-            case this.SystemeData.inputkey[this.id][" "]:
-                if (!this.SystemeData.playerBomb[this.id].onBomb) {
+            case this.SystemeData.inputkey[this.id][" "] && !this.SystemeData.playerBomb[this.id].onBomb:
+                // if (!this.SystemeData.playerBomb[this.id].onBomb) {
                     this.SystemeData.playerBomb[this.id] = {
                         onBomb: true,
-                        bomb: (this.SystemeData.playerBomb[this.id].bomb + 1)
+                        // bomb: (this.SystemeData.playerBomb[this.id].bomb + 1)
+                        bomb: new Bomb(this.SystemeData,this.posx+16,this.posy+32,"normal",this.id)
                     }
-                }
+                // }
                 // this.SystemeData.inputkey[this.id][" "] = false;
                 // console.log("BOOM");
                 // console.log(this.SystemeData.playerBomb)

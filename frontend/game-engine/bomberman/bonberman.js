@@ -3,26 +3,40 @@ import { Tablevel } from "./src/data/level.js";
 import { Player } from "./src/entity/player/player.js";
 import { Level } from "./src/map/newmap.js";
 import OtherPlayer from "./src/entity/player/otherplayer.js";
+import Bomb from "./src/entity/props/bomb/bomb.js";
 
 const SystemeData = {
     isPaused: false,
     isMenuPaused: false,
     isMainMenu: false,
     inputkey: {},
-    playerBomb:{}
+    playerBomb:{},
+    level:{}
 }
 
 const level = new Level(Tablevel.Monde1.Level1);
+SystemeData.level = level;
 document.getElementById("game").appendChild(level.HTML);
 const player = new Player(SystemeData,"player1","funny");
 // SystemeData.inputkey[player.id] = {}
-player.move(24,24);
+player.move(60,60);
 document.getElementById("game").appendChild(player.HTML);
 const pause = new MenuPause(SystemeData);
 document.body.appendChild(pause.HTML)
 const player2 = new OtherPlayer(SystemeData,"player2","funny2");
 player2.move(24,312);
 document.getElementById("game").appendChild(player2.HTML);
+// const bomb = new Bomb(SystemeData,24,24,"normal");
+// document.getElementById("bomb").appendChild(bomb.HTML);
+// const bomb2 = new Bomb(SystemeData,24,48,"moyen");
+// document.getElementById("bomb").appendChild(bomb2.HTML);
+// const bomb3 = new Bomb(SystemeData,24,72,"hard");
+// document.getElementById("bomb").appendChild(bomb3.HTML);
+// const bomb4 = new Bomb(SystemeData,24,96,"pic");
+// document.getElementById("bomb").appendChild(bomb4.HTML);
+// const bomb5 = new Bomb(SystemeData,24,120,"p");
+// document.getElementById("bomb").appendChild(bomb5.HTML);
+
 // const player3 = new Player(SystemeData,"player3");
 // player3.move(404,-40);
 // document.getElementById("game").appendChild(player3.HTML);
@@ -33,8 +47,20 @@ document.getElementById("game").appendChild(player2.HTML);
 function gameLoop() {
     if (!SystemeData.isPaused) {
         player.move();
-        // player.checkTrigger(player2)
         player2.move();
+        // SystemeData.playerBomb
+        const tabBomb = Object.entries(SystemeData.playerBomb);
+        tabBomb.forEach(([player, data]) => {
+            // console.log(bomb)
+            if (data.bomb != 0){
+                data.bomb.update();
+            }
+        })
+        // bomb.update();
+        // bomb2.update();
+        // bomb3.update();
+        // bomb4.update();
+        // bomb5.update();
         // player3.move();
         // player4.move();
         // console.log("play")
