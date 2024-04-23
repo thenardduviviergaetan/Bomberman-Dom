@@ -73,7 +73,7 @@ func WebsocketHandler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 
 	client.hub.register <- client
-
 	go client.Write()
 	go client.Read()
+	// go hub.SetCountDown(len(hub.Clients))
 }

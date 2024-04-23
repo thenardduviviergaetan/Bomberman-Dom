@@ -14,17 +14,40 @@ export default class WaitingRoom extends Component {
         this.currentPlayer = currentPlayer;
         this.counter = new Component("div", { className: "countDown" }, [""]);
         this.ws.onMessage((message) => {
-            this.setCountDown()
-            // if ((message.type === "join" || message.type === "leave") && !this.started) {
-            //     this.newPlayerJoin(message.connected);
-            //     if(this.playerList.children.length >= 2 && !this.countDownID) {
-            //         this.setCountDown();
-            //     } else if (this.playerList.children.length < 2) {
-            //         this.stopCountDown();
-            //     }
-            // }
-        });
+
+            switch (message.type) {
+                case "join":
+                case "leave":
+                    this.newPlayerJoin(message.connected)
+                    break
+                case "update-timer":
+                    console.log("INNER TIMER:", message.body);
+                    this.counter.children = [message.body.toString()]
+                    this.update();
+                    break;
+                case "update-timer":
+                    console.log("INNER TIMER:", message.body);
+                    this.counter.children = [message.body.toString()]
+                    this.update();
+                    break;
+                case "finish-timer":
+                    this.resolve();
+                    break;
+                case "finish-timer":
+                    this.resolve();
+                    break;
+            }
+        })
+        // if ((message.type === "join" || message.type === "leave") && !this.started) {
+        //     this.newPlayerJoin(message.connected);
+
+        // if (this.playerList.children.length >= 2 && !this.countDownID) {
+        //     this.setCountDown();
+        // } else if (this.playerList.children.length < 2) {
+        //     this.stopCountDown();
+        // }
     }
+
 
     initialize(resolve, reject) {
         this.resolve = resolve;
@@ -34,35 +57,45 @@ export default class WaitingRoom extends Component {
         this.addElement(this.counter);
     }
 
-    setCountDown() {
+    // setCountDown() {
         //TODO check for the 1s delay when joining a party with already 3 players
         // sets the count down that will start the game.
-        this.countDown = 1; // change this to 30
-        let check = false;
-        this.countDownID = setInterval(() => {
-            // if (this.playerList.children.length === 4 && !check) {
-            //     check = true;
-            //     this.countDown = 1;
-            // } else if (this.playerList.children.length !== 4) {
-            //     check = false
-            // }
-            this.countDown--;
-            if (this.countDown <= 10) {
-                if (this.countDown <= 0) {
-                    this.started = true;
-                    clearInterval(this.countDownID);
-                    this.resolve();
-                } else {
-                    console.log(this.countDown);
-                    this.counter.children = [this.countDown.toString()];
-                    this.update();
-                };
-            } else {
-                this.counter.children = [];
-                this.update()
-            }
-        }, 1000);
-    }
+
+        // this.ws.sendMessage({ type: "await-timer" });
+
+        // this.ws.onMessage((message) => {
+        //     console.log("GLOBAL :", message);
+        //     switch (message.type) {
+
+        //     }
+        // })
+
+        // this.countDown = 20; //TODO change this to 30
+        // let check = false;
+        // this.countDownID = setInterval(() => {
+        //     if (this.playerList.children.length === 4 && !check) {
+        //         check = true;
+        //         this.countDown = 1;
+        //     } else if (this.playerList.children.length !== 4) {
+        //         check = false
+        //     }
+        //     this.countDown--;
+        //     if (this.countDown <= 10) {
+        //         if (this.countDown <= 0) {
+        //             this.started = true;
+        //             clearInterval(this.countDownID);
+        //             this.resolve();
+        //         } else {
+        //             console.log(this.countDown);
+        //             this.counter.children = [this.countDown.toString()];
+        //             this.update();
+        //         };
+        //     } else {
+        //         this.counter.children = [];
+        //         this.update()
+        //     }
+        // }, 1000);
+    // }
 
 
     stopCountDown() {

@@ -3,14 +3,17 @@ package livechat
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
-// Hub represents a WebSocket hub that manages the clients and their connections.
+// Hub represents a WebSocket hub that manages the Clients and their connections.
 type Hub struct {
-	clients    map[string]*Client // A map of client IDs to client instances.
+	Clients    map[string]*Client // A map of client IDs to client instances.
 	broadcast  chan []byte        // A channel used for broadcasting messages to all clients.
 	register   chan *Client       // A channel used for registering new clients.
 	unregister chan *Client       // A channel used for unregistering clients.
+	timer      int                // A int to set the duration of the timer.
 }
 
 // Message represents a WebSocket message.
@@ -28,11 +31,16 @@ type Connected struct {
 	Connected []string `json:"connected"` // List of connected users
 }
 
+type Timer struct {
+	Type string `json:"type"`
+	Body int    `json:"body"` // Body of the message
+}
+
 // InitHub initializes a new instance of the Hub struct.
 // It returns a pointer to the newly created Hub.
 func InitHub() *Hub {
 	return &Hub{
-		clients:    make(map[string]*Client),
+		Clients:    make(map[string]*Client),
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
@@ -43,24 +51,51 @@ func InitHub() *Hub {
 // CheckUsername checks if a username is already taken by a client.
 // It returns true if the username is already taken, false otherwise.
 func (h *Hub) CheckUsername(username string) bool {
-	_, exist := h.clients[username]
+	_, exist := h.Clients[username]
 	return exist
 }
 
-// Run starts the main event loop of the Hub, handling incoming events from clients.
+func (h *Hub) SetCountDown(players int) {
+	// stop := time.After(10*time.Second)
+
+	fmt.Println("players: ", players)
+	if players >= 2 && players < 5 {
+		for h.timer > 0 {
+			fmt.Println("h.timer: ", h.timer)
+			goTimer := &Timer{
+				Type: "update-timer",
+				Body: h.timer,
+			}
+
+			toSend, err := json.Marshal(goTimer)
+			if err != nil {
+				fmt.Println(err)
+			}
+			// h.broadcast <- toSend
+			for _, client := range h.Clients {
+				client.send <- toSend
+			}
+			time.Sleep(1 * time.Second)
+			h.timer--
+		}
+	}
+}
+
+// Run starts the main event loop of the Hub, handling incoming events from Clients.
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
 // This method runs in a separate goroutine and should be called after initializing the Hub.
 func (h *Hub) Run() {
-	// var started bool
+	var playerReady = 0
+
 	for {
 		select {
 		case client := <-h.register:
 
-			h.clients[client.Username] = client
+			h.Clients[client.Username] = client
 
 			connectedList := make([]string, 0)
 
-			for _, c := range h.clients {
+			for _, c := range h.Clients {
 				connectedList = append(connectedList, c.Username)
 			}
 
@@ -76,16 +111,16 @@ func (h *Hub) Run() {
 				fmt.Println(err)
 				return
 			}
-
-			for _, c := range h.clients {
+			for _, c := range h.Clients {
 				c.send <- joinedMessage
 			}
+			h.timer = 15
 
 		case client := <-h.unregister:
-			if _, ok := h.clients[client.Username]; ok {
+			if _, ok := h.Clients[client.Username]; ok {
 				connectedList := make([]string, 0)
 
-				for _, c := range h.clients {
+				for _, c := range h.Clients {
 					connectedList = append(connectedList, c.Username)
 				}
 
@@ -102,24 +137,97 @@ func (h *Hub) Run() {
 					fmt.Println(err)
 					return
 				}
-				for _, c := range h.clients {
+				for _, c := range h.Clients {
 					c.send <- leftMessage
 				}
-				close(h.clients[client.Username].send)
-				delete(h.clients, client.Username)
+				close(h.Clients[client.Username].send)
+				delete(h.Clients, client.Username)
 			}
-
 		case message := <-h.broadcast:
 			var msg *Message
 			json.Unmarshal(message, &msg)
 			switch msg.Type {
 			case "chat":
-				for _, client := range h.clients {
+				for _, client := range h.Clients {
 					client.send <- message
 				}
+			case "request-map":
+				if playerReady != len(h.Clients) {
+					playerReady++
+				} else {
+					mapAtlas := RandomizeMap()
+					mapToSend, err := json.Marshal(mapAtlas)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+
+					msg := &Message{
+						Type: "map",
+						Body: string(mapToSend),
+					}
+					msgToSend, err := json.Marshal(msg)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					for _, client := range h.Clients {
+						client.send <- msgToSend
+					}
+					playerReady = 0
+				}
+			case "update-timer":
+				for _, client := range h.Clients {
+					client.send <- message
+				}
+				// case "await-timer":
+				// if countdownTrigger < len(h.Clients) {
+				// 	countdownTrigger++
+				// } else {
+				// 	for {
+
+				// 	}
+
+				// }
 			}
 		}
 	}
+}
+
+// TODO move this func to middleware
+func RandomizeMap() [][]int {
+	var baseMap = [][]int{
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0, 1},
+		{1, 4, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
+		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
+		{1, 4, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1},
+		{1, 0, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+	}
+
+	for y, line := range baseMap {
+		for x, block := range line {
+			var r = rand.Intn(100)
+			if block == 3 && r < 30 {
+				baseMap[y][x] = 2
+			}
+		}
+	}
+
+	return baseMap
 }
 
 // removeElement removes the specified clientDisconnected from the connected slice and returns the updated slice.

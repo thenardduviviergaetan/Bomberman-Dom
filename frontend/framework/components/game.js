@@ -5,8 +5,13 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
+        
         this.size = 19;
-        console.log("Game constructor: ");
+        // 0 = spawn
+        // 1 = Wall
+        // 2 = stone
+        // 3 = path
+        // 4 = only path
         this.atlas = [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 4, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 4, 0, 1],
@@ -28,7 +33,6 @@ export default class Game extends Component {
             [1, 0, 4, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 4, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ];
-        console.log(this.atlas)
         this.background();
         // return this;
     }
@@ -36,28 +40,30 @@ export default class Game extends Component {
 
     background() {
         const background = new Component("div", { class: "background", style: "background-color:green;width:608px; height:608px;" });
-        const wall = new Component("div", { class: "wall", style: "background-color:black;width:32px;height:32px;" });
-        const cases = new Component("div", { class: "cases", style: "background-color:transparent;width:32px;height:32px;" })
-        const props = new Component("div", { class: "props", style: "background-color:grey;width:32px;height:32px;" })
-        const playerCase = new Component("div", { class: "props", style: "background-color:blue;width:32px;height:32px;" })
-        const spawn = new Component("div", { class: "props", style: "background-color:red;width:32px;height:32px;" })
+        const block_wall = new Component("div", { class: "wall", style: "background-color:black;width:32px;height:32px;" });
+        const block_path = new Component("div", { class: "path", style: "background-color:transparent;width:32px;height:32px;" })
+        const block_stone = new Component("div", { class: "props", style: "background-color:grey;width:32px;height:32px;" })
+        const block_playerCase = new Component("div", { class: "props", style: "background-color:blue;width:32px;height:32px;" })
+        // const block_spawn = new Component("div", { class: "props", style: "background-color:red;width:32px;height:32px;" })
 
         for (let line of this.atlas) {
             const lineMap = new Component("div", { class: "line", style: "display:flex;flex-direction:row;width:100%;height:fit-content;" })
             line.forEach(type => {
                 switch (type) {
                     case 1:
-                        lineMap.addElement(wall);
+                        lineMap.addElement(block_wall);
                         break;
                     case 2:
+                        lineMap.addElement(block_stone)
+                        break;
                     case 3:
-                        lineMap.addElement(cases);
+                        lineMap.addElement(block_path)
                         break;
                     case 0:
-                        lineMap.addElement(playerCase);
+                        lineMap.addElement(block_playerCase)
                         break;
                     case 4:
-                        lineMap.addElement(spawn);
+                        lineMap.addElement(block_path)
                         break;
                     default:
                         break;
@@ -70,7 +76,7 @@ export default class Game extends Component {
 
 
     randomizeBlock(){
-        
+
     }
 
 }
