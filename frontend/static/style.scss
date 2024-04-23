@@ -22,6 +22,10 @@ body {
     align-items: center;
     height: 100vh;
     background-image: url('./img/pixel-art-sky-background-with-clouds-cloudy-blue-sky-for-8bit-game-on-white-background-vector.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
 }
 
 #root {
@@ -119,6 +123,7 @@ body {
     font-weight: bold;
     &:hover{
     background-color: rgba($color: $chat-color2, $alpha: .7);
+    cursor: pointer;
     }
 }
 #container {
