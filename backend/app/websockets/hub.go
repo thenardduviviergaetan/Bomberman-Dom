@@ -56,18 +56,6 @@ func (h *Hub) CheckUsername(username string) bool {
 	return exist
 }
 
-func (h *Hub) SetCountDown() {
-
-	fmt.Println("players: ", len(h.Clients))
-	if len(h.Clients) >= 2 && len(h.Clients) < 5 {
-		for h.timer >= 0 {
-			h.timerChan <- h.timer
-			time.Sleep(1 * time.Second)
-			h.timer--
-		}
-	}
-}
-
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
 // This method runs in a separate goroutine and should be called after initializing the Hub.
@@ -78,76 +66,14 @@ func (h *Hub) Run() {
 		select {
 
 		case client := <-h.register:
-
-			h.Clients[client.Username] = client
+			h.RegisterClient(client)
 			go h.SetCountDown()
 
-			connectedList := make([]string, 0)
-
-			for _, c := range h.Clients {
-				connectedList = append(connectedList, c.Username)
-			}
-
-			message := &Connected{
-				Type:      "join",
-				Body:      client.Username + " joined the chat",
-				Sender:    client.Username,
-				Connected: connectedList,
-			}
-			fmt.Printf("%s Joined the chat !\n", client.Username)
-			joinedMessage, err := json.Marshal(message)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			for _, c := range h.Clients {
-				c.send <- joinedMessage
-			}
-			h.timer = 15
-
 		case client := <-h.unregister:
-			if _, ok := h.Clients[client.Username]; ok {
-				connectedList := make([]string, 0)
-
-				for _, c := range h.Clients {
-					connectedList = append(connectedList, c.Username)
-				}
-
-				message := &Connected{
-					Type:      "leave",
-					Body:      client.Username + " left the chat",
-					Sender:    client.Username,
-					Connected: removeElement(connectedList, client.Username),
-				}
-				fmt.Printf("%s left the chat !\n", client.Username)
-
-				leftMessage, err := json.Marshal(message)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				for _, c := range h.Clients {
-					c.send <- leftMessage
-				}
-				close(h.Clients[client.Username].send)
-				delete(h.Clients, client.Username)
-			}
+			h.UnregiserClient(client)
 		case <-h.timerChan:
-			fmt.Println("timer: ", h.timer)
-			goTimer := &Timer{
-				Type: "update-timer",
-				Body: h.timer,
-			}
-
-			toSend, err := json.Marshal(goTimer)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			for _, client := range h.Clients {
-				client.send <- toSend
-			}
-
+			// go h.SetCountDown()
+			h.UpdateTimer()
 		case message := <-h.broadcast:
 			var msg *Message
 			json.Unmarshal(message, &msg)
@@ -184,6 +110,96 @@ func (h *Hub) Run() {
 				}
 			}
 		}
+	}
+}
+
+func (h *Hub) RegisterClient(client *Client) {
+	h.Clients[client.Username] = client
+
+	connectedList := make([]string, 0)
+
+	for _, c := range h.Clients {
+		connectedList = append(connectedList, c.Username)
+	}
+
+	message := &Connected{
+		Type:      "join",
+		Body:      client.Username + " joined the chat",
+		Sender:    client.Username,
+		Connected: connectedList,
+	}
+	fmt.Printf("%s Joined the chat !\n", client.Username)
+	joinedMessage, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, c := range h.Clients {
+		c.send <- joinedMessage
+	}
+	// h.timer = 15
+}
+
+func (h *Hub) UnregiserClient(client *Client) {
+	if _, ok := h.Clients[client.Username]; ok {
+		connectedList := make([]string, 0)
+
+		for _, c := range h.Clients {
+			connectedList = append(connectedList, c.Username)
+		}
+
+		message := &Connected{
+			Type:      "leave",
+			Body:      client.Username + " left the chat",
+			Sender:    client.Username,
+			Connected: removeElement(connectedList, client.Username),
+		}
+		fmt.Printf("%s left the chat !\n", client.Username)
+
+		leftMessage, err := json.Marshal(message)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for _, c := range h.Clients {
+			c.send <- leftMessage
+		}
+		close(h.Clients[client.Username].send)
+		delete(h.Clients, client.Username)
+	}
+}
+
+func (h *Hub) SetCountDown() {
+	if len(h.Clients) >= 2 && len(h.Clients) < 5 {
+		if h.timer == 0 {
+			h.timer = 15
+			go h.StartCountDown()
+		}
+	}
+}
+
+func (h *Hub) StartCountDown() {
+	for h.timer >= 0 && len(h.Clients) >= 2 {
+		h.timerChan <- h.timer
+		time.Sleep(1 * time.Second)
+		h.timer--
+	}
+}
+
+func (h *Hub) UpdateTimer() {
+	fmt.Println("timer: ", h.timer)
+	goTimer := &Timer{
+		Type: "update-timer",
+		Body: h.timer,
+	}
+
+	toSend, err := json.Marshal(goTimer)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, client := range h.Clients {
+		client.send <- toSend
 	}
 }
 
