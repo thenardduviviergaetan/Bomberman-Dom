@@ -46,6 +46,7 @@ type Timer struct {
 func initTimer() *Timer {
 	return &Timer{
 		startCountdown: make(chan bool),
+		// resetCountdown: make(chan bool),
 		resetCountdown: make(chan bool, 2),
 		broadcastTime:  make(chan int),
 	}
@@ -104,16 +105,15 @@ func (t *Timer) runCountDown() {
 func (h *Hub) checkCountDown() {
 	fmt.Println("Checking")
 
-	fmt.Println("Clients: ", h.Clients, "\nstarted: ", h.timer.started, "\nreset:", <-h.timer.resetCountdown, "\nstart:", <-h.timer.startCountdown, "\nbroadcast:", <-h.timer.broadcastTime)
 	if h.timer.started {
 		// fmt.Println("Timer is started")
 		switch {
 		case len(h.Clients) < 2:
-			// fmt.Println("Stopping countdown")
+			fmt.Println("Stopping countdown")
 			h.timer.started = false
-			h.timer.resetCountdown <- true
+			// h.timer.resetCountdown <- true
 		default:
-			// fmt.Println("Resetting countdown")
+			fmt.Println("Resetting countdown")
 			h.timer.resetCountdown <- true
 		}
 
