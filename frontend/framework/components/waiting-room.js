@@ -13,7 +13,7 @@ export default class WaitingRoom extends Component {
         this.reject;
         this.currentPlayer = currentPlayer;
         this.counter = new Component("div", { className: "countDown" }, [""]);
-        
+
         // if ((message.type === "join" || message.type === "leave") && !this.started) {
         //     this.newPlayerJoin(message.connected);
 
@@ -25,7 +25,7 @@ export default class WaitingRoom extends Component {
     }
 
 
-    #receive(){
+    #receive() {
         this.ws.onMessage((message) => {
 
             switch (message.type) {
@@ -40,20 +40,24 @@ export default class WaitingRoom extends Component {
                         console.log("Game has started");
                         console.log("this", this);
                         this.resolve();
-                }
+                    }
                     if (message.body === -1) {
                         console.log("Reinitialize counter");
                         this.counter.children = [" "]
                     } else {
-                        this.counter.children = [message.body.toString()]
+                        if (message.body <= 10) {
+                            this.counter.children = [message.body.toString()]
+                        } else{
+                            this.counter.children = [""];
+                        }
                     }
 
                     this.update();
                     break;
                 // case "finish-timer":
-                    // this.resolve();
-                    // console.log(message)
-                    // break;
+                // this.resolve();
+                // console.log(message)
+                // break;
             }
         })
     }

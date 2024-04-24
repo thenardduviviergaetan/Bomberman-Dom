@@ -163,11 +163,11 @@ func (h *Hub) Run() {
 // If there is an error during the JSON conversion or sending the message, it prints the error and returns.
 // After sending the map, it resets the playerReady count to 0.
 func (h *Hub) GenerateMap(playerReady int) {
-	h.gameStarted = true
 
 	if playerReady != len(h.Clients) {
 		playerReady++
 	} else {
+		h.gameStarted = true
 		mapAtlas := RandomizeMap()
 		mapToSend, err := json.Marshal(mapAtlas)
 		if err != nil {
