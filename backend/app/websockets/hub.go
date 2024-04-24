@@ -39,7 +39,7 @@ type TimerMsg struct {
 
 type Timer struct {
 	startCountdown chan bool
-	resetCountdown chan bool
+	resetCountdown chan int
 	broadcastTime  chan int
 	started        bool
 }
@@ -47,7 +47,7 @@ type Timer struct {
 func initTimer() *Timer {
 	return &Timer{
 		startCountdown: make(chan bool),
-		resetCountdown: make(chan bool, 2),
+		resetCountdown: make(chan int, 2),
 		broadcastTime:  make(chan int),
 	}
 }
@@ -89,8 +89,9 @@ func (t *Timer) runCountDown() {
 		select {
 		case s := <-t.startCountdown:
 			t.started = s
-		case <-t.resetCountdown:
-			timeCounter = startingTime
+		case newTimer := <-t.resetCountdown:
+			// timeCounter = startingTime
+			timeCounter = newTimer
 		default:
 			if timeCounter <= 0 {
 				t.started = false
@@ -109,11 +110,14 @@ func (t *Timer) runCountDown() {
 // If the number of clients is 2 or more and the timer is not already started, the timer is started.
 func (h *Hub) checkCountDown() {
 	if h.timer.started {
-		if len(h.Clients) < 2 {
+		switch len(h.Clients) {
+		case 1:
 			h.timer.started = false
-			h.timer.resetCountdown <- true
-		} else {
-			h.timer.resetCountdown <- true
+			fallthrough
+		case 2, 3:
+			h.timer.resetCountdown <- 15
+		case 4:
+			h.timer.resetCountdown <- 10
 		}
 	} else if len(h.Clients) >= 2 {
 		h.timer.started = true
