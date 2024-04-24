@@ -14,8 +14,6 @@ type Hub struct {
 	register   chan *Client       // A channel used for registering new clients.
 	unregister chan *Client       // A channel used for unregistering clients.
 	timer      *Timer
-	// timer      int                // A int to set the duration of the timer
-	// timerChan  chan int
 }
 
 // Message represents a WebSocket message.
@@ -48,7 +46,7 @@ type Timer struct {
 func initTimer() *Timer {
 	return &Timer{
 		startCountdown: make(chan bool),
-		resetCountdown: make(chan bool, 1),
+		resetCountdown: make(chan bool, 2),
 		broadcastTime:  make(chan int),
 	}
 }
@@ -86,17 +84,15 @@ func (t *Timer) runCountDown() {
 		case s := <-t.startCountdown:
 			t.started = s
 		case <-t.resetCountdown:
-			fmt.Println("Starting Time =", startingTime)
 			timeCounter = startingTime
-			t.broadcastTime <- -1
 		default:
 			if !t.started || timeCounter <= 0 {
 				continue
 			}
 
 			timeCounter--
-			fmt.Println("TimerCounter ==", timeCounter)
 			time.Sleep(1 * time.Second)
+			fmt.Println("Timecount =", timeCounter)
 
 			if timeCounter <= 10 {
 				t.broadcastTime <- timeCounter
@@ -105,48 +101,74 @@ func (t *Timer) runCountDown() {
 	}
 }
 
-// func (h *Hub) SetCountDown(players int) {
-// 	// stop := time.After(10*time.Second)
+func (h *Hub) checkCountDown() {
+	fmt.Println("Checking")
 
-// 	fmt.Println("players: ", players)
-// 	if players >= 2 && players < 5 {
-// 		for h.timer >= 0 {
-// 			// fmt.Println("h.timer: ", h.timer)
-// 			// goTimer := &Timer{
-// 			// 	Type: "update-timer",
-// 			// 	Body: h.timer,
-// 			// }
+	fmt.Println("Clients: ", h.Clients, "\nstarted: ", h.timer.started, "\nreset:", <-h.timer.resetCountdown, "\nstart:", <-h.timer.startCountdown, "\nbroadcast:", <-h.timer.broadcastTime)
+	if h.timer.started {
+		// fmt.Println("Timer is started")
+		switch {
+		case len(h.Clients) < 2:
+			// fmt.Println("Stopping countdown")
+			h.timer.started = false
+			h.timer.resetCountdown <- true
+		default:
+			// fmt.Println("Resetting countdown")
+			h.timer.resetCountdown <- true
+		}
 
-// 			// toSend, err := json.Marshal(goTimer)
-// 			// if err != nil {
-// 			// 	fmt.Println(err)
-// 			// }
-// 			// // h.broadcast <- toSend
-// 			// // for _, client := range h.Clients {
-// 			// // 	client.send <- toSend
-// 			// // }
-// 			h.timerChan <- h.timer
-// 			time.Sleep(1 * time.Second)
-// 			h.timer--
-// 		}
-// 	}
+	} else {
+		// fmt.Println("Timer is not started")
+		switch {
+		case len(h.Clients) >= 2:
+			// fmt.Println("Starting countdown")
+			h.timer.started = true
+			h.timer.startCountdown <- true
+		default:
+			fmt.Println("No action")
+		}
+	}
+
+	fmt.Println("Check finished")
+}
+
+// switch {
+// case !h.timer.started && len(h.Clients) >= 2:
+// 	fmt.Println("Sending start to countdown")
+// 	h.timer.startCountdown <- true
+
+// case h.timer.started && len(h.Clients) >= 2:
+// 	fmt.Println("Reseting Countdown")
+// 	h.timer.resetCountdown <- true
+
+// case len(h.Clients) < 2:
+// 	fmt.Println("Stopping countdown")
+// 	h.timer.started = false
+// 	h.timer.resetCountdown <- true
+// 	// h.timer.startCountdown <- false
+
+// default:
+// 	fmt.Println("default")
 // }
 
-func (h *Hub) checkCountDown() {
-	switch {
-	case len(h.Clients) >= 2 && !h.timer.started:
-		fmt.Println("Sending start to countdown")
-		h.timer.startCountdown <- true
-	case len(h.Clients) >= 2:
-		fmt.Println("Reseting Countdown")
-		h.timer.resetCountdown <- true
-		fmt.Println("Reset done")
-	case h.timer.started:
-		fmt.Println("Stopping and reseting countdowns")
-		h.timer.startCountdown <- false
-		h.timer.resetCountdown <- true
-	}
-}
+// case len(h.Clients) >= 2 && !h.timer.started:
+// case len(h.Clients) >= 2:
+// 	fmt.Println("Reseting Countdown")
+// 	h.timer.resetCountdown <- true
+
+// // case len(h.Clients) < 2:
+// // 	fmt.Println("Stopping countdown")
+// case h.timer.started:
+// 	fmt.Println("Stopping and reseting countdowns")
+// 	h.timer.startCountdown <- false
+// 	h.timer.resetCountdown <- true
+// 	h.timer.started = false
+// default:
+// 	fmt.Println("No action")
+// 	h.timer.startCountdown <- false
+// 	h.timer.started = false
+// 	h.timer.resetCountdown <- true
+// }
 
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
@@ -156,18 +178,17 @@ func (h *Hub) Run() {
 
 	for {
 		select {
-
 		case client := <-h.register:
 			h.RegisterClient(client)
 			h.checkCountDown()
-			// go h.SetCountDown()
 
 		case client := <-h.unregister:
-			h.UnregiserClient(client)
+			h.UnregisterClient(client)
+			fmt.Println("Est on là ?")
 			h.checkCountDown()
 		case t := <-h.timer.broadcastTime:
-			// go h.SetCountDown()
 			h.UpdateTimer(t)
+
 		case message := <-h.broadcast:
 			var msg *Message
 			json.Unmarshal(message, &msg)
@@ -178,32 +199,36 @@ func (h *Hub) Run() {
 					client.send <- message
 				}
 			case "request-map":
-				if playerReady != len(h.Clients) {
-					playerReady++
-				} else {
-					mapAtlas := RandomizeMap()
-					mapToSend, err := json.Marshal(mapAtlas)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-
-					msg := &Message{
-						Type: "map",
-						Body: string(mapToSend),
-					}
-					msgToSend, err := json.Marshal(msg)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-					for _, client := range h.Clients {
-						client.send <- msgToSend
-					}
-					playerReady = 0
-				}
+				h.GenerateMap(playerReady)
 			}
 		}
+	}
+}
+
+func (h *Hub) GenerateMap(playerReady int) {
+	if playerReady != len(h.Clients) {
+		playerReady++
+	} else {
+		mapAtlas := RandomizeMap()
+		mapToSend, err := json.Marshal(mapAtlas)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		msg := &Message{
+			Type: "map",
+			Body: string(mapToSend),
+		}
+		msgToSend, err := json.Marshal(msg)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for _, client := range h.Clients {
+			client.send <- msgToSend
+		}
+		playerReady = 0
 	}
 }
 
@@ -231,10 +256,9 @@ func (h *Hub) RegisterClient(client *Client) {
 	for _, c := range h.Clients {
 		c.send <- joinedMessage
 	}
-	// h.timer = 15
 }
 
-func (h *Hub) UnregiserClient(client *Client) {
+func (h *Hub) UnregisterClient(client *Client) {
 	if _, ok := h.Clients[client.Username]; ok {
 		connectedList := make([]string, 0)
 
@@ -263,25 +287,8 @@ func (h *Hub) UnregiserClient(client *Client) {
 	}
 }
 
-// func (h *Hub) SetCountDown() {
-// 	if len(h.Clients) >= 2 && len(h.Clients) < 5 {
-// 		if h.timer == 0 {
-// 			h.timer = 15
-// 			go h.StartCountDown()
-// 		}
-// 	}
-// }
-
-// func (h *Hub) StartCountDown() {
-// 	for h.timer >= 0 && len(h.Clients) >= 2 {
-// 		h.timerChan <- h.timer
-// 		time.Sleep(1 * time.Second)
-// 		h.timer--
-// 	}
-// }
-
 func (h *Hub) UpdateTimer(t int) {
-	fmt.Println("timer: ", h.timer)
+	// fmt.Println("timer: ", h.timer)
 	goTimer := &TimerMsg{
 		Type: "update-timer",
 		Body: t,
