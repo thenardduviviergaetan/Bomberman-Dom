@@ -150,6 +150,25 @@ func (h *Hub) Run() {
 				for _, client := range h.Clients {
 					client.send <- message
 				}
+
+			case "MAP_PLZ":
+
+				fmt.Println("MAP_PLZ => RESPONSE : NOPE")
+
+				yourMap := struct {
+					Type string      `json:"type"`
+					Body interface{} `json:"body"`
+				}{}
+
+				yourMap.Type = "MAP_PLZ"
+				yourMap.Body = RandomizeMap()
+
+				yourMapToSend, _ := json.Marshal(yourMap)
+
+				for _, client := range h.Clients {
+					client.send <- yourMapToSend
+				}
+
 			case "request-map":
 				h.GenerateMap(playerReady)
 			}
@@ -163,11 +182,11 @@ func (h *Hub) Run() {
 // If there is an error during the JSON conversion or sending the message, it prints the error and returns.
 // After sending the map, it resets the playerReady count to 0.
 func (h *Hub) GenerateMap(playerReady int) {
+	h.gameStarted = true
 
 	if playerReady != len(h.Clients) {
 		playerReady++
 	} else {
-		h.gameStarted = true
 		mapAtlas := RandomizeMap()
 		mapToSend, err := json.Marshal(mapAtlas)
 		if err != nil {
@@ -323,5 +342,6 @@ func removeElement(connected []string, clientDisconnected string) []string {
 	}
 	newConnected := []string{}
 	newConnected = append(newConnected, newTab...)
+	fmt.Println("connected after: ", newConnected)
 	return newConnected
 }

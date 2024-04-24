@@ -44,6 +44,7 @@ export default class Chat extends Component {
                     chatElement.addElement(sender, data.body);
                     break
                 default:
+                    console.log("coucou: " + data.body);
                     return
             }
 

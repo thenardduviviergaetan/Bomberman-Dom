@@ -61,25 +61,9 @@ export default class GameManager {
             container.replaceChildren(waitRoom, game);
             // const script = new Component("script", { src: "./test.js" });
             // this.app.addComponent(script);
-            
-            this.ws.sendMessage({ 
-                type: "request-map",
-            })
-            
-            this.ws.onMessage((message) => {
-                if(message.type === "map") {
-                    console.log(message)
-                    game.atlas = JSON.parse(message.body)
-                    
-                    console.log("New Atlas", game.atlas)
-                    console.log("CHAT ",chat);
-                    // game.update()
-                }
-            })
-            game.update()
-            // container.update()
+            container.update()
         });
-        console.log(chat)
+
         container.addElement(chat, waitRoom);
         this.app.addComponent(leaveButton);
         this.app.addComponent(container);

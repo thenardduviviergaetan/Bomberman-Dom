@@ -5,36 +5,27 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
-        
+
         this.size = 19;
         // 0 = spawn
         // 1 = Wall
         // 2 = stone
         // 3 = path
         // 4 = only path
-        this.atlas = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 4, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 4, 0, 1],
-            [1, 4, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 4, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
-            [1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 1],
-            [1, 4, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 4, 1],
-            [1, 0, 4, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 4, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        ];
-        this.background();
+        // this.atlas;
         // return this;
+        this.atlas = this.ws.sendMessage({ type: "MAP_PLZ" });
+
+        this.ws.onMessage((message) => {
+            if (message.type === "MAP_PLZ") {
+                this.atlas = message.body
+                console.log("New Atlas", this.atlas)
+            }
+        })
+
+
+        this.background();
+        // this.randomizeBlock()
     }
 
 
@@ -75,8 +66,20 @@ export default class Game extends Component {
     }
 
 
-    randomizeBlock(){
+    async randomizeBlock() {
+        // this.ws.onMessage((message) => {
+        //     console.log("message == ", message)
+        //     if (message.type === "map") {
+        //         //         console.log(message)
+        //         //         // console.log(object);
+        //         this.atlas = message.body
 
+        //         console.log("New Atlas", this.atlas)
+        //         //         console.log("CHAT ", chat);
+        //         //         // game.update()
+        //     }
+        //     //     // game.update()
+        // })
     }
 
 }
