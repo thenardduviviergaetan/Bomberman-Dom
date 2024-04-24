@@ -47,7 +47,10 @@ export default class GameManager {
         const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
-            location.reload(); 
+            this.ws.close();
+            this.app.clear();
+            this.launchMenu();
+            // location.reload(); 
         })
 
         const ready = new Promise((resolve, reject) => {

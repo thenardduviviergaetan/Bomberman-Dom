@@ -46,7 +46,6 @@ type Timer struct {
 func initTimer() *Timer {
 	return &Timer{
 		startCountdown: make(chan bool),
-		// resetCountdown: make(chan bool),
 		resetCountdown: make(chan bool, 2),
 		broadcastTime:  make(chan int),
 	}
@@ -85,6 +84,7 @@ func (t *Timer) runCountDown() {
 		case s := <-t.startCountdown:
 			t.started = s
 		case <-t.resetCountdown:
+			fmt.Println("Resseting Count")
 			timeCounter = startingTime
 		default:
 			if !t.started || timeCounter <= 0 {
@@ -103,72 +103,25 @@ func (t *Timer) runCountDown() {
 }
 
 func (h *Hub) checkCountDown() {
-	fmt.Println("Checking")
+	fmt.Println("Checking Countdown")
 
 	if h.timer.started {
-		// fmt.Println("Timer is started")
-		switch {
-		case len(h.Clients) < 2:
+		if len(h.Clients) < 2 {
 			fmt.Println("Stopping countdown")
 			h.timer.started = false
-			// h.timer.resetCountdown <- true
-		default:
-			fmt.Println("Resetting countdown")
+			h.timer.resetCountdown <- true
+		} else {
 			h.timer.resetCountdown <- true
 		}
-
+	} else if len(h.Clients) >= 2 {
+		h.timer.started = true
+		h.timer.startCountdown <- true
 	} else {
-		// fmt.Println("Timer is not started")
-		switch {
-		case len(h.Clients) >= 2:
-			// fmt.Println("Starting countdown")
-			h.timer.started = true
-			h.timer.startCountdown <- true
-		default:
-			fmt.Println("No action")
-		}
+		fmt.Println("No action")
 	}
 
 	fmt.Println("Check finished")
 }
-
-// switch {
-// case !h.timer.started && len(h.Clients) >= 2:
-// 	fmt.Println("Sending start to countdown")
-// 	h.timer.startCountdown <- true
-
-// case h.timer.started && len(h.Clients) >= 2:
-// 	fmt.Println("Reseting Countdown")
-// 	h.timer.resetCountdown <- true
-
-// case len(h.Clients) < 2:
-// 	fmt.Println("Stopping countdown")
-// 	h.timer.started = false
-// 	h.timer.resetCountdown <- true
-// 	// h.timer.startCountdown <- false
-
-// default:
-// 	fmt.Println("default")
-// }
-
-// case len(h.Clients) >= 2 && !h.timer.started:
-// case len(h.Clients) >= 2:
-// 	fmt.Println("Reseting Countdown")
-// 	h.timer.resetCountdown <- true
-
-// // case len(h.Clients) < 2:
-// // 	fmt.Println("Stopping countdown")
-// case h.timer.started:
-// 	fmt.Println("Stopping and reseting countdowns")
-// 	h.timer.startCountdown <- false
-// 	h.timer.resetCountdown <- true
-// 	h.timer.started = false
-// default:
-// 	fmt.Println("No action")
-// 	h.timer.startCountdown <- false
-// 	h.timer.started = false
-// 	h.timer.resetCountdown <- true
-// }
 
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
@@ -180,12 +133,10 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.RegisterClient(client)
-			h.checkCountDown()
 
 		case client := <-h.unregister:
 			h.UnregisterClient(client)
-			fmt.Println("Est on là ?")
-			h.checkCountDown()
+
 		case t := <-h.timer.broadcastTime:
 			h.UpdateTimer(t)
 
@@ -256,6 +207,7 @@ func (h *Hub) RegisterClient(client *Client) {
 	for _, c := range h.Clients {
 		c.send <- joinedMessage
 	}
+	h.checkCountDown()
 }
 
 func (h *Hub) UnregisterClient(client *Client) {
@@ -280,10 +232,14 @@ func (h *Hub) UnregisterClient(client *Client) {
 			return
 		}
 		for _, c := range h.Clients {
-			c.send <- leftMessage
+			if c.Username != client.Username {
+				c.send <- leftMessage
+			}
 		}
 		close(h.Clients[client.Username].send)
 		delete(h.Clients, client.Username)
+
+		h.checkCountDown()
 	}
 }
 
