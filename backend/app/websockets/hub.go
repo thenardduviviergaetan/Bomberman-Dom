@@ -323,6 +323,5 @@ func removeElement(connected []string, clientDisconnected string) []string {
 	}
 	newConnected := []string{}
 	newConnected = append(newConnected, newTab...)
-	fmt.Println("connected after: ", newConnected)
 	return newConnected
 }

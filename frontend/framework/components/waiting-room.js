@@ -14,14 +14,6 @@ export default class WaitingRoom extends Component {
         this.currentPlayer = currentPlayer;
         this.counter = new Component("div", { className: "countDown" }, [""]);
 
-        // if ((message.type === "join" || message.type === "leave") && !this.started) {
-        //     this.newPlayerJoin(message.connected);
-
-        // if (this.playerList.children.length >= 2 && !this.countDownID) {
-        //     this.setCountDown();
-        // } else if (this.playerList.children.length < 2) {
-        //     this.stopCountDown();
-        // }
     }
 
 
@@ -37,27 +29,19 @@ export default class WaitingRoom extends Component {
                     console.log("INNER TIMER:", message.body);
                     console.log("body = ", message.body.toString());
                     if (message.body === 0) {
-                        console.log("Game has started");
-                        console.log("this", this);
                         this.resolve();
                     }
                     if (message.body === -1) {
-                        console.log("Reinitialize counter");
                         this.counter.children = [" "]
                     } else {
                         if (message.body <= 10) {
                             this.counter.children = [message.body.toString()]
-                        } else{
+                        } else {
                             this.counter.children = [""];
                         }
                     }
-
                     this.update();
                     break;
-                // case "finish-timer":
-                // this.resolve();
-                // console.log(message)
-                // break;
             }
         })
     }
@@ -70,46 +54,6 @@ export default class WaitingRoom extends Component {
         this.addElement(this.playerList);
         this.addElement(this.counter);
     }
-
-    // setCountDown() {
-    //TODO check for the 1s delay when joining a party with already 3 players
-    // sets the count down that will start the game.
-
-    // this.ws.sendMessage({ type: "await-timer" });
-
-    // this.ws.onMessage((message) => {
-    //     console.log("GLOBAL :", message);
-    //     switch (message.type) {
-
-    //     }
-    // })
-
-    // this.countDown = 20; //TODO change this to 30
-    // let check = false;
-    // this.countDownID = setInterval(() => {
-    //     if (this.playerList.children.length === 4 && !check) {
-    //         check = true;
-    //         this.countDown = 1;
-    //     } else if (this.playerList.children.length !== 4) {
-    //         check = false
-    //     }
-    //     this.countDown--;
-    //     if (this.countDown <= 10) {
-    //         if (this.countDown <= 0) {
-    //             this.started = true;
-    //             clearInterval(this.countDownID);
-    //             this.resolve();
-    //         } else {
-    //             console.log(this.countDown);
-    //             this.counter.children = [this.countDown.toString()];
-    //             this.update();
-    //         };
-    //     } else {
-    //         this.counter.children = [];
-    //         this.update()
-    //     }
-    // }, 1000);
-    // }
 
 
     stopCountDown() {
