@@ -14,6 +14,7 @@ type Hub struct {
 	register   chan *Client       // A channel used for registering new clients.
 	unregister chan *Client       // A channel used for unregistering clients.
 	timer      int                // A int to set the duration of the timer.
+	timerChan  chan int
 }
 
 // Message represents a WebSocket message.
@@ -44,6 +45,8 @@ func InitHub() *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
+		// timer:      15,
+		timerChan: make(chan int),
 		// connected:  make([]string, 0),
 	}
 }
@@ -60,21 +63,22 @@ func (h *Hub) SetCountDown(players int) {
 
 	fmt.Println("players: ", players)
 	if players >= 2 && players < 5 {
-		for h.timer > 0 {
-			fmt.Println("h.timer: ", h.timer)
-			goTimer := &Timer{
-				Type: "update-timer",
-				Body: h.timer,
-			}
+		for h.timer >= 0 {
+			// fmt.Println("h.timer: ", h.timer)
+			// goTimer := &Timer{
+			// 	Type: "update-timer",
+			// 	Body: h.timer,
+			// }
 
-			toSend, err := json.Marshal(goTimer)
-			if err != nil {
-				fmt.Println(err)
-			}
-			// h.broadcast <- toSend
-			for _, client := range h.Clients {
-				client.send <- toSend
-			}
+			// toSend, err := json.Marshal(goTimer)
+			// if err != nil {
+			// 	fmt.Println(err)
+			// }
+			// // h.broadcast <- toSend
+			// // for _, client := range h.Clients {
+			// // 	client.send <- toSend
+			// // }
+			h.timerChan <- h.timer
 			time.Sleep(1 * time.Second)
 			h.timer--
 		}
@@ -89,11 +93,13 @@ func (h *Hub) Run() {
 
 	for {
 		select {
+
 		case client := <-h.register:
 
 			h.Clients[client.Username] = client
 
 			connectedList := make([]string, 0)
+			go h.SetCountDown(len(client.hub.Clients))
 
 			for _, c := range h.Clients {
 				connectedList = append(connectedList, c.Username)
@@ -148,6 +154,7 @@ func (h *Hub) Run() {
 			json.Unmarshal(message, &msg)
 			switch msg.Type {
 			case "chat":
+				fmt.Println("chat message: ", string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}
@@ -176,10 +183,10 @@ func (h *Hub) Run() {
 					}
 					playerReady = 0
 				}
-			case "update-timer":
-				for _, client := range h.Clients {
-					client.send <- message
-				}
+				// case "update-timer":
+				// 	for _, client := range h.Clients {
+				// 		client.send <- message
+				// 	}
 				// case "await-timer":
 				// if countdownTrigger < len(h.Clients) {
 				// 	countdownTrigger++
@@ -190,6 +197,21 @@ func (h *Hub) Run() {
 
 				// }
 			}
+		case <-h.timerChan:
+			goTimer := &Timer{
+				Type: "update-timer",
+				Body: h.timer,
+			}
+
+			toSend, err := json.Marshal(goTimer)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			for _, client := range h.Clients {
+				client.send <- toSend
+			}
+
 		}
 	}
 }

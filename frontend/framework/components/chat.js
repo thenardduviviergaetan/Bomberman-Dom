@@ -27,7 +27,7 @@ export default class Chat extends Component {
         const chatBox = new Component("div", { id: "chat-box" });
         this.ws.onMessage((data) => {
             let chatElement;
-            console.log("this.messages", this.messages);
+            console.log("Message from chat.js: ", data.body);
             switch (data.type) {
                 case 'join':
                     chatElement = new Component("p", { id: "chat-element",className: "chat-element-join"});

@@ -74,7 +74,8 @@ export default class GameManager {
                     // game.update()
                 }
             })
-            container.update()
+            game.update()
+            // container.update()
         });
         console.log(chat)
         container.addElement(chat, waitRoom);
