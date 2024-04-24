@@ -50,7 +50,6 @@ export default class GameManager {
             this.ws.close();
             this.app.clear();
             this.launchMenu();
-            // location.reload(); 
         })
 
         const ready = new Promise((resolve, reject) => {

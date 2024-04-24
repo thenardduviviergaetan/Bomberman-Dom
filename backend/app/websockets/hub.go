@@ -9,11 +9,12 @@ import (
 
 // Hub represents a WebSocket hub that manages the Clients and their connections.
 type Hub struct {
-	Clients    map[string]*Client // A map of client IDs to client instances.
-	broadcast  chan []byte        // A channel used for broadcasting messages to all clients.
-	register   chan *Client       // A channel used for registering new clients.
-	unregister chan *Client       // A channel used for unregistering clients.
-	timer      *Timer
+	Clients     map[string]*Client // A map of client IDs to client instances.
+	broadcast   chan []byte        // A channel used for broadcasting messages to all clients.
+	register    chan *Client       // A channel used for registering new clients.
+	unregister  chan *Client       // A channel used for unregistering clients.
+	timer       *Timer
+	gameStarted bool
 }
 
 // Message represents a WebSocket message.
@@ -70,11 +71,16 @@ func (h *Hub) CheckUsername(username string) bool {
 	return exist
 }
 
+// LaunchRoutines launches the necessary goroutines for the Hub.
+// It starts the main Run goroutine and the timer's runCountDown goroutine.
 func (h *Hub) LaunchRoutines() {
 	go h.Run()
 	go h.timer.runCountDown()
 }
 
+// runCountDown is a method of the Timer struct that runs the countdown logic.
+// It continuously decrements the timeCounter until it reaches 0 or the countdown is reset.
+// If the countdown is started and timeCounter is greater than 0, it broadcasts the current timeCounter value to all connected clients.
 func (t *Timer) runCountDown() {
 	const startingTime = 15
 	var timeCounter = startingTime
@@ -84,30 +90,26 @@ func (t *Timer) runCountDown() {
 		case s := <-t.startCountdown:
 			t.started = s
 		case <-t.resetCountdown:
-			fmt.Println("Resseting Count")
 			timeCounter = startingTime
 		default:
-			if !t.started || timeCounter <= 0 {
-				continue
-			}
+			if timeCounter <= 0 {
+				t.started = false
+			} else if t.started {
+				timeCounter--
+				time.Sleep(1 * time.Second)
 
-			timeCounter--
-			time.Sleep(1 * time.Second)
-			fmt.Println("Timecount =", timeCounter)
-
-			if timeCounter <= 10 {
 				t.broadcastTime <- timeCounter
 			}
 		}
 	}
 }
 
+// checkCountDown checks the number of clients connected to the hub and starts or stops the countdown timer accordingly.
+// If the timer is already started and the number of clients drops below 2, the timer is stopped and the countdown is reset.
+// If the number of clients is 2 or more and the timer is not already started, the timer is started.
 func (h *Hub) checkCountDown() {
-	fmt.Println("Checking Countdown")
-
 	if h.timer.started {
 		if len(h.Clients) < 2 {
-			fmt.Println("Stopping countdown")
 			h.timer.started = false
 			h.timer.resetCountdown <- true
 		} else {
@@ -116,11 +118,7 @@ func (h *Hub) checkCountDown() {
 	} else if len(h.Clients) >= 2 {
 		h.timer.started = true
 		h.timer.startCountdown <- true
-	} else {
-		fmt.Println("No action")
 	}
-
-	fmt.Println("Check finished")
 }
 
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
@@ -128,12 +126,12 @@ func (h *Hub) checkCountDown() {
 // This method runs in a separate goroutine and should be called after initializing the Hub.
 func (h *Hub) Run() {
 	var playerReady = 0
-
 	for {
 		select {
 		case client := <-h.register:
-			h.RegisterClient(client)
-
+			if !h.gameStarted {
+				h.RegisterClient(client)
+			}
 		case client := <-h.unregister:
 			h.UnregisterClient(client)
 
@@ -145,7 +143,6 @@ func (h *Hub) Run() {
 			json.Unmarshal(message, &msg)
 			switch msg.Type {
 			case "chat":
-				fmt.Println("chat message: ", string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}
@@ -156,7 +153,14 @@ func (h *Hub) Run() {
 	}
 }
 
+// GenerateMap generates a map and sends it to all connected clients.
+// It takes the number of players ready as a parameter and checks if all players are ready.
+// If all players are ready, it generates a random map, converts it to JSON, and sends it to all clients.
+// If there is an error during the JSON conversion or sending the message, it prints the error and returns.
+// After sending the map, it resets the playerReady count to 0.
 func (h *Hub) GenerateMap(playerReady int) {
+	h.gameStarted = true
+
 	if playerReady != len(h.Clients) {
 		playerReady++
 	} else {
@@ -183,6 +187,10 @@ func (h *Hub) GenerateMap(playerReady int) {
 	}
 }
 
+// RegisterClient registers a new client in the hub.
+// It adds the client to the hub's Clients map and sends a join message to all connected clients.
+// The join message includes the client's username and the list of currently connected clients.
+// It also checks if the countdown can be started.
 func (h *Hub) RegisterClient(client *Client) {
 	h.Clients[client.Username] = client
 
@@ -210,6 +218,8 @@ func (h *Hub) RegisterClient(client *Client) {
 	h.checkCountDown()
 }
 
+// UnregisterClient removes a client from the hub and sends a leave message to the remaining clients.
+// If the client is successfully removed, it also checks the countdown for the game.
 func (h *Hub) UnregisterClient(client *Client) {
 	if _, ok := h.Clients[client.Username]; ok {
 		connectedList := make([]string, 0)
@@ -243,6 +253,7 @@ func (h *Hub) UnregisterClient(client *Client) {
 	}
 }
 
+// UpdateTimer updates the timer value and sends the updated value to all connected clients.
 func (h *Hub) UpdateTimer(t int) {
 	// fmt.Println("timer: ", h.timer)
 	goTimer := &TimerMsg{
@@ -260,7 +271,8 @@ func (h *Hub) UpdateTimer(t int) {
 	}
 }
 
-// TODO move this func to middleware
+// RandomizeMap randomizes the given base map by replacing certain blocks with a different value.
+// It returns the randomized map.
 func RandomizeMap() [][]int {
 	var baseMap = [][]int{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
