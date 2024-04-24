@@ -27,21 +27,23 @@ export default class Chat extends Component {
         const chatBox = new Component("div", { id: "chat-box" });
         this.ws.onMessage((data) => {
             let chatElement;
-            console.log("Message from chat.js: ", data.body);
             switch (data.type) {
                 case 'join':
-                    chatElement = new Component("p", { id: "chat-element",className: "chat-element-join"});
+                    chatElement = new Component("p", { id: "chat-element", className: "chat-element-join" });
                     chatElement.children.push(data.body);
                     break
                 case 'leave':
-                    chatElement = new Component("p", { id: "chat-element",className: "chat-element-leave"});
+                    chatElement = new Component("p", { id: "chat-element", className: "chat-element-leave" });
                     chatElement.children.push(data.body);
                     break
                 case 'chat':
-                    chatElement = new Component("p", { id: "chat-element",className: "chat-element"});
-                    const sender = new Component("span", {className: "chat-sender"},[`<${data.sender}> : `])
-                    chatElement.addElement(sender,data.body); 
+                    console.log("Message from chat.js: ", data.body);
+                    chatElement = new Component("p", { id: "chat-element", className: "chat-element" });
+                    const sender = new Component("span", { className: "chat-sender" }, [`<${data.sender}> : `])
+                    chatElement.addElement(sender, data.body);
                     break
+                default:
+                    return
             }
 
             chatBox.addElement(chatElement);

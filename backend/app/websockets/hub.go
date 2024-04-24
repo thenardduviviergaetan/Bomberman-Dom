@@ -45,9 +45,7 @@ func InitHub() *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		// timer:      15,
-		timerChan: make(chan int),
-		// connected:  make([]string, 0),
+		timerChan:  make(chan int),
 	}
 }
 
@@ -58,26 +56,11 @@ func (h *Hub) CheckUsername(username string) bool {
 	return exist
 }
 
-func (h *Hub) SetCountDown(players int) {
-	// stop := time.After(10*time.Second)
+func (h *Hub) SetCountDown() {
 
-	fmt.Println("players: ", players)
-	if players >= 2 && players < 5 {
+	fmt.Println("players: ", len(h.Clients))
+	if len(h.Clients) >= 2 && len(h.Clients) < 5 {
 		for h.timer >= 0 {
-			// fmt.Println("h.timer: ", h.timer)
-			// goTimer := &Timer{
-			// 	Type: "update-timer",
-			// 	Body: h.timer,
-			// }
-
-			// toSend, err := json.Marshal(goTimer)
-			// if err != nil {
-			// 	fmt.Println(err)
-			// }
-			// // h.broadcast <- toSend
-			// // for _, client := range h.Clients {
-			// // 	client.send <- toSend
-			// // }
 			h.timerChan <- h.timer
 			time.Sleep(1 * time.Second)
 			h.timer--
@@ -97,9 +80,9 @@ func (h *Hub) Run() {
 		case client := <-h.register:
 
 			h.Clients[client.Username] = client
+			go h.SetCountDown()
 
 			connectedList := make([]string, 0)
-			go h.SetCountDown(len(client.hub.Clients))
 
 			for _, c := range h.Clients {
 				connectedList = append(connectedList, c.Username)
@@ -149,6 +132,22 @@ func (h *Hub) Run() {
 				close(h.Clients[client.Username].send)
 				delete(h.Clients, client.Username)
 			}
+		case <-h.timerChan:
+			fmt.Println("timer: ", h.timer)
+			goTimer := &Timer{
+				Type: "update-timer",
+				Body: h.timer,
+			}
+
+			toSend, err := json.Marshal(goTimer)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			for _, client := range h.Clients {
+				client.send <- toSend
+			}
+
 		case message := <-h.broadcast:
 			var msg *Message
 			json.Unmarshal(message, &msg)
@@ -183,35 +182,7 @@ func (h *Hub) Run() {
 					}
 					playerReady = 0
 				}
-				// case "update-timer":
-				// 	for _, client := range h.Clients {
-				// 		client.send <- message
-				// 	}
-				// case "await-timer":
-				// if countdownTrigger < len(h.Clients) {
-				// 	countdownTrigger++
-				// } else {
-				// 	for {
-
-				// 	}
-
-				// }
 			}
-		case <-h.timerChan:
-			goTimer := &Timer{
-				Type: "update-timer",
-				Body: h.timer,
-			}
-
-			toSend, err := json.Marshal(goTimer)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			for _, client := range h.Clients {
-				client.send <- toSend
-			}
-
 		}
 	}
 }
