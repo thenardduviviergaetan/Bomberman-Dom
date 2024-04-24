@@ -20,11 +20,11 @@ export default class Game extends Component {
             if (message.type === "MAP_PLZ") {
                 this.atlas = message.body
                 console.log("New Atlas", this.atlas)
+                this.background();
             }
         })
 
 
-        this.background();
         // this.randomizeBlock()
     }
 
@@ -63,6 +63,7 @@ export default class Game extends Component {
             background.addElement(lineMap);
         }
         this.addElement(background);
+        this.update();
     }
 
 
