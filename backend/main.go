@@ -13,8 +13,9 @@ func main() {
 	app := app.NewApp()
 	server := server.NewServer(app)
 	hub := livechat.InitHub()
-	go hub.Run()
 
+	hub.LaunchRoutines()
+	// go hub.Run()
 	server.Start(hub)
 	// server.Start(database.DB)
 }

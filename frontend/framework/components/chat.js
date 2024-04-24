@@ -20,6 +20,7 @@ export default class Chat extends Component {
             const data = getFormValues(e).input;
             this.ws.sendMessage({ type: "chat", body: data, sender: this.username });
         })
+
         this.addElement(form);
     }
 

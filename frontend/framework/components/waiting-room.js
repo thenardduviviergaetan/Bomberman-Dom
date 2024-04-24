@@ -22,11 +22,14 @@ export default class WaitingRoom extends Component {
                     break
                 case "update-timer":
                     console.log("INNER TIMER:", message.body);
-                    this.counter.children = [message.body.toString()]
+                    if (message.body.toString() == "-1") {
+                        console.log("Reinitialize counter");
+                        this.counter.children = [" "]
+                    }else {
+                        this.counter.children = [message.body.toString()]
+                    }
+
                     this.update();
-                    break;
-                case "finish-timer":
-                    this.resolve();
                     break;
                 case "finish-timer":
                     this.resolve();
