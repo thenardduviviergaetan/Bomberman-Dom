@@ -75,9 +75,11 @@ export default class Component {
     actionListener(eventType, func) {
         this.props[`on${eventType}`] = (event) => {
             event.preventDefault();
-            func(event.target);
             if (eventType === 'submit') {
+                func(event.target);
                 event.target.reset();
+            } else {
+                func(event);
             }
         };
     }
