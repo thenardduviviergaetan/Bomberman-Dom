@@ -46,7 +46,7 @@ type Timer struct {
 
 func initTimer() *Timer {
 	return &Timer{
-		startCountdown: make(chan bool),
+		startCountdown: make(chan bool, 2),
 		resetCountdown: make(chan int, 2),
 		broadcastTime:  make(chan int),
 	}
@@ -89,17 +89,22 @@ func (t *Timer) runCountDown() {
 		select {
 		case s := <-t.startCountdown:
 			t.started = s
+			if !s {
+				timeCounter = startingTime
+				t.broadcastTime <- timeCounter
+			}
 		case newTimer := <-t.resetCountdown:
-			// timeCounter = startingTime
 			timeCounter = newTimer
 		default:
 			if timeCounter <= 0 {
 				t.started = false
+				timeCounter = startingTime
 			} else if t.started {
 				timeCounter--
 				time.Sleep(1 * time.Second)
-
-				t.broadcastTime <- timeCounter
+				if t.started {
+					t.broadcastTime <- timeCounter
+				}
 			}
 		}
 	}
@@ -111,9 +116,11 @@ func (t *Timer) runCountDown() {
 func (h *Hub) checkCountDown() {
 	if h.timer.started {
 		switch len(h.Clients) {
-		case 1:
+		case 0, 1:
+			h.timer.resetCountdown <- 15
 			h.timer.started = false
-			fallthrough
+			h.timer.startCountdown <- false
+			// fallthrough
 		case 2, 3:
 			h.timer.resetCountdown <- 15
 		case 4:
@@ -152,25 +159,32 @@ func (h *Hub) Run() {
 				}
 
 			case "MAP_PLZ":
+				fmt.Println("MAP_PLZ")
+				fmt.Println("playerReady == ", playerReady)
+				fmt.Println("len(h.Clients) == ", len(h.Clients))
+				fmt.Println("(len(h.Clients) == playerReady)", (len(h.Clients) == playerReady))
+				playerReady++
+				if playerReady != len(h.Clients) {
+					fmt.Println("MAP_PLZ => RESPONSE : NOPE")
+				} else {
+					fmt.Println("MAP_PLZ => RESPONSE : YEAH")
+					yourMap := struct {
+						Type string      `json:"type"`
+						Body interface{} `json:"body"`
+					}{}
 
-				fmt.Println("MAP_PLZ => RESPONSE : NOPE")
+					yourMap.Type = "MAP_PLZ"
+					yourMap.Body = RandomizeMap()
 
-				yourMap := struct {
-					Type string      `json:"type"`
-					Body interface{} `json:"body"`
-				}{}
+					yourMapToSend, _ := json.Marshal(yourMap)
 
-				yourMap.Type = "MAP_PLZ"
-				yourMap.Body = RandomizeMap()
-
-				yourMapToSend, _ := json.Marshal(yourMap)
-
-				for _, client := range h.Clients {
-					client.send <- yourMapToSend
+					for _, client := range h.Clients {
+						client.send <- yourMapToSend
+					}
 				}
-
-			case "request-map":
-				h.GenerateMap(playerReady)
+				// case "request-map":
+				// 	h.GenerateMap(playerReady)
+				// }
 			}
 		}
 	}
@@ -181,34 +195,34 @@ func (h *Hub) Run() {
 // If all players are ready, it generates a random map, converts it to JSON, and sends it to all clients.
 // If there is an error during the JSON conversion or sending the message, it prints the error and returns.
 // After sending the map, it resets the playerReady count to 0.
-func (h *Hub) GenerateMap(playerReady int) {
-	h.gameStarted = true
+// func (h *Hub) GenerateMap(playerReady int) {
+// 	h.gameStarted = true
 
-	if playerReady != len(h.Clients) {
-		playerReady++
-	} else {
-		mapAtlas := RandomizeMap()
-		mapToSend, err := json.Marshal(mapAtlas)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+// 	if playerReady != len(h.Clients) {
+// 		playerReady++
+// 	} else {
+// 		mapAtlas := RandomizeMap()
+// 		mapToSend, err := json.Marshal(mapAtlas)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			return
+// 		}
 
-		msg := &Message{
-			Type: "map",
-			Body: string(mapToSend),
-		}
-		msgToSend, err := json.Marshal(msg)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		for _, client := range h.Clients {
-			client.send <- msgToSend
-		}
-		playerReady = 0
-	}
-}
+// 		msg := &Message{
+// 			Type: "map",
+// 			Body: string(mapToSend),
+// 		}
+// 		msgToSend, err := json.Marshal(msg)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			return
+// 		}
+// 		for _, client := range h.Clients {
+// 			client.send <- msgToSend
+// 		}
+// 		playerReady = 0
+// 	}
+// }
 
 // RegisterClient registers a new client in the hub.
 // It adds the client to the hub's Clients map and sends a join message to all connected clients.
@@ -288,7 +302,6 @@ func (h *Hub) UpdateTimer(t int) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	for _, client := range h.Clients {
 		client.send <- toSend
 	}
