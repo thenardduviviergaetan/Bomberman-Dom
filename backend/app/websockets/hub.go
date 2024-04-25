@@ -37,6 +37,12 @@ type TimerMsg struct {
 	Body int    `json:"body"` // Body of the message
 }
 
+type MapMsg struct {
+	Type   string      `json:"type"`
+	Sender string      `json:"sender"`
+	Body   interface{} `json:"body"`
+}
+
 type Timer struct {
 	startCountdown chan bool
 	resetCountdown chan int
@@ -165,13 +171,36 @@ func (h *Hub) Run() {
 				}
 
 			case "map":
+				/*
+					playerReady++
+					if playerReady != len(h.Clients) {
+					} else {
+						jsonMap := middleware.GenerateMap()
+						for _, client := range h.Clients {
+							client.send <- jsonMap
+						}
+						playerReady = 0
+					}
+				*/
+
 				playerReady++
-				if playerReady != len(h.Clients) {
-				} else {
-					jsonMap := middleware.GenerateMap()
+				if playerReady == len(h.Clients) {
+					var basemap interface{}
+
+					if err := json.Unmarshal(middleware.GenerateMap2(), &basemap); err != nil {
+						fmt.Println("ERROR", err)
+					}
+
+					mapArr := make([][]byte, 0, playerReady)
+
+					for i, client := range h.Clients {
+						mapArr[i]
+					}
+
 					for _, client := range h.Clients {
 						client.send <- jsonMap
 					}
+
 					playerReady = 0
 				}
 			}

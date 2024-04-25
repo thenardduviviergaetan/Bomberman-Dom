@@ -10,6 +10,13 @@ export default class Player extends Component {
         this.movementSize = 15
         // this.init();
         this.initListeners();
+        
+        /*
+                on message :
+                if type === "spawn" :
+                if msg.sender == this.username :
+                
+                */
     }
 
     // init(){

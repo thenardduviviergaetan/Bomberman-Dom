@@ -52,4 +52,47 @@ func GenerateMap() []byte {
 
 	jsonMapToSend, _ := json.Marshal(mapMsg)
 	return jsonMapToSend
+
+	/*
+		TheOldestBrother Version
+		data := struct {
+			Map        [][]int
+			SpawnPoint int
+		}{
+			Map: RandomizeMap(),
+		}
+
+		mapMsg := struct {
+			Type string      `json:"type"`
+			Body interface{} `json:"body"`
+			Sender string `json:"sender"`
+		}{
+			Type: "map",
+			Body: data,
+		}
+
+		jsonMapToSend, _ := json.Marshal(mapMsg)
+		return jsonMapToSend
+	*/
+}
+
+func GenerateMap2() []byte {
+	data := struct {
+		Map        [][]int
+		SpawnPoint int
+	}{
+		Map: RandomizeMap(),
+	}
+
+	mapMsg := struct {
+		Type   string      `json:"type"`
+		Body   interface{} `json:"body"`
+		Sender string      `json:"sender"`
+	}{
+		Type: "map",
+		Body: data,
+	}
+
+	jsonMapToSend, _ := json.Marshal(mapMsg)
+	return jsonMapToSend
 }

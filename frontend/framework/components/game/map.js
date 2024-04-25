@@ -13,7 +13,6 @@ export default class Map extends Component {
         const block_path = new Component("div", { class: "path", style: "background-color:transparent;width:32px;height:32px;" })
         const block_breakable = new Component("div", { class: "props", style: "background-color:grey;width:32px;height:32px;" })
         const block_spawn = new Component("div", { class: "spawn", style: "background-color:blue;width:32px;height:32px;" })
-        
         for (let line of this.atlas) {
             const lineMap = new Component("div", { class: "line", style: "display:flex;flex-direction:row;width:100%;height:fit-content;" })
             line.forEach(type => {
