@@ -164,34 +164,16 @@ func (h *Hub) Run() {
 					client.send <- message
 				}
 
-			case "MAP_PLZ":
-				fmt.Println("MAP_PLZ")
-				fmt.Println("playerReady == ", playerReady)
-				fmt.Println("len(h.Clients) == ", len(h.Clients))
-				fmt.Println("(len(h.Clients) == playerReady)", (len(h.Clients) == playerReady))
+			case "map":
 				playerReady++
 				if playerReady != len(h.Clients) {
-					fmt.Println("MAP_PLZ => RESPONSE : NOPE")
 				} else {
-					fmt.Println("MAP_PLZ => RESPONSE : YEAH")
-					yourMap := struct {
-						Type string      `json:"type"`
-						Body interface{} `json:"body"`
-					}{}
-
-					yourMap.Type = "MAP_PLZ"
-					yourMap.Body = middleware.RandomizeMap()
-
-					yourMapToSend, _ := json.Marshal(yourMap)
-
+					jsonMap := middleware.GenerateMap()
 					for _, client := range h.Clients {
-						client.send <- yourMapToSend
+						client.send <- jsonMap
 					}
 					playerReady = 0
 				}
-				// case "request-map":
-				// 	h.GenerateMap(playerReady)
-				// }
 			}
 		}
 	}

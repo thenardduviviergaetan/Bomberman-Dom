@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"encoding/json"
 	"math/rand"
 )
 
@@ -38,6 +38,18 @@ func RandomizeMap() [][]int {
 			}
 		}
 	}
-	fmt.Println("baseMap", baseMap)
 	return baseMap
+}
+
+func GenerateMap() []byte {
+	mapMsg := struct {
+		Type string      `json:"type"`
+		Body interface{} `json:"body"`
+	}{}
+
+	mapMsg.Type = "map"
+	mapMsg.Body = RandomizeMap()
+
+	jsonMapToSend, _ := json.Marshal(mapMsg)
+	return jsonMapToSend
 }

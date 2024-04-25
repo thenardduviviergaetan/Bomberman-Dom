@@ -13,9 +13,9 @@ export default class Game extends Component {
         this.ws = ws;
         
         this.size = 19;
-        this.atlas = this.ws.sendMessage({ type: "MAP_PLZ" });
+        this.atlas = this.ws.sendMessage({ type: "map" });
         this.ws.onMessage((message) => {
-            if (message.type === "MAP_PLZ") {
+            if (message.type === "map") {
                 this.atlas = message.body
                 const map = new Map(this.atlas)
                 const player1 = new Player({id:this.username,className:"player-sprite",style:"top:32px;left:32px;"})
