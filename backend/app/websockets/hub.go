@@ -3,7 +3,7 @@ package livechat
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	middleware "server/app/middlewares"
 	"time"
 )
 
@@ -96,15 +96,21 @@ func (t *Timer) runCountDown() {
 		case newTimer := <-t.resetCountdown:
 			timeCounter = newTimer
 		default:
-			if timeCounter <= 0 {
-				t.started = false
-				timeCounter = startingTime
-			} else if t.started {
-				timeCounter--
-				time.Sleep(1 * time.Second)
-				if t.started {
-					t.broadcastTime <- timeCounter
+
+			if t.started {
+				if timeCounter <= 0 {
+					t.started = false
+					timeCounter = startingTime
+
+				} else {
+					timeCounter--
+					time.Sleep(1 * time.Second)
+					if t.started {
+						t.broadcastTime <- timeCounter
+					}
 				}
+			} else {
+				t.started = <-t.startCountdown
 			}
 		}
 	}
@@ -174,13 +180,14 @@ func (h *Hub) Run() {
 					}{}
 
 					yourMap.Type = "MAP_PLZ"
-					yourMap.Body = RandomizeMap()
+					yourMap.Body = middleware.RandomizeMap()
 
 					yourMapToSend, _ := json.Marshal(yourMap)
 
 					for _, client := range h.Clients {
 						client.send <- yourMapToSend
 					}
+					playerReady = 0
 				}
 				// case "request-map":
 				// 	h.GenerateMap(playerReady)
@@ -189,40 +196,6 @@ func (h *Hub) Run() {
 		}
 	}
 }
-
-// GenerateMap generates a map and sends it to all connected clients.
-// It takes the number of players ready as a parameter and checks if all players are ready.
-// If all players are ready, it generates a random map, converts it to JSON, and sends it to all clients.
-// If there is an error during the JSON conversion or sending the message, it prints the error and returns.
-// After sending the map, it resets the playerReady count to 0.
-// func (h *Hub) GenerateMap(playerReady int) {
-// 	h.gameStarted = true
-
-// 	if playerReady != len(h.Clients) {
-// 		playerReady++
-// 	} else {
-// 		mapAtlas := RandomizeMap()
-// 		mapToSend, err := json.Marshal(mapAtlas)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
-
-// 		msg := &Message{
-// 			Type: "map",
-// 			Body: string(mapToSend),
-// 		}
-// 		msgToSend, err := json.Marshal(msg)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
-// 		for _, client := range h.Clients {
-// 			client.send <- msgToSend
-// 		}
-// 		playerReady = 0
-// 	}
-// }
 
 // RegisterClient registers a new client in the hub.
 // It adds the client to the hub's Clients map and sends a join message to all connected clients.
@@ -305,43 +278,6 @@ func (h *Hub) UpdateTimer(t int) {
 	for _, client := range h.Clients {
 		client.send <- toSend
 	}
-}
-
-// RandomizeMap randomizes the given base map by replacing certain blocks with a different value.
-// It returns the randomized map.
-func RandomizeMap() [][]int {
-	var baseMap = [][]int{
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0, 1},
-		{1, 4, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1},
-		{1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1},
-		{1, 4, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1},
-		{1, 0, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-	}
-
-	for y, line := range baseMap {
-		for x, block := range line {
-			var r = rand.Intn(100)
-			if block == 3 && r < 30 {
-				baseMap[y][x] = 2
-			}
-		}
-	}
-
-	return baseMap
 }
 
 // removeElement removes the specified clientDisconnected from the connected slice and returns the updated slice.
