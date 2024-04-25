@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	middleware "server/app/middlewares"
-	"time"
+	"server/db/models"
 )
 
 // Hub represents a WebSocket hub that manages the Clients and their connections.
@@ -17,41 +17,6 @@ type Hub struct {
 	gameStarted bool
 }
 
-// Message represents a WebSocket message.
-type Message struct {
-	Type   string `json:"type"`   // Type specifies the type of the message.
-	Body   string `json:"body"`   // Body contains the content of the message.
-	Sender string `json:"sender"` // Sender identifies the sender of the message.
-}
-
-// Connected represents a message sent over websockets to notify clients about connected users.
-type Connected struct {
-	Type      string   `json:"type"`      // Type of the message
-	Body      string   `json:"body"`      // Body of the message
-	Sender    string   `json:"sender"`    // Sender of the message
-	Connected []string `json:"connected"` // List of connected users
-}
-
-type TimerMsg struct {
-	Type string `json:"type"`
-	Body int    `json:"body"` // Body of the message
-}
-
-type Timer struct {
-	startCountdown chan bool
-	resetCountdown chan int
-	broadcastTime  chan int
-	started        bool
-}
-
-func initTimer() *Timer {
-	return &Timer{
-		startCountdown: make(chan bool, 2),
-		resetCountdown: make(chan int, 2),
-		broadcastTime:  make(chan int),
-	}
-}
-
 // InitHub initializes a new instance of the Hub struct.
 // It returns a pointer to the newly created Hub.
 func InitHub() *Hub {
@@ -60,7 +25,7 @@ func InitHub() *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		timer:      initTimer(),
+		timer:      InitTimer(),
 	}
 }
 
@@ -72,70 +37,10 @@ func (h *Hub) CheckUsername(username string) bool {
 }
 
 // LaunchRoutines launches the necessary goroutines for the Hub.
-// It starts the main Run goroutine and the timer's runCountDown goroutine.
+// It starts the main Run goroutine and the timer's RunCountDown goroutine.
 func (h *Hub) LaunchRoutines() {
 	go h.Run()
-	go h.timer.runCountDown()
-}
-
-// runCountDown is a method of the Timer struct that runs the countdown logic.
-// It continuously decrements the timeCounter until it reaches 0 or the countdown is reset.
-// If the countdown is started and timeCounter is greater than 0, it broadcasts the current timeCounter value to all connected clients.
-func (t *Timer) runCountDown() {
-	const startingTime = 15
-	var timeCounter = startingTime
-
-	for {
-		select {
-		case s := <-t.startCountdown:
-			t.started = s
-			if !s {
-				timeCounter = startingTime
-				t.broadcastTime <- timeCounter
-			}
-		case newTimer := <-t.resetCountdown:
-			timeCounter = newTimer
-		default:
-
-			if t.started {
-				if timeCounter <= 0 {
-					t.started = false
-					timeCounter = startingTime
-
-				} else {
-					timeCounter--
-					time.Sleep(1 * time.Second)
-					if t.started {
-						t.broadcastTime <- timeCounter
-					}
-				}
-			} else {
-				t.started = <-t.startCountdown
-			}
-		}
-	}
-}
-
-// checkCountDown checks the number of clients connected to the hub and starts or stops the countdown timer accordingly.
-// If the timer is already started and the number of clients drops below 2, the timer is stopped and the countdown is reset.
-// If the number of clients is 2 or more and the timer is not already started, the timer is started.
-func (h *Hub) checkCountDown() {
-	if h.timer.started {
-		switch len(h.Clients) {
-		case 0, 1:
-			h.timer.resetCountdown <- 15
-			h.timer.started = false
-			h.timer.startCountdown <- false
-			// fallthrough
-		case 2, 3:
-			h.timer.resetCountdown <- 15
-		case 4:
-			h.timer.resetCountdown <- 10
-		}
-	} else if len(h.Clients) >= 2 {
-		h.timer.started = true
-		h.timer.startCountdown <- true
-	}
+	go h.timer.RunCountDown()
 }
 
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
@@ -156,7 +61,7 @@ func (h *Hub) Run() {
 			h.UpdateTimer(t)
 
 		case message := <-h.broadcast:
-			var msg *Message
+			var msg *models.Message
 			json.Unmarshal(message, &msg)
 			switch msg.Type {
 			case "chat":
@@ -192,7 +97,7 @@ func (h *Hub) RegisterClient(client *Client) {
 		connectedList = append(connectedList, c.Username)
 	}
 
-	message := &Connected{
+	message := &models.Connected{
 		Type:      "join",
 		Body:      client.Username + " joined the chat",
 		Sender:    client.Username,
@@ -207,7 +112,7 @@ func (h *Hub) RegisterClient(client *Client) {
 	for _, c := range h.Clients {
 		c.send <- joinedMessage
 	}
-	h.checkCountDown()
+	h.CheckCountDown()
 }
 
 // UnregisterClient removes a client from the hub and sends a leave message to the remaining clients.
@@ -220,7 +125,7 @@ func (h *Hub) UnregisterClient(client *Client) {
 			connectedList = append(connectedList, c.Username)
 		}
 
-		message := &Connected{
+		message := &models.Connected{
 			Type:      "leave",
 			Body:      client.Username + " left the chat",
 			Sender:    client.Username,
@@ -241,24 +146,7 @@ func (h *Hub) UnregisterClient(client *Client) {
 		close(h.Clients[client.Username].send)
 		delete(h.Clients, client.Username)
 
-		h.checkCountDown()
-	}
-}
-
-// UpdateTimer updates the timer value and sends the updated value to all connected clients.
-func (h *Hub) UpdateTimer(t int) {
-	// fmt.Println("timer: ", h.timer)
-	goTimer := &TimerMsg{
-		Type: "update-timer",
-		Body: t,
-	}
-
-	toSend, err := json.Marshal(goTimer)
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, client := range h.Clients {
-		client.send <- toSend
+		h.CheckCountDown()
 	}
 }
 
