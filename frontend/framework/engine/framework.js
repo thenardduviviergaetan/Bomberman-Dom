@@ -74,6 +74,7 @@ export default class Framework {
         this._components.length = 0
         await this.render()
     }
+
     async replaceComponent(component) {
         this.clear();
         this.addComponent(component)

@@ -38,13 +38,11 @@ export default class Chat extends Component {
                     chatElement.children.push(data.body);
                     break
                 case 'chat':
-                    console.log("Message from chat.js: ", data.body);
                     chatElement = new Component("p", { id: "chat-element", className: "chat-element" });
                     const sender = new Component("span", { className: "chat-sender" }, [`<${data.sender}> : `])
                     chatElement.addElement(sender, data.body);
                     break
                 default:
-                    console.log("coucou: " + data.body);
                     return
             }
 

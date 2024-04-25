@@ -25,6 +25,19 @@ body {
   justify-content: space-between;
 }
 
+#fps {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  color: #ffc746;
+  font-weight: bold;
+  font-size: 1rem;
+  z-index: 100;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: 40px;
+}
+
 .bootMenu {
   display: flex;
   margin: auto;
@@ -264,6 +277,21 @@ body {
 #chat form #chat-input:focus {
   outline: none;
   overflow-wrap: break-word;
+}
+
+#map {
+  position: relative;
+  width: 608px;
+  height: 608px;
+  background-color: green;
+}
+
+.player-sprite {
+  position: absolute;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background-color: #ffc746;
 }
 
 @keyframes stagger-right {

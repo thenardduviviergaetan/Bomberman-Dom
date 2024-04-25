@@ -2,7 +2,7 @@ import Framework from "../engine/framework.js"
 import Component from "../components/component.js"
 import BootMenu from "./boot-menu.js"
 import WS from "../../framework/websocket/websocket.js"
-import Game from "../../framework/components/game.js"
+import Game from "../../framework/components/game/game.js"
 import Chat from "../../framework/components/chat.js"
 import WaitingRoom from "./waiting-room.js"
 export default class GameManager {

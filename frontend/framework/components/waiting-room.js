@@ -27,7 +27,6 @@ export default class WaitingRoom extends Component {
                     break
                 case "update-timer":
                     console.log("INNER TIMER:", message.body);
-                    console.log("body = ", message.body.toString());
                     if (message.body === 0) {
                         this.resolve();
                     }
@@ -70,7 +69,6 @@ export default class WaitingRoom extends Component {
         //Each time a new player is added this function is called
         this.playerList.children = [];
         players.flat().forEach((playerUsername) => {
-            console.log("PLAYERS NAME:", playerUsername);
             const player = new Component("li", { className: "player" }, [
                 playerUsername,
             ]);

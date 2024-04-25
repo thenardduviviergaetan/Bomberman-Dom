@@ -36,6 +36,18 @@ body {
     justify-content: space-between;
 }
 
+#fps {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    color: $primary-color;
+    font-weight: bold;
+    font-size: 1rem;
+    z-index: 100;
+    width: fit-content;
+    height: 40px;
+}
+
 .bootMenu {
     display: flex;
     margin: auto;
@@ -107,7 +119,7 @@ body {
 }
 
 
-#leave-button{
+#leave-button {
     z-index: 2;
     position: absolute;
     height: fit-content;
@@ -118,15 +130,17 @@ body {
     right: 0;
     margin-top: 15px;
     margin-right: 15px;
-    padding:10px;
+    padding: 10px;
     transition: background-color 0.3s;
     color: white;
     font-weight: bold;
-    &:hover{
-    background-color: rgba($color: $chat-color2, $alpha: .7);
-    cursor: pointer;
+
+    &:hover {
+        background-color: rgba($color: $chat-color2, $alpha: .7);
+        cursor: pointer;
     }
 }
+
 #container {
     width: 100%;
     height: 100%;
@@ -153,32 +167,35 @@ body {
 #waitingRoom {
     width: 70%;
     height: 80%;
-    ul{
+
+    ul {
         display: flex;
         align-items: center;
         flex-direction: column;
         list-style-type: none;
         padding: 0;
         margin: 0;
-        li{
+
+        li {
             padding: 10px;
-            border-radius:6px;    
+            border-radius: 6px;
             width: 90%;
             margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
-            background-color: rgba($color:$primary-color, $alpha:.8);
-            color:white;
-            span{
+            background-color: rgba($color: $primary-color, $alpha: .8);
+            color: white;
+
+            span {
                 font-size: 1.5rem;
             }
         }
     }
 }
 
-.countDown{
+.countDown {
     text-align: center;
     z-index: 1;
     margin-top: 30%;
@@ -188,7 +205,7 @@ body {
     animation: stagger-up 0.5s ease-in;
 }
 
-#playersCount{
+#playersCount {
     font-size: 1.5rem;
     font-weight: bold;
     text-align: center;
@@ -197,16 +214,16 @@ body {
 }
 
 
-.player{
+.player {
     background-color: rgba($color: $background-color, $alpha: .6);
 }
 
-#room-container{
+#room-container {
     width: 100%;
     height: 100%;
 }
 
-#playerList{
+#playerList {
     width: 100%;
 }
 
@@ -259,9 +276,10 @@ body {
             margin-bottom: 3px;
             margin-top: 2px;
             border-radius: 8px;
+
             &:last-child {
-            // animation: fadeIn 0.5s ease-in, stagger-right 0.5s ease-in;
-            
+                // animation: fadeIn 0.5s ease-in, stagger-right 0.5s ease-in;
+
                 .chat-sender {
                     color: $chat-color3
                 }
@@ -289,7 +307,8 @@ body {
             border: 1px solid $primary-color;
             border-radius: 5px;
             background-color: $background-color;
-            &:focus{
+
+            &:focus {
                 outline: none;
                 overflow-wrap: break-word;
             }
@@ -298,8 +317,25 @@ body {
 }
 
 
+//MAP
+
+#map {
+    position: relative;
+    width: 608px;
+    height: 608px;
+    background-color: green
+}
+
+.player-sprite {
+    position: absolute;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    background-color: $primary-color;
+}
+
 @keyframes stagger-right {
-    from{
+    from {
         opacity: 0;
         transform: translateX(50px);
     }
@@ -311,12 +347,13 @@ body {
 }
 
 
-@keyframes stagger-up{
-    from{
+@keyframes stagger-up {
+    from {
         opacity: 0;
         transform: translateY(50px);
     }
-    to{
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
