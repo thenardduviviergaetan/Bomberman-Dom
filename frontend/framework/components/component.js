@@ -77,9 +77,10 @@ export default class Component {
             event.preventDefault();
             if (eventType === 'submit') {
                 func(event.target);
+                func(event.target);
                 event.target.reset();
             } else {
-                func(event);
+                func(event)
             }
         };
     }
