@@ -43,7 +43,7 @@ export default class GameManager {
 
     launchgame() {
         const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
-        const container = new Component("div", { id: "container" });
+        const container = new Component("div", { id: "container"});
         const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
@@ -57,7 +57,7 @@ export default class GameManager {
         });
 
         ready.then(() => {
-            const game = new Game({ id: "game" }, this.ws, this.username);
+            const game = new Game({ id: "game",tabindex:-1 }, this.ws, this.username); // FIXME : tabindex here
             container.replaceChildren(waitRoom, game);
             // const script = new Component("script", { src: "./test.js" });
             // this.app.addComponent(script);

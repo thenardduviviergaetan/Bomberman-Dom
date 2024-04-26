@@ -61,10 +61,6 @@ export default class Component {
      * @returns {Promise<void>} A promise that resolves when the update is complete.
      */
     async update() {
-        // const oldVNode = this.vNode;
-        // this.vNode = await this.render();
-        // const patches = diff(oldVNode, this.vNode);
-        // await patch(this.domNode, patches);
         this.updateDOM()
     }
     /**

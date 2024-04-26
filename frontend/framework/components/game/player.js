@@ -1,9 +1,10 @@
 import Component from "../component.js";
 
 export default class Player extends Component {
-    constructor(props, ws, username) {
+    constructor(props, game) {
         super("div", props);
-        this.ws = ws;
+        this.game = game
+        this.ws = game.ws;
         this.username = username;
         this.posX = 0
         this.posY = 0
@@ -21,30 +22,31 @@ export default class Player extends Component {
         //TODO Set a debounce for the keydown
         // this.actionListener('keydown', (key) => this.sendMove(key))
         // this.ws.onMessage((key) => this.receiveMove(key))
-        this.actionListener('keydown', (event) => this.handleKeyDown(event))
-        // this.actionListener('keyup', (event) => this.handleKeyUp(event))
+        this.game.actionListener('keydown', (event) => this.handleKeyDown(event)) //FIXME this is the only method valuable 
+        this.game.actionListener('keyup', (event) => this.handleKeyUp(event)) //FIXME this is the only method valuable
+        // this.actionListener('click', (event) => console.log("clicked"))
     }
 
     handleKeyDown(event) {
         switch (event.key.toLowerCase()) {
             case 'arrowleft', "q":
-                console.log("left")
+                console.log(`left : ${this.username}`)
                 this.movePlayer('left');
                 break;
             case 'arrowright', "d":
-                console.log("right")
+                console.log(`right : ${this.username}`)
                 this.movePlayer('right');
                 break;
             case 'arrowup', "z":
-                console.log("up")
+                console.log(`up : ${this.username}`)
                 this.movePlayer('up');
                 break;
             case 'arrowdown', "s":
-                console.log("down")
+                console.log(`down : ${this.username}`)
                 this.movePlayer('down');
                 break;
             case ' ', "space":
-                console.log("bomb")
+                console.log(`bomb : ${this.username}`)
                 this.dropBomb()
                 break;
             default:
