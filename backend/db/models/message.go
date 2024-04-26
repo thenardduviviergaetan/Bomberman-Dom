@@ -19,3 +19,11 @@ type TimerMsg struct {
 	Type string `json:"type"`
 	Body int    `json:"body"` // Body of the message
 }
+
+// type: "move", direction: "right", player: this.username, position:{x:this.posX, y:this.posY}
+type MsgMove struct {
+	Type      string      `json:"type"`
+	Direction string      `json:"direction"`
+	Player    string      `json:"player"`
+	Position  interface{} `json:"position"`
+}

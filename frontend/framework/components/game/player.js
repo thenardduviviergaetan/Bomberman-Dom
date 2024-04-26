@@ -5,7 +5,7 @@ export default class Player extends Component {
         super("div", props);
         this.game = game
         this.ws = game.ws;
-        this.username = username;
+        this.username = game.username;
         this.posX = 0
         this.posY = 0
         this.movementSize = 15
@@ -68,12 +68,12 @@ export default class Player extends Component {
     }
 
     movePlayer(direction) {
-        this.ws.sendMessage({ type: "move", direction: direction, sender: this.username, position:{x:this.posX, y:this.posY} });
+        this.ws.sendMessage({ type: "move", direction: direction, player: this.username, position:{x:this.posX, y:this.posY} });
     }
     // sendMove(key) {
     //     switch (key.key) {
     //         case "ArrowRight", "d", "D":
-    //             this.ws.sendMessage({ type: "move", direction: "right", sender: this.username, position:{x:this.posX, y:this.posY} });
+    //             this.ws.sendMessage({ type: "move", direction: "right", player: this.username, position:{x:this.posX, y:this.posY} });
     //             break;
     //         case "ArrowLeft", "q", "Q":
     //             this.ws.sendMessage({ type: "move", direction: "left" });

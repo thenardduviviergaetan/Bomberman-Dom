@@ -15,6 +15,7 @@ type Hub struct {
 	unregister  chan *Client       // A channel used for unregistering clients.
 	timer       *Timer
 	gameStarted bool
+	game        *Game
 }
 
 // InitHub initializes a new instance of the Hub struct.
@@ -26,6 +27,7 @@ func InitHub() *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		timer:      InitTimer(),
+		game:       InitGame(),
 	}
 }
 
@@ -41,6 +43,7 @@ func (h *Hub) CheckUsername(username string) bool {
 func (h *Hub) LaunchRoutines() {
 	go h.Run()
 	go h.timer.RunCountDown()
+	// go h.game.StartGame()
 }
 
 // Run starts the main event loop of the Hub, handling incoming events from Clients.
@@ -59,6 +62,9 @@ func (h *Hub) Run() {
 
 		case t := <-h.timer.broadcastTime:
 			h.UpdateTimer(t)
+
+		case pos := <-h.game.broadcastMove:
+			h.SendPosition(pos)
 
 		case message := <-h.broadcast:
 			var msg *models.Message
@@ -79,6 +85,9 @@ func (h *Hub) Run() {
 					}
 					playerReady = 0
 				}
+			case "move":
+				fmt.Println("test")
+				h.game.broadcastMove <- message
 			}
 		}
 	}
