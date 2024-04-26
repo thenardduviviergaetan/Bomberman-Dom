@@ -1,22 +1,40 @@
 import Component from "../component.js";
 
-export default class Player extends Component {
+export class Player extends Component {
     constructor(props, ws, username) {
         super("div", props);
         this.ws = ws;
         this.username = username;
-        this.posX = 0
-        this.posY = 0
-        this.movementSize = 15
-        // this.init();
-        this.initListeners();
+        this.props.style = {top:"",left:"",transform:""};
+        this.posX;
+        this.posY;
+        this.draw();
+    }
+    
+    draw() {
+        this.props.style.top = this.posY;
+        this.props.style.left = this.posX;
+        this.update();
     }
 
-    // init(){
+    update(){
+        this.props.style.transform = `translate(${this.posX}px, ${this.posY}px)`
+        //Can't apply this, you'll tansform and then use .left and .top (le translate sert à rien sinon)
+        // this.draw()
+        this.update()
+    }
 
-    // }
-    // draw() {
-    // }
+
+}
+
+export class CurrentPlayer extends Player{
+    constructor(props, ws, username){
+        super(props, ws, username)
+        this.movementSize = 15
+        this.initListeners()
+
+    }
+
     initListeners() {
         //TODO Set a debounce for the keydown
         // this.actionListener('keydown', (key) => this.sendMove(key))
@@ -66,79 +84,10 @@ export default class Player extends Component {
     }
 
     movePlayer(direction) {
-        this.ws.sendMessage({ type: "move", direction: direction, sender: this.username, position:{x:this.posX, y:this.posY} });
+        this.ws.sendMessage({ type: "move", direction: direction, sender: this.username, position: { x: this.posX, y: this.posY } });
     }
-    // sendMove(key) {
-    //     switch (key.key) {
-    //         case "ArrowRight", "d", "D":
-    //             this.ws.sendMessage({ type: "move", direction: "right", sender: this.username, position:{x:this.posX, y:this.posY} });
-    //             break;
-    //         case "ArrowLeft", "q", "Q":
-    //             this.ws.sendMessage({ type: "move", direction: "left" });
-    //             break;
-    //         case "ArrowDown", "s", "S":
-    //             this.ws.sendMessage({ type: "move", direction: "down" });
-    //             break;
-    //         case "ArrowUp", "z", "Z":
-    //             this.ws.sendMessage({ type: "move", direction: "up" });
-    //             break;
-    //         case "Space":
-    //             this.ws.sendMessage({ type: "bomb", action: "bomb" });
-    //             break;
-    //     }
-    // }
 
-    // receiveMove(key) {
-    //     switch (key.key) {
-    //         case "ArrowRight", "d", "D":
-    //             this.posX += this.movementSize
-    //             break;
-    //         case "ArrowLeft", "q", "Q":
-    //             this.posX -= this.movementSize
-    //             break;
-    //         case "ArrowDown", "s", "S":
-    //             this.posY += this.movementSize
-    //             break;
-    //         case "ArrowUp", "z", "Z":
-    //             this.posY -= this.movementSize
-    //             break;
-    //     }
-    // }
-
-}
-
-/*
- draw() {
-        this.x = Math.max(0, Math.min(this.x, this.gameAreaWidth - this.width));
-        this.player.style.transform = `translate(${this.x}px, ${this.y}px)`;
+    dropBomb(){
+        this.ws.sendMessage({ type: "bomb", sender: this.username, position:{x:this.posX, y:this.posY} });
     }
-    movePlayer(direction) {
-        direction === 'left' ? this.moveLeft() : this.moveRight();
-    }
-    moveLeft() {
-        if (!this.movingLeft) {
-            this.movingLeft = true;
-            requestAnimationFrame(this.moveLeftFrame.bind(this));
-        }
-    }
-    moveLeftFrame() {
-        if (this.movingLeft) {
-            this.x -= 2;
-            this.draw();
-            requestAnimationFrame(this.moveLeftFrame.bind(this));
-        }
-    }
-    moveRight() {
-        if (!this.movingRight) {
-            this.movingRight = true;
-            requestAnimationFrame(this.moveRightFrame.bind(this));
-        }
-    }
-    moveRightFrame() {
-        if (this.movingRight) {
-            this.x += 2;
-            this.draw();
-            requestAnimationFrame(this.moveRightFrame.bind(this));
-        }
-    }
-*/
+} 

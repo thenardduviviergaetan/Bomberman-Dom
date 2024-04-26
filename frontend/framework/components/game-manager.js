@@ -57,7 +57,7 @@ export default class GameManager {
         });
 
         ready.then(() => {
-            const game = new Game({ id: "game" }, this.ws, this.username);
+            const game = new Game({ id: "game" }, this.ws, this.username, waitRoom.playerList.children);
             container.replaceChildren(waitRoom, game);
             // const script = new Component("script", { src: "./test.js" });
             // this.app.addComponent(script);
