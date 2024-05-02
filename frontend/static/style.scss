@@ -328,6 +328,7 @@ body {
 
 .player-sprite {
     position: absolute;
+    z-index: 100;
     border-radius: 50%;
     width: 32px;
     height: 32px;

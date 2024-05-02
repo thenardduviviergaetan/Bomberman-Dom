@@ -79,7 +79,23 @@ func (h *Hub) Run() {
 					}
 					playerReady = 0
 				}
+			case "move":
+
+				moveMsg := struct {
+					Type     string      `json:"type"`
+					Sender   string      `json:"sender"`
+					Position interface{} `json:"position"`
+				}{}
+
+				json.Unmarshal(message, &moveMsg)
+
+				fmt.Println("MOVE OK: ", moveMsg)
+
+				for _, client := range h.Clients {
+					client.send <- message
+				}
 			}
+
 		}
 	}
 }

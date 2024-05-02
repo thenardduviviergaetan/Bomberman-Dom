@@ -23,10 +23,10 @@ export default class Game extends Component {
                 this.atlas = message.body
                 const map = new Map(this.atlas)
                 const positions = [
-                    { top: 32, left: 32 },
-                    { top: 608 - 64, left: 608 - 64 },
-                    { top: 32, left: 608 - 64 },
-                    { top: 608 - 64, left: 32 }
+                    { top: -608 +32, left: 32 },
+                    { top: -64 , left: 608 - 64 },
+                    { top: -608+32, left: 608 - 64 },
+                    { top: -64, left: 32 }
                 ]
                 this.players.forEach((player, index) => {
 
@@ -35,13 +35,14 @@ export default class Game extends Component {
                         className: "player-sprite",
                         style: {
                             top: positions[index].top,
-                            left: positions[index].left
+                            left: positions[index].left,
                         }
                     }
 
                     if (player.children[0] !== this.username) {
                         const newPlayer = new Player(props)
                         map.addElement(newPlayer)
+                        this.players[index] = newPlayer
                     } else {
                         this.currentPlayer = new CurrentPlayer(
                             props
@@ -49,11 +50,18 @@ export default class Game extends Component {
                             this.username)
 
                         map.addElement(this.currentPlayer)
+                        this.players[index] = this.currentPlayer
                     }
                 })
 
                 this.addElement(map)
                 this.update()
+            }
+
+            if (message.type === "move") {
+                console.log("move received: ", message);
+                const player = this.players.find(player => player.props.id === message.sender)
+                player.move(message.position)
             }
         })
         this.FRAMERATE = 1000 / 60;
