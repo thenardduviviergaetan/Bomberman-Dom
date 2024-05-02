@@ -1,11 +1,11 @@
 import Component from "../component.js";
 import Map from "./map.js";
-import {Player} from "./player.js";
+import { CurrentPlayer, Player } from "./player.js";
 
 let lastUpdateTime = performance.now()
 let frameCount = 0
 let fps = document.getElementById("fps")
-//TODO make a div without the outer walls where the player will be in
+
 export default class Game extends Component {
     constructor(props, ws, username, players) {
         super("section", props);
@@ -17,31 +17,41 @@ export default class Game extends Component {
 
         this.players = players
         console.log("PLAYERS:", this.players);
-        
-        this.currentPlayer = new Player({ id: this.username, className: "player-sprite" }, this.ws, this.username)
 
         this.ws.onMessage((message) => {
             if (message.type === "map") {
                 this.atlas = message.body
                 const map = new Map(this.atlas)
                 const positions = [
-                    {top: "32px", left: "32px"},
-                    {top: `${608-64}px`, left: `${608-64}px`},
-                    {top: "32px", left: `${608-64}px`},
-                    {top: `${608-64}px`, left: "32px"}
+                    { top: 32, left: 32 },
+                    { top: 608 - 64, left: 608 - 64 },
+                    { top: 32, left: 608 - 64 },
+                    { top: 608 - 64, left: 32 }
                 ]
                 this.players.forEach((player, index) => {
-                    if (player.username !== this.username) {
-                        let newPlayer = new Component("div", { id: player.children[0], className: "player-sprite" })
-                        newPlayer.posX = positions[index].left
-                        newPlayer.posY = positions[index].top
+
+                    const props = {
+                        id: player.children[0],
+                        className: "player-sprite",
+                        style: {
+                            top: positions[index].top,
+                            left: positions[index].left
+                        }
+                    }
+
+                    if (player.children[0] !== this.username) {
+                        const newPlayer = new Player(props)
                         map.addElement(newPlayer)
                     } else {
-                        this.currentPlayer.posX = positions[index].left
-                        this.currentPlayer.posY = positions[index].top
+                        this.currentPlayer = new CurrentPlayer(
+                            props
+                            , this.ws,
+                            this.username)
+
+                        map.addElement(this.currentPlayer)
                     }
                 })
-                map.addElement(this.currentPlayer)
+
                 this.addElement(map)
                 this.update()
             }
@@ -71,8 +81,7 @@ export default class Game extends Component {
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
 
-    updateState(){
-        this.currentPlayer.initListeners()
+    updateState() {
     }
 
 

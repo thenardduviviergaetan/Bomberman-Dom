@@ -15,7 +15,7 @@ export default class GameManager {
     async launchMenu() {
         const bootMenu = new BootMenu();
         const ready = new Promise((resolve, reject) => {
-            bootMenu.initialize(resolve, reject);            
+            bootMenu.initialize(resolve, reject);
         });
 
         this.app.addComponent(bootMenu);
@@ -59,8 +59,6 @@ export default class GameManager {
         ready.then(() => {
             const game = new Game({ id: "game" }, this.ws, this.username, waitRoom.playerList.children);
             container.replaceChildren(waitRoom, game);
-            // const script = new Component("script", { src: "./test.js" });
-            // this.app.addComponent(script);
             container.update()
         });
 
