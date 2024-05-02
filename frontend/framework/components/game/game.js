@@ -8,8 +8,10 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
+
         this.size = 19;
         this.atlas = this.ws.sendMessage({ type: "map" });
+
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
 
@@ -83,8 +85,7 @@ export default class Game extends Component {
         const deltaTime = timestamp - this.lastTime
         if (deltaTime >= this.FRAMERATE) {
             this.lastTime = timestamp
-                this.updateState()
-                
+            this.updateState()
         }
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
