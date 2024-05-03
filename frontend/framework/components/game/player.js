@@ -4,7 +4,7 @@ import { checkGround } from "./collisions.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
-const MOVEMENT_SIZE = 2;
+const MOVEMENT_SIZE = 4;
 const FRAMERATE = 1000 / 60;
 
 const DIRECTION_MAP = {
@@ -38,31 +38,31 @@ export class Player extends Component {
         // this.animate()
     }
 
-    animate(direction){
+    animate(direction) {
         this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
         let offsetX = this.frameIndex * FRAME_WIDTH;
 
-    let offsetY = 0;
+        let offsetY = 0;
 
-    switch (direction) {
-        case "down":
-            offsetY = 0;
-            break;
-        case "up":
-            offsetY = FRAME_WIDTH;
-            break;
-        case "right":
-            offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
-            break;
-        case "left":
-            offsetX = (this.frameIndex + 3) * FRAME_WIDTH; 
-            offsetY = FRAME_WIDTH;
-            break;
-    }
+        switch (direction) {
+            case "down":
+                offsetY = 0;
+                break;
+            case "up":
+                offsetY = FRAME_WIDTH;
+                break;
+            case "right":
+                offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
+                break;
+            case "left":
+                offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
+                offsetY = FRAME_WIDTH;
+                break;
+        }
 
         this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
 
-}
+    }
 
     move(direction, position) {
         this.posX = position.x;
@@ -75,7 +75,7 @@ export class Player extends Component {
     }
 }
 export class CurrentPlayer extends Player {
-    constructor(props, ws, username,parent) {
+    constructor(props, ws, username, parent) {
         super(props, ws, username);
         this.parent = parent;
 
@@ -92,9 +92,9 @@ export class CurrentPlayer extends Player {
 
     updatePosition(direction) {
         // console.log(this.parent)
-        checkGround(this);
-        this.posY += direction === "up" ? -MOVEMENT_SIZE : direction === "down" ? MOVEMENT_SIZE : 0;
-        this.posX += direction === "left" ? -MOVEMENT_SIZE : direction === "right" ? MOVEMENT_SIZE : 0;
+        const playerGround = checkGround(this);
+        this.posY += direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
+        this.posX += direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
     }
 
     dropBomb() {
