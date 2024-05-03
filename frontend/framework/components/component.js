@@ -20,7 +20,7 @@ export default class Component {
      * Adds CSS class names to the component's props.
      * @param {...string} classList - The CSS class names to add.
      */
-    className(...classList) {
+    addClassName(...classList) {
         this.props.className += ' ' + classList.join(" ")
     }
     /**
@@ -82,5 +82,12 @@ export default class Component {
                 func(event)
             }
         };
+    }
+
+    clone(){
+        const clone = new Component(this.tag, this.props, this.children)
+        clone.children = this.children.map((child) => child.clone())
+        clone.parent = this.parent
+        return clone
     }
 }

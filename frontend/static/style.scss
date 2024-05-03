@@ -323,8 +323,16 @@ body {
     position: relative;
     width: 608px;
     height: 608px;
-    background-color: green
+    // background-color: green
 }
+
+.line {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: fit-content;
+}
+
 
 .player-sprite {
     will-change: transform; 

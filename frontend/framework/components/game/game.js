@@ -2,6 +2,13 @@ import Component from "../component.js";
 import Map from "./map.js";
 import { CurrentPlayer, Player } from "./player.js";
 
+const FRAMERATE = 1000 / 60;
+const positions = [
+    { top: -608 + 32, left: 32 },
+    { top: -64, left: 608 - 64 },
+    { top: -608 + 32, left: 608 - 64 },
+    { top: -64, left: 32 }
+]
 
 export default class Game extends Component {
     constructor(props, ws, username, readyPlayers) {
@@ -26,7 +33,6 @@ export default class Game extends Component {
         })
 
 
-        this.FRAMERATE = 1000 / 60;
         this.lastTime = 0
 
         this.fps = document.getElementById("fps")
@@ -36,15 +42,10 @@ export default class Game extends Component {
         this.gameLoop()
     }
 
-    initMap(message){
+    initMap(message) {
         this.atlas = message.body
         const map = new Map(this.atlas)
-        const positions = [
-            { top: -608 + 32, left: 32 },
-            { top: -64, left: 608 - 64 },
-            { top: -608 + 32, left: 608 - 64 },
-            { top: -64, left: 32 }
-        ]
+
         this.readyPlayers.forEach((player, index) => {
 
             const props = {
@@ -83,7 +84,7 @@ export default class Game extends Component {
     gameLoop(timestamp) {
         this.fpsCounter()
         const deltaTime = timestamp - this.lastTime
-        if (deltaTime >= this.FRAMERATE) {
+        if (deltaTime >= FRAMERATE) {
             this.lastTime = timestamp
             this.updateState()
         }

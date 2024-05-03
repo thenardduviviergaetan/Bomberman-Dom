@@ -283,7 +283,14 @@ body {
   position: relative;
   width: 608px;
   height: 608px;
-  background-color: green;
+}
+
+.line {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: -moz-fit-content;
+  height: fit-content;
 }
 
 .player-sprite {
