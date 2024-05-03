@@ -92,11 +92,20 @@ export default class Game extends Component {
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
 
-    updateState() {
-        this.playerMoveQueue.forEach((player) => {
-            player.player.move(player.direction, player.position)
+    async updateState() {
+
+        const movePromises = this.playerMoveQueue.map((player) => {
+            new Promise((resolve) => {
+                player.player.move(player.direction, player.position)
+                resolve()
+            })
         })
+        await Promise.all(movePromises)
         this.playerMoveQueue = []
+        // this.playerMoveQueue.forEach((player) => {
+            // player.player.move(player.direction, player.position)
+        // })
+        // this.playerMoveQueue = []
     }
 
     fpsCounter() {

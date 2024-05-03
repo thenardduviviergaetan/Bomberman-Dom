@@ -3,8 +3,8 @@ import { debounce } from "../../engine/utils.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
-const MOVEMENT_SIZE = 4;
-const FRAMERATE = 1000 / 60;
+const MOVEMENT_SIZE = 2;
+const ANIMATION_FRAME_RATE = 8
 
 const DIRECTION_MAP = {
     "ArrowUp": "up",
@@ -29,41 +29,47 @@ export class Player extends Component {
         this.draw();
 
         this.frameIndex = 0
+        this.animationCounter = 0
 
     }
 
     draw() {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
-        // this.animate()
     }
 
-    animate(direction){
-        this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
-        let offsetX = this.frameIndex * FRAME_WIDTH;
+    animate(direction) {
+        this.animationCounter++
+        if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
+            this.prevDirection = direction;
 
-    let offsetY = 0;
+            this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
+            let offsetX = this.frameIndex * FRAME_WIDTH;
 
-    switch (direction) {
-        case "down":
-            offsetY = 0;
-            break;
-        case "up":
-            offsetY = FRAME_WIDTH;
-            break;
-        case "right":
-            offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
-            break;
-        case "left":
-            offsetX = (this.frameIndex + 3) * FRAME_WIDTH; 
-            offsetY = FRAME_WIDTH;
-            break;
+            let offsetY = 0;
+
+            switch (direction) {
+                case "down":
+                    offsetY = 0;
+                    break;
+                case "up":
+                    offsetY = FRAME_WIDTH;
+                    break;
+                case "right":
+                    offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
+                    break;
+                case "left":
+                    offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
+                    offsetY = FRAME_WIDTH;
+                    break;
+            }
+
+            this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
+
+        }
     }
-
-        this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
-
-}
 
     move(direction, position) {
+
         this.posX = position.x;
         this.posY = position.y;
         requestAnimationFrame(() => {
@@ -76,23 +82,40 @@ export class Player extends Component {
 export class CurrentPlayer extends Player {
     constructor(props, ws, username) {
         super(props, ws, username);
+        this.direction = null
+        this.isMoving = false;
 
         window.addEventListener("keydown", debounce((event) => {
+            this.direction = DIRECTION_MAP[event.key];
+            if (!this.isMoving) this.updatePosition();
+        }), 10)
 
-            const direction = DIRECTION_MAP[event.key];
-
-            if (direction) {
-                this.updatePosition(direction);
-                this.ws.sendMessage({ type: "move", sender: this.username, direction: direction, position: { x: this.posX, y: this.posY } });
+        window.addEventListener("keyup", debounce((event) => {
+            if (this.direction === DIRECTION_MAP[event.key]) {
+                this.direction = null;
             }
-        }), FRAMERATE);
+        }), 10)
     }
 
-    updatePosition(direction) {
-        this.posY += direction === "up" ? -MOVEMENT_SIZE : direction === "down" ? MOVEMENT_SIZE : 0;
-        this.posX += direction === "left" ? -MOVEMENT_SIZE : direction === "right" ? MOVEMENT_SIZE : 0;
+    updatePosition() {
+        this.isMoving = true;
+        let lastSendTime = performance.now();
+        const move = () => {
+            if (!this.direction) {
+                this.isMoving = false;
+                return;
+            }
+            this.posY += this.direction === "up" ? -MOVEMENT_SIZE : this.direction === "down" ? MOVEMENT_SIZE : 0;
+            this.posX += this.direction === "left" ? -MOVEMENT_SIZE : this.direction === "right" ? MOVEMENT_SIZE : 0;
+            // this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
+            if (Date.now() - lastSendTime >= 1000 / 60) {
+                this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
+                lastSendTime = performance.now();
+            }
+            requestAnimationFrame(move);
+        }
+        requestAnimationFrame(move);
     }
-
     dropBomb() {
         this.ws.sendMessage({
             type: "bomb",
