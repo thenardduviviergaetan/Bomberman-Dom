@@ -1,9 +1,10 @@
 import Component from "../component.js";
 import { debounce } from "../../engine/utils.js";
+import { checkGround } from "./collisions.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
-const MOVEMENT_SIZE = 4;
+const MOVEMENT_SIZE = 2;
 const FRAMERATE = 1000 / 60;
 
 const DIRECTION_MAP = {
@@ -74,8 +75,9 @@ export class Player extends Component {
     }
 }
 export class CurrentPlayer extends Player {
-    constructor(props, ws, username) {
+    constructor(props, ws, username,parent) {
         super(props, ws, username);
+        this.parent = parent;
 
         window.addEventListener("keydown", debounce((event) => {
 
@@ -89,6 +91,8 @@ export class CurrentPlayer extends Player {
     }
 
     updatePosition(direction) {
+        // console.log(this.parent)
+        checkGround(this);
         this.posY += direction === "up" ? -MOVEMENT_SIZE : direction === "down" ? MOVEMENT_SIZE : 0;
         this.posX += direction === "left" ? -MOVEMENT_SIZE : direction === "right" ? MOVEMENT_SIZE : 0;
     }

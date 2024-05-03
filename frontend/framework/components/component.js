@@ -23,6 +23,9 @@ export default class Component {
     addClassName(...classList) {
         this.props.className += ' ' + classList.join(" ")
     }
+    rmClassName(cl){
+        this.props.className = this.props.className.split(" ").filter((el) => { return el !== cl}).join(" ");
+    }
     /**
      * Adds child components to the component.
      * @param {...Component} children - The child components to add.
