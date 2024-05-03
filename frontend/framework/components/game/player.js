@@ -1,6 +1,22 @@
 import Component from "../component.js";
 import { debounce } from "../../engine/utils.js";
 
+const FRAME_COUNT = 3;
+const FRAME_WIDTH = 32;
+const MOVEMENT_SIZE = 4;
+const FRAMERATE = 1000 / 60;
+
+const DIRECTION_MAP = {
+    "ArrowUp": "up",
+    "z": "up",
+    "ArrowDown": "down",
+    "s": "down",
+    "ArrowLeft": "left",
+    "q": "left",
+    "ArrowRight": "right",
+    "d": "right"
+};
+
 export class Player extends Component {
     constructor(props, ws, username) {
         super("div", props);
@@ -11,47 +27,70 @@ export class Player extends Component {
         this.sprite = `url(./framework/components/game/assets/player${props.index + 1}.png)`
         this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px;`;
         this.draw();
+
+        this.frameIndex = 0
+
     }
 
     draw() {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
+        // this.animate()
     }
 
-    move(position) {
+    animate(direction){
+        this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
+        let offsetX = this.frameIndex * FRAME_WIDTH;
+
+    let offsetY = 0;
+
+    switch (direction) {
+        case "down":
+            offsetY = 0;
+            break;
+        case "up":
+            offsetY = FRAME_WIDTH;
+            break;
+        case "right":
+            offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
+            break;
+        case "left":
+            offsetX = (this.frameIndex + 3) * FRAME_WIDTH; 
+            offsetY = FRAME_WIDTH;
+            break;
+    }
+
+        this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
+
+}
+
+    move(direction, position) {
         this.posX = position.x;
         this.posY = position.y;
         requestAnimationFrame(() => {
+            this.animate(direction)
             this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
             this.updateDOM();
         });
     }
 }
-
 export class CurrentPlayer extends Player {
     constructor(props, ws, username) {
         super(props, ws, username);
-        this.movementSize = 4;
 
-        const directionMap = {
-            "ArrowUp": "up",
-            "z": "up",
-            "ArrowDown": "down",
-            "s": "down",
-            "ArrowLeft": "left",
-            "q": "left",
-            "ArrowRight": "right",
-            "d": "right"
-        };
         window.addEventListener("keydown", debounce((event) => {
 
-            const direction = directionMap[event.key];
+            const direction = DIRECTION_MAP[event.key];
 
             if (direction) {
-                this.posY += direction === "up" ? -this.movementSize : direction === "down" ? this.movementSize : 0;
-                this.posX += direction === "left" ? -this.movementSize : direction === "right" ? this.movementSize : 0;
-                this.ws.sendMessage({ type: "move", sender: this.username, position: { x: this.posX, y: this.posY } });
+                this.updatePosition(direction);
+                this.ws.sendMessage({ type: "move", sender: this.username, direction: direction, position: { x: this.posX, y: this.posY } });
             }
-        }, 10));
+        }), FRAMERATE);
+    }
+
+    updatePosition(direction) {
+        this.posY += direction === "up" ? -MOVEMENT_SIZE : direction === "down" ? MOVEMENT_SIZE : 0;
+        this.posX += direction === "left" ? -MOVEMENT_SIZE : direction === "right" ? MOVEMENT_SIZE : 0;
     }
 
     dropBomb() {

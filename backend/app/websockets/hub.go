@@ -63,6 +63,7 @@ func (h *Hub) Run() {
 		case message := <-h.broadcast:
 			var msg *models.Message
 			json.Unmarshal(message, &msg)
+			fmt.Println("MSG: ", msg)
 			switch msg.Type {
 			case "chat":
 				for _, client := range h.Clients {
@@ -80,19 +81,18 @@ func (h *Hub) Run() {
 					playerReady = 0
 				}
 			case "move":
-
-				moveMsg := struct {
-					Type     string      `json:"type"`
-					Sender   string      `json:"sender"`
-					Position interface{} `json:"position"`
-				}{}
+				var moveMsg *models.MoveMessage
 
 				json.Unmarshal(message, &moveMsg)
 
-				fmt.Println("MOVE OK: ", moveMsg)
+				jsonMove, err := json.Marshal(moveMsg)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 
 				for _, client := range h.Clients {
-					client.send <- message
+					client.send <- jsonMove
 				}
 			}
 

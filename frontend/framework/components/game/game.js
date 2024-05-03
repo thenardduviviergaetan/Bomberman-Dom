@@ -79,7 +79,7 @@ export default class Game extends Component {
 
     updatePlayers(message) {
         const player = this.readyPlayers.find(player => player.props.id === message.sender)
-        this.playerMoveQueue.push({ player, position: message.position })
+        this.playerMoveQueue.push({ player, direction: message.direction, position: message.position })
     }
 
     gameLoop(timestamp) {
@@ -94,7 +94,7 @@ export default class Game extends Component {
 
     updateState() {
         this.playerMoveQueue.forEach((player) => {
-            player.player.move(player.position)
+            player.player.move(player.direction, player.position)
         })
         this.playerMoveQueue = []
     }

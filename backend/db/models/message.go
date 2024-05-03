@@ -19,3 +19,10 @@ type TimerMsg struct {
 	Type string `json:"type"`
 	Body int    `json:"body"` // Body of the message
 }
+
+type MoveMessage struct {
+	Type      string      `json:"type"`
+	Sender    string      `json:"sender"`
+	Direction string      `json:"direction"`
+	Position  interface{} `json:"position"`
+}

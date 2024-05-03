@@ -19,6 +19,11 @@ export default class Map extends Component {
     }
 
     initMap() {
+        const wall = new Component("div", { class: "wall", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+        const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+        const shadow = new Component("div", { class: "shadow", style: `background-image: ${this.tileSetImage}; background-position: -${64}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+        const spawn = new Component("div", { class: "spawn", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+
         for (let y = 0; y < this.atlas.length; y++) {
             const lineMap = new Component("div", { class: "line" })
             for (let x = 0; x < this.atlas[y].length; x++) {
@@ -26,27 +31,19 @@ export default class Map extends Component {
                 let block;
                 switch (type) {
                     case TILE_TYPES.WALL:
-                        block = new Component("div", { class: "wall", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+                        block = wall
                         break;
                     case TILE_TYPES.BLOCK:
                         block = new Component("div", { class: "block", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
                         break;
                     case TILE_TYPES.PATH:
-                        if (y > 0 && (this.atlas[y - 1][x] === 1 ||this.atlas[y-1][x]===2 )) {
-                            block = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${64}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-                        } else {
-                            block = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-                        }
+                        (y > 0 && (this.atlas[y - 1][x] === 1 || this.atlas[y - 1][x] === 2)) ? block = shadow : block = path;
                         break;
                     case TILE_TYPES.SPAWN:
-                        block = new Component("div", { class: "spawn", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+                        block = spawn
                         break;
                     case TILE_TYPES.SAFE_ZONE:
-                        if (y > 0 && (this.atlas[y - 1][x] === 1 ||this.atlas[y-1][x]===2 )) {
-                            block = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${64}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-                        } else {
-                            block = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-                        }
+                        (y > 0 && (this.atlas[y - 1][x] === 1 || this.atlas[y - 1][x] === 2)) ? block = shadow : block = path;
                         break;
                     default:
                         break;
