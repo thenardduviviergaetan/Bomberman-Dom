@@ -338,10 +338,12 @@ body {
     will-change: transform; 
     position: absolute;
     z-index: 100;
-    border-radius: 50%;
+    // background-image: url('../framework/components/game/assets/player1.png');
+    // background-position: -32px 0;
+    // border-radius: 50%;
     width: 32px;
     height: 32px;
-    background-color: $primary-color;
+    // background-color: $primary-color;
 }
 
 @keyframes stagger-right {

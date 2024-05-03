@@ -54,7 +54,8 @@ export default class Game extends Component {
                 style: {
                     top: positions[index].top,
                     left: positions[index].left,
-                }
+                },
+                index: index
             }
 
             if (player.children[0] !== this.username) {
