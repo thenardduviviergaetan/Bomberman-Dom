@@ -36,7 +36,7 @@ export default class Game extends Component {
         this.lastTime = 0
 
         this.fps = document.getElementById("fps")
-        this.lastUpdateTime = Date.now()
+        this.lastUpdateTime = performance.now()
         this.frameCount = 0
 
         this.gameLoop()
@@ -100,10 +100,11 @@ export default class Game extends Component {
     }
 
     fpsCounter() {
-        if (Date.now() - this.lastUpdateTime >= 1000) {
+        const now = performance.now()
+        if (now - this.lastUpdateTime >= 1000) {
             this.fps.textContent = `FPS: ${this.frameCount}`
             this.frameCount = 0
-            this.lastUpdateTime = Date.now()
+            this.lastUpdateTime = now
         }
         this.frameCount++
     }
