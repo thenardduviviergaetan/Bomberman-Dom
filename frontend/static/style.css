@@ -293,12 +293,25 @@ body {
   height: fit-content;
 }
 
+#TabBomb {
+  will-change: transform;
+  position: absolute;
+  z-index: 99;
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+
 .player-sprite {
   will-change: transform;
   position: absolute;
   z-index: 100;
   width: 32px;
   height: 32px;
+}
+
+.bomb {
+  position: absolute;
 }
 
 @keyframes stagger-right {

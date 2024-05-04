@@ -1,4 +1,5 @@
 import Component from "../component.js";
+import TabBomb from "./bomb.js";
 import Map from "./map.js";
 import { CurrentPlayer, Player } from "./player.js";
 
@@ -30,6 +31,11 @@ export default class Game extends Component {
             if (message.type === "move") {
                 this.updatePlayers(message)
             }
+
+            if (message.type === "bomb") {
+                console.log(message)
+                this.tabBomb.newBomb(message);
+            }
         })
 
 
@@ -44,8 +50,8 @@ export default class Game extends Component {
 
     initMap(message) {
         this.atlas = message.body
-        const map = new Map(this.atlas)
-
+        this.map = new Map(this.atlas)
+        this.tabBomb = new TabBomb();
         this.readyPlayers.forEach((player, index) => {
 
             const props = {
@@ -60,21 +66,23 @@ export default class Game extends Component {
 
             if (player.children[0] !== this.username) {
                 const newPlayer = new Player(props)
-                map.addElement(newPlayer)
+                this.map.addElement(newPlayer)
                 this.readyPlayers[index] = newPlayer
             } else {
                 this.currentPlayer = new CurrentPlayer(
                     props,
                     this.ws,
                     this.username,
-                map)
+                    this.map
+                )
 
-                map.addElement(this.currentPlayer)
+                this.map.addElement(this.currentPlayer)
                 this.readyPlayers[index] = this.currentPlayer
             }
         })
 
-        this.addElement(map)
+        this.map.addElement(this.tabBomb)
+        this.addElement(this.map)
         this.update()
     }
 
@@ -90,6 +98,7 @@ export default class Game extends Component {
             this.lastTime = timestamp
             this.updateState()
         }
+        if (this.tabBomb !== undefined) this.tabBomb.tick();
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
 
@@ -104,7 +113,7 @@ export default class Game extends Component {
         await Promise.all(movePromises)
         this.playerMoveQueue = []
         // this.playerMoveQueue.forEach((player) => {
-            // player.player.move(player.direction, player.position)
+        // player.player.move(player.direction, player.position)
         // })
         // this.playerMoveQueue = []
     }
