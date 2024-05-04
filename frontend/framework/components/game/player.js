@@ -100,16 +100,16 @@ export class CurrentPlayer extends Player {
     }
 
     updatePosition() {
-        const playerGround = checkGround(this);
         this.isMoving = true;
         let lastSendTime = performance.now();
         const move = () => {
+            const playerGround = checkGround(this);
             if (!this.direction) {
                 this.isMoving = false;
                 return;
             }
-            this.posY += direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
-            this.posX += direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
+            this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
+            this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
             // this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
             if (Date.now() - lastSendTime >= 1000 / 60) {
                 this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });

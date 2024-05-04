@@ -47,17 +47,21 @@ export function checkGround(player) {
         switch (key) {
             case "top":
                 groundObj.groundUp = blockBorder.borderDown-20 >= playerBoder.up
+                console.log("up",blockBorder.borderDown-20, playerBoder.up,groundObj.groundUp)
                 break;
             case "left":
                 groundObj.groundLeft = blockBorder.borderRight-8 >= playerBoder.left
+                console.log("left",blockBorder.borderRight-8, playerBoder.left,groundObj.groundLeft)
                 break;
             // case "in":
             //     break;
             case "right":
                 groundObj.groundRight = blockBorder.borderLeft+8 <= playerBoder.right
+                console.log("right",blockBorder.borderLeft+8 , playerBoder.right,groundObj.groundRight)
                 break;
             case "bottom":
                 groundObj.groundDown = blockBorder.borderUp <= playerBoder.down
+                console.log("bottom",blockBorder.borderUp, playerBoder.down,groundObj.groundDown)
                 break;
         }
     });
