@@ -1,5 +1,6 @@
 import Component from "../component.js";
 import { debounce } from "../../engine/utils.js";
+import { checkGround } from "./collisions.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
@@ -80,10 +81,11 @@ export class Player extends Component {
     }
 }
 export class CurrentPlayer extends Player {
-    constructor(props, ws, username) {
+    constructor(props, ws, username, parent) {
         super(props, ws, username);
         this.direction = null
         this.isMoving = false;
+        this.parent = parent;
 
         window.addEventListener("keydown", debounce((event) => {
             this.direction = DIRECTION_MAP[event.key];
@@ -98,6 +100,7 @@ export class CurrentPlayer extends Player {
     }
 
     updatePosition() {
+        const playerGround = checkGround(this);
         this.isMoving = true;
         let lastSendTime = performance.now();
         const move = () => {
@@ -105,8 +108,8 @@ export class CurrentPlayer extends Player {
                 this.isMoving = false;
                 return;
             }
-            this.posY += this.direction === "up" ? -MOVEMENT_SIZE : this.direction === "down" ? MOVEMENT_SIZE : 0;
-            this.posX += this.direction === "left" ? -MOVEMENT_SIZE : this.direction === "right" ? MOVEMENT_SIZE : 0;
+            this.posY += direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
+            this.posX += direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
             // this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
             if (Date.now() - lastSendTime >= 1000 / 60) {
                 this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });

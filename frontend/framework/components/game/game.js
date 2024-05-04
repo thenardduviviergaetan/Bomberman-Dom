@@ -64,9 +64,10 @@ export default class Game extends Component {
                 this.readyPlayers[index] = newPlayer
             } else {
                 this.currentPlayer = new CurrentPlayer(
-                    props
-                    , this.ws,
-                    this.username)
+                    props,
+                    this.ws,
+                    this.username,
+                map)
 
                 map.addElement(this.currentPlayer)
                 this.readyPlayers[index] = this.currentPlayer
