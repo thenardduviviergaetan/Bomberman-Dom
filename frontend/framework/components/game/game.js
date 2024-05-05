@@ -33,7 +33,7 @@ export default class Game extends Component {
             }
 
             if (message.type === "bomb") {
-                console.log(message)
+                // console.log(message)
                 this.tabBomb.newBomb(message);
             }
         })
@@ -51,7 +51,6 @@ export default class Game extends Component {
     initMap(message) {
         this.atlas = message.body
         this.map = new Map(this.atlas)
-        this.tabBomb = new TabBomb();
         this.readyPlayers.forEach((player, index) => {
 
             const props = {
@@ -80,7 +79,7 @@ export default class Game extends Component {
                 this.readyPlayers[index] = this.currentPlayer
             }
         })
-
+        this.tabBomb = new TabBomb(this.map, this.currentPlayer);
         this.map.addElement(this.tabBomb)
         this.addElement(this.map)
         this.update()

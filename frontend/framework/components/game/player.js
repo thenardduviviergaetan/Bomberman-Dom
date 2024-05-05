@@ -67,14 +67,11 @@ export class Player extends Component {
                     offsetY = FRAME_WIDTH;
                     break;
             }
-
             this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
-
         }
     }
 
     move(direction, position) {
-
         this.posX = position.x;
         this.posY = position.y;
         requestAnimationFrame(() => {
@@ -90,17 +87,17 @@ export class CurrentPlayer extends Player {
         this.direction = null
         this.isMoving = false;
         this.parent = parent;
-        this.maxBomb = 1;
-        this.bomb = 0;
         this.bombCooldown = 0;
 
         window.addEventListener("keydown", debounce((event) => {
+            if (DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0)) {
+                this.dropBomb();
+                this.bombCooldown = new Date().getTime() + 1500;
+                return;
+            }
             this.direction = DIRECTION_MAP[event.key];
             if (!this.isMoving) this.updatePosition();
-            if (DROP_BOMB[event.key] && (this.bomb <= this.maxBomb && this.bombCooldown - new Date().getTime() <= 0)) {
-                this.dropBomb();
-                this.bombCooldown = new Date().getTime()+500;
-            }
+            // if (DROP_BOMB[event.key] && (this.bomb <= this.maxBomb && this.bombCooldown - new Date().getTime() <= 0)) {
         }), 10)
 
         window.addEventListener("keyup", debounce((event) => {
@@ -133,10 +130,17 @@ export class CurrentPlayer extends Player {
     dropBomb() {
         this.ws.sendMessage({
             type: "bomb",
-            bombType:0,
+            bombType: 0,
             sender: this.username,
             position: { "x": this.posX, "y": this.posY + 608 },
             date: new Date().getTime()
+        });
+    }
+    playerDeath(cause){
+        this.ws.sendMessage({
+            type: "death",
+            sender: this.username,
+            cause: cause
         });
     }
 }

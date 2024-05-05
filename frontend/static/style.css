@@ -301,6 +301,9 @@ body {
   height: 100%;
   top: 0;
 }
+#TabBomb div {
+  position: absolute;
+}
 
 .player-sprite {
   will-change: transform;
