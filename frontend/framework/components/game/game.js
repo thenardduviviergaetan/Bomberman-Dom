@@ -30,6 +30,10 @@ export default class Game extends Component {
             if (message.type === "move") {
                 this.updatePlayers(message)
             }
+
+            if (message.type === "restart") {
+                this.stop = true;
+            }
         })
 
 
@@ -90,11 +94,6 @@ export default class Game extends Component {
             this.lastTime = timestamp
             this.updateState()
         }
-        this.ws.onMessage((message)=>{
-            if (message.type === "restart"){
-                this.stop = true;
-            }
-        })
         if (this.stop){
             console.log("stop");
             this.fps.textContent = "";
@@ -104,20 +103,25 @@ export default class Game extends Component {
     }
 
     async updateState() {
-
-        const movePromises = this.playerMoveQueue.map((player) => {
-            new Promise((resolve) => {
-                player.player.move(player.direction, player.position)
-                resolve()
-            })
-        })
-        await Promise.all(movePromises)
-        this.playerMoveQueue = []
-        // this.playerMoveQueue.forEach((player) => {
-            // player.player.move(player.direction, player.position)
-        // })
-        // this.playerMoveQueue = []
+        await Promise.all(this.playerMoveQueue.map(player => player.player.move(player.direction, player.position)));
+        this.playerMoveQueue = [];
     }
+
+    // async updateState() {
+
+    //     const movePromises = this.playerMoveQueue.map((player) => {
+    //         new Promise((resolve) => {
+    //             player.player.move(player.direction, player.position)
+    //             resolve()
+    //         })
+    //     })
+    //     await Promise.all(movePromises)
+    //     this.playerMoveQueue = []
+    //     // this.playerMoveQueue.forEach((player) => {
+    //         // player.player.move(player.direction, player.position)
+    //     // })
+    //     // this.playerMoveQueue = []
+    // }
 
     fpsCounter() {
         const now = performance.now()
