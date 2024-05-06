@@ -83,6 +83,10 @@ func (h *Hub) Run() {
 				for _, client := range h.Clients {
 					client.send <- message
 				}
+			case "restart":
+				for _, client := range h.Clients {
+					client.send <- message
+				}
 			}
 
 		}

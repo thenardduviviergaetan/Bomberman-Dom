@@ -15,7 +15,7 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
-
+        this.stop = false;
         this.size = 19;
         this.atlas = this.ws.sendMessage({ type: "map" });
 
@@ -89,6 +89,16 @@ export default class Game extends Component {
         if (deltaTime >= FRAMERATE) {
             this.lastTime = timestamp
             this.updateState()
+        }
+        this.ws.onMessage((message)=>{
+            if (message.type === "restart"){
+                this.stop = true;
+            }
+        })
+        if (this.stop){
+            console.log("stop");
+            this.fps.textContent = "";
+            return
         }
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
