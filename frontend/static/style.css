@@ -311,6 +311,7 @@ body {
   z-index: 100;
   width: 32px;
   height: 32px;
+  background-color: #ffc746;
 }
 
 .bomb {

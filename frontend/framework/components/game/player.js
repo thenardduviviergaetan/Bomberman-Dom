@@ -31,17 +31,22 @@ export class Player extends Component {
         this.posY = props.style.top;
         this.sprite = `url(./framework/components/game/assets/player${props.index + 1}.png)`
         this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px;`;
+        this.life = 3;
         this.draw();
 
         this.frameIndex = 0
         this.animationCounter = 0
 
     }
-
+    addLife(nb) {
+        this.life += nb;
+    }
+    rmLife(nb) {
+        this.life -= nb;
+    }
     draw() {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
     }
-
     animate(direction) {
         this.animationCounter++
         if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
@@ -88,6 +93,7 @@ export class CurrentPlayer extends Player {
         this.isMoving = false;
         this.parent = parent;
         this.bombCooldown = 0;
+        this.cooldownDegats = 0;
 
         window.addEventListener("keydown", debounce((event) => {
             if (DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0)) {
@@ -136,7 +142,23 @@ export class CurrentPlayer extends Player {
             date: new Date().getTime()
         });
     }
-    playerDeath(cause){
+    triggerBlast() {
+        const time = new Date().getTime();
+        if (time - this.cooldownDegats > 1500) {
+            this.cooldownDegats = time;
+            this.rmLife(1);
+            if (this.life <= 0) {
+                this.playerDeath("blast");
+            }else{
+                this.ws.sendMessage({
+                    type: "degats",
+                    sender: this.username,
+                    nb: 1
+                });
+            }
+        }
+    }
+    playerDeath(cause) {
         this.ws.sendMessage({
             type: "death",
             sender: this.username,

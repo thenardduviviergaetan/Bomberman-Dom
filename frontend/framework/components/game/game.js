@@ -36,6 +36,9 @@ export default class Game extends Component {
                 // console.log(message)
                 this.tabBomb.newBomb(message);
             }
+            if (message.type === "death" || message.type === "degats") {
+            console.log(message);
+            }
         })
 
 

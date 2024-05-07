@@ -22,6 +22,8 @@ function getBorder(obj, posY, posX) {
         borderLeft: posX * FRAME_WIDTH,
         borderRight: (posX + 1) * FRAME_WIDTH,
         borderUp: posY * FRAME_WIDTH,
-        borderDown: (posY + 1) * FRAME_WIDTH
+        borderDown: (posY + 1) * FRAME_WIDTH,
+        indexX:posX,
+        indexY:posY
     }
 }

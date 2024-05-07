@@ -1,6 +1,6 @@
 import Component from "../component.js";
 import { initCross } from "../function.js";
-import { checkTriger } from "./collisions.js";
+import { checkTrigger } from "./collisions.js";
 import TabSprite from "./sprite.js";
 const keys = ["top", "left", "in", "right", "bottom"];
 const expose = ["path", "block", "shadow", "spawn"];
@@ -135,30 +135,38 @@ class Blast extends Component {
         this.initBlast();
     }
     initBlast() {
-        const indexX = parseInt(this.posX / this.parent.parent.tileSize);
-        const indexY = parseInt(this.posY / this.parent.parent.tileSize);
-        const cross = initCross(indexX, indexY, this.parent.parent)
+        const map = this.parent.parent;
+        const indexX = parseInt(this.posX / map.tileSize);
+        const indexY = parseInt(this.posY / map.tileSize);
+        const cross = initCross(indexX, indexY, map)
         keys.forEach(key => {
-            if (cross[key] === undefined || expose.filter((el) => el == cross[key].type).length === 0) return;
-            // console.log(checkTriger(this.parent.parent.curentPlayer,cross[key]));
-            // console.log(key)
+            const blockBorder = cross[key];
+            if (blockBorder === undefined || expose.filter((el) => el == blockBorder.type).length === 0) return;
             const spriteAnimation = [];
-            // console.log(yellowFlammeSprite.length)
             ANIMATION_FRAME_BLAST[key].forEach(idsprite => {
                 spriteAnimation.push(this.typeflame === "yellow" ? yellowFlammeSprite[idsprite] : blueFlammeSprite[idsprite])
-                // console.log("idsprite, yellowFlammeSprite[idsprite]")
-                // console.log(idsprite, yellowFlammeSprite[idsprite])
             });
-            // console.log(spriteAnimation)
-            const posY = key === "bottom" ? cross[key].borderUp + 64 : cross[key].borderUp;
-            this.addElement(new Fire(cross[key].borderLeft, posY , spriteAnimation));
+            // correction pour le bottom je ne sais pas d'ou peut venir l'erreur car ce me le fais que pour lui
+            if (key === "bottom") {
+                blockBorder.borderUp += 64;
+                blockBorder.borderDown += 64;
+                blockBorder.indexY += 2;
+            }
+            this.addElement(new Fire(blockBorder.borderLeft, blockBorder.borderUp, spriteAnimation, blockBorder,this.parent));
+            if (blockBorder.type === "block") {
+                console.log(blockBorder.type, "block");
+                const top = map.children[blockBorder.indexY - 1].children[blockBorder.indexX]
+                const bottom = map.children[blockBorder.indexY + 1].children[blockBorder.indexX]
+                this.parent.parent.children[blockBorder.indexY].children[blockBorder.indexX] = top.props.class === "block" || top.props.class === "wall" ? map.shadow : map.path;
+                if (bottom.props.class === "shadow") this.parent.parent.children[blockBorder.indexY + 1].children[blockBorder.indexX] = map.path;
+                this.parent.parent.update();
+            }
         });
-        this.update();
     }
     tick() {
-        const time  = new Date().getTime();
+        const time = new Date().getTime();
         let updateFrame = false;
-        if (time - this.aLive >= 200){
+        if (time - this.aLive >= 200) {
             updateFrame = true;
             this.aLive = time;
         }
@@ -168,7 +176,6 @@ class Blast extends Component {
             } else {
                 this.animationId++
                 this.children.forEach(fire => fire.tick(this.animationId))
-                // this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`
                 this.update();
             }
         }
@@ -177,19 +184,23 @@ class Blast extends Component {
 }
 
 class Fire extends Component {
-    constructor(posX, posY, spriteAnimation) {
+    constructor(posX, posY, spriteAnimation, border,parent) {
         super("div", {}, []);
         this.posX = posX;
         this.posY = posY;
-        // this.animationId = 0
         this.spriteAnimation = spriteAnimation;
-        console.log(this.spriteAnimation)
+        this.border = border;
+        this.parent = parent;
+        // console.log(this.spriteAnimation)
         this.props.style = `${this.spriteAnimation[0].style} top: ${this.posY}px; left: ${this.posX}px;`
-        console.log(this.props)
+        // console.log(this.props)
 
     }
     tick(animationId) {
         this.props.style = `${this.spriteAnimation[animationId].style} top: ${this.posY}px; left: ${this.posX}px;`
+        if (checkTrigger(this.parent.curentPlayer, this.border)){
+            this.parent.curentPlayer.triggerBlast();
+        }
     }
 }
 

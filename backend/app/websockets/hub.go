@@ -84,6 +84,16 @@ func (h *Hub) Run() {
 				for _, client := range h.Clients {
 					client.send <- message
 				}
+			case "death":
+				fmt.Println(string(message))
+				for _, client := range h.Clients {
+					client.send <- message
+				}
+			case "degats":
+				fmt.Println(string(message))
+				for _, client := range h.Clients {
+					client.send <- message
+				}
 			case "bomb":
 				// var bombMsg *models.BombMessage
 				// json.Unmarshal(message, &bombMsg)
