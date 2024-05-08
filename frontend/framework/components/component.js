@@ -98,4 +98,8 @@ export default class Component {
         clone.parent = this.parent
         return clone
     }
+
+    updateStyle(style){
+        document.getElementById(this.props.id).style = style;
+    }
 }

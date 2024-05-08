@@ -33,7 +33,7 @@ export class Player extends Component {
         this.posX = props.style.left;
         this.posY = props.style.top;
         this.sprite = `url(./framework/components/game/assets/player${props.index + 1}.png)`
-        this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px; transition: transform 0.1s;`;
+        this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px;`;
         this.draw();
 
         this.frameIndex = 0
@@ -54,18 +54,16 @@ export class Player extends Component {
             this.prevDirection = direction;
             this.frameIndex = this.frameCycle[this.cycleIndex];
             this.cycleIndex = (this.cycleIndex + 1) % this.frameCycle.length;
-            const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
-            this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
         }
     }
 
     async move(direction, position) {
         this.posX = position.x;
         this.posY = position.y;
+        this.animate(direction);
         const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
-        this.animate(direction);
-        this.updateDOM()
+        this.updateStyle(this.props.style);
     }
 }
 
@@ -80,13 +78,13 @@ export class CurrentPlayer extends Player {
         window.addEventListener("keydown", debounce((event) => {
             this.direction = DIRECTION_MAP[event.key];
             if (!this.isMoving) this.updatePosition();
-        }), 100)
+        }), 500)
 
         window.addEventListener("keyup", debounce((event) => {
             if (this.direction === DIRECTION_MAP[event.key]) {
                 this.direction = null;
             }
-        }), 100)
+        }), 500)
     }
 
     moveCurrent() {
@@ -106,8 +104,10 @@ export class CurrentPlayer extends Player {
 
     updatePosition() {
         this.isMoving = true;
+        const oldPosX = this.posX;
+        const oldPosY = this.posY;
         this.moveCurrent();
-        if (this.direction) {
+        if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.frameID = requestAnimationFrame(() => this.updatePosition());
         } else {
             cancelAnimationFrame(this.frameID);
