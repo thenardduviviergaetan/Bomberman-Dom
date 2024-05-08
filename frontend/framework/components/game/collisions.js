@@ -63,17 +63,17 @@ function getPlayerBorder(player) {
     }
 }
 
-export function checkTriger(player, obj) {
+export function checkTrigger(player, obj) {
     const playerBorder = getPlayerBorder(player);
-    const trigerTop = obj.borderUp <= playerBorder.up && playerBorder.up <= obj.borderDown;
-    const trigerBottom = obj.borderUp <= playerBorder.down && playerBorder.down <= obj.borderDown;
-    const trigerLeft = obj.borderLeft <= playerBorder.left && playerBorder.left <= obj.borderRight;
-    const trigerRight = obj.borderLeft <= playerBorder.right && playerBorder.right <= obj.borderRight;
-    // console.log("(trigerTop || trigerBottom) && (trigerLeft || trigerRight)")
-    // console.log(trigerTop, trigerBottom, trigerLeft, trigerRight)
+    const triggerTop = obj.borderUp <= playerBorder.up && playerBorder.up <= obj.borderDown;
+    const triggerBottom = obj.borderUp <= playerBorder.down && playerBorder.down <= obj.borderDown;
+    const triggerLeft = obj.borderLeft <= playerBorder.left && playerBorder.left <= obj.borderRight;
+    const triggerRight = obj.borderLeft <= playerBorder.right && playerBorder.right <= obj.borderRight;
+    // console.log("(triggerTop || triggerBottom) && (triggerLeft || triggerRight)")
+    // console.log(triggerTop, triggerBottom, triggerLeft, triggerRight)
     if (
-        (trigerTop || trigerBottom) &&
-        (trigerLeft || trigerRight)
+        (triggerTop || triggerBottom) &&
+        (triggerLeft || triggerRight)
     ) {
         return true;
     }

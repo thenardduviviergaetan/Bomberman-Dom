@@ -1,6 +1,6 @@
 import Component from "../component.js";
 import { initCross } from "../function.js";
-import { checkTriger } from "./collisions.js";
+import { checkTrigger } from "./collisions.js";
 import TabSprite from "./sprite.js";
 const keys = ["top", "left", "in", "right", "bottom"];
 const expose = ["path", "block", "shadow", "spawn"];
@@ -140,7 +140,7 @@ class Blast extends Component {
         const cross = initCross(indexX, indexY, this.parent.parent)
         keys.forEach(key => {
             if (cross[key] === undefined || expose.filter((el) => el == cross[key].type).length === 0) return;
-            // console.log(checkTriger(this.parent.parent.curentPlayer,cross[key]));
+            // console.log(checkTrigger(this.parent.parent.curentPlayer,cross[key]));
             // console.log(key)
             const spriteAnimation = [];
             // console.log(yellowFlammeSprite.length)
