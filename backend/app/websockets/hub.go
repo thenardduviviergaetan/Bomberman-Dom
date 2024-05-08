@@ -3,6 +3,7 @@ package livechat
 import (
 	"encoding/json"
 	"fmt"
+
 	middleware "server/app/middlewares"
 	"server/db/models"
 )
@@ -47,7 +48,7 @@ func (h *Hub) LaunchRoutines() {
 // It continuously listens for events such as client registration, unregistration, and broadcasting messages.
 // This method runs in a separate goroutine and should be called after initializing the Hub.
 func (h *Hub) Run() {
-	var playerReady = 0
+	playerReady := 0
 	for {
 		select {
 		case client := <-h.register:
@@ -84,6 +85,20 @@ func (h *Hub) Run() {
 					client.send <- message
 				}
 			case "restart":
+				for _, client := range h.Clients {
+					client.send <- message
+				}
+			case "death":
+				fmt.Println(string(message))
+				for _, client := range h.Clients {
+					client.send <- message
+				}
+			case "degats":
+				fmt.Println(string(message))
+				for _, client := range h.Clients {
+					client.send <- message
+				}
+			case "bomb":
 				for _, client := range h.Clients {
 					client.send <- message
 				}

@@ -316,6 +316,18 @@ body {
   height: fit-content;
 }
 
+#TabBomb {
+  will-change: transform;
+  position: absolute;
+  z-index: 99;
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+#TabBomb div {
+  position: absolute;
+}
+
 .player-sprite {
   will-change: transform;
   position: absolute;

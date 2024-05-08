@@ -23,7 +23,8 @@ export default class Map extends Component {
         const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const shadow = new Component("div", { class: "shadow", style: `background-image: ${this.tileSetImage}; background-position: -${64}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const spawn = new Component("div", { class: "spawn", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-
+        this.path = path;
+        this.shadow = shadow;
         for (let y = 0; y < this.atlas.length; y++) {
             const lineMap = new Component("div", { class: "line" })
             for (let x = 0; x < this.atlas[y].length; x++) {
