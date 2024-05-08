@@ -59,18 +59,6 @@ export function checkTrigger(player, objBorder) {
         (triggerTop || triggerBottom) &&
         (triggerLeft || triggerRight)
     ) {
-        if (triggerTop) console.log("triggerTop :")
-        if (triggerTop) console.log("objBorder.borderUp, playerBorder.up, objBorder.borderDown")
-        if (triggerTop) console.log(objBorder.borderUp, playerBorder.up, objBorder.borderDown)
-        if (triggerBottom) console.log("triggerBottom :")
-        if (triggerBottom) console.log("objBorder.borderUp, playerBorder.down, objBorder.borderDown")
-        if (triggerBottom) console.log(objBorder.borderUp, playerBorder.down, objBorder.borderDown)
-        if (triggerLeft) console.log("triggerLeft :")
-        if (triggerLeft) console.log("objBorder.borderLeft, playerBorder.left, objBorder.borderRight")
-        if (triggerLeft) console.log(objBorder.borderLeft, playerBorder.left, objBorder.borderRight)
-        if (triggerRight) console.log("triggerRight :")
-        if (triggerRight) console.log("objBorder.borderLeft, playerBorder.right, objBorder.borderRight")
-        if (triggerRight) console.log(objBorder.borderLeft, playerBorder.right, objBorder.borderRight)
         return true;
     }
     return false;
