@@ -33,11 +33,13 @@ export class Player extends Component {
         this.posX = props.style.left;
         this.posY = props.style.top;
         this.sprite = `url(./framework/components/game/assets/player${props.index + 1}.png)`
-        this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px;`;
+        this.props.style = `background-image: ${this.sprite}; background-position: -${0}px -${0}px; transition: transform 0.1s;`;
         this.draw();
 
         this.frameIndex = 0
         this.animationCounter = 0
+        this.frameCycle = [0, 1, 0, 2]
+        this.cycleIndex = 0
 
     }
 
@@ -45,61 +47,35 @@ export class Player extends Component {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
     }
 
-    // animate(direction) {
-    //     this.animationCounter++
-    //     if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
-    //         this.prevDirection = direction;
-
-    //         this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
-    //         const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
-    //         this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
-    //     }
-    // }
-
 
     animate(direction) {
         this.animationCounter++
         if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
             this.prevDirection = direction;
-            const nextFrameIndex = (this.frameIndex + 1) % FRAME_COUNT;
-            if (nextFrameIndex !== this.frameIndex) {
-                this.frameIndex = nextFrameIndex;
-                const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
-                this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
-            }
+            this.frameIndex = this.frameCycle[this.cycleIndex];
+            this.cycleIndex = (this.cycleIndex + 1) % this.frameCycle.length;
+            const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
+            this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
         }
     }
 
-    move(direction, position) {
-        return new Promise((resolve) => {
-            this.posX = position.x;
-            this.posY = position.y;
-            requestAnimationFrame(() => {
-                this.animate(direction)
-                this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
-                this.updateDOM();
-                resolve();
-            });
-        });
+    async move(direction, position) {
+        this.posX = position.x;
+        this.posY = position.y;
+        const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
+        this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
+        this.animate(direction);
+        this.updateDOM()
     }
 }
-//     move(direction, position) {
 
-//         this.posX = position.x;
-//         this.posY = position.y;
-//         requestAnimationFrame(() => {
-//             this.animate(direction)
-//             this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
-//             this.updateDOM();
-//         });
-//     }
-// }
 export class CurrentPlayer extends Player {
     constructor(props, ws, username, parent) {
         super(props, ws, username);
         this.direction = null
         this.isMoving = false;
         this.parent = parent;
+        this.frameID = null;
 
         window.addEventListener("keydown", debounce((event) => {
             this.direction = DIRECTION_MAP[event.key];
@@ -113,22 +89,30 @@ export class CurrentPlayer extends Player {
         }), 100)
     }
 
-
     moveCurrent() {
         const playerGround = checkGround(this);
         if (!this.direction) {
             this.isMoving = false;
             return;
         }
+        const oldPosX = this.posX;
+        const oldPosY = this.posY;
         this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
         this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
-        this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
-        requestAnimationFrame(this.moveCurrent.bind(this));
+        if (this.posX !== oldPosX || this.posY !== oldPosY) {
+            this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
+        }
     }
 
     updatePosition() {
         this.isMoving = true;
         this.moveCurrent();
+        if (this.direction) {
+            this.frameID = requestAnimationFrame(() => this.updatePosition());
+        } else {
+            cancelAnimationFrame(this.frameID);
+            this.isMoving = false;
+        }
     }
     dropBomb() {
         this.ws.sendMessage({

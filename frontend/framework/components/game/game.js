@@ -107,22 +107,6 @@ export default class Game extends Component {
         this.playerMoveQueue = [];
     }
 
-    // async updateState() {
-
-    //     const movePromises = this.playerMoveQueue.map((player) => {
-    //         new Promise((resolve) => {
-    //             player.player.move(player.direction, player.position)
-    //             resolve()
-    //         })
-    //     })
-    //     await Promise.all(movePromises)
-    //     this.playerMoveQueue = []
-    //     // this.playerMoveQueue.forEach((player) => {
-    //         // player.player.move(player.direction, player.position)
-    //     // })
-    //     // this.playerMoveQueue = []
-    // }
-
     fpsCounter() {
         const now = performance.now()
         if (now - this.lastUpdateTime >= 1000) {
