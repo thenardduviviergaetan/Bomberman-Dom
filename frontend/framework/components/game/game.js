@@ -16,7 +16,7 @@ export default class Game extends Component {
         super("section", props);
         this.username = username;
         this.ws = ws;
-
+        this.stop = false;
         this.size = 19;
         this.atlas = this.ws.sendMessage({ type: "map" });
 
@@ -30,6 +30,10 @@ export default class Game extends Component {
 
             if (message.type === "move") {
                 this.updatePlayers(message)
+            }
+
+            if (message.type === "restart") {
+                this.stop = true;
             }
 
             if (message.type === "bomb") {
@@ -97,24 +101,18 @@ export default class Game extends Component {
             this.lastTime = timestamp
             this.updateState()
         }
+        if (this.stop){
+            console.log("stop");
+            this.fps.textContent = "";
+            return
+        }
         if (this.tabBomb !== undefined) this.tabBomb.tick();
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
 
     async updateState() {
-
-        const movePromises = this.playerMoveQueue.map((player) => {
-            new Promise((resolve) => {
-                player.player.move(player.direction, player.position)
-                resolve()
-            })
-        })
-        await Promise.all(movePromises)
-        this.playerMoveQueue = []
-        // this.playerMoveQueue.forEach((player) => {
-        // player.player.move(player.direction, player.position)
-        // })
-        // this.playerMoveQueue = []
+        await Promise.all(this.playerMoveQueue.map(player => player.player.move(player.direction, player.position)));
+        this.playerMoveQueue = [];
     }
 
     fpsCounter() {

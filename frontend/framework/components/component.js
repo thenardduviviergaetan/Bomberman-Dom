@@ -87,10 +87,19 @@ export default class Component {
         };
     }
 
+    clear(){
+        this.children = [];
+        this.update();
+    }
+
     clone(){
         const clone = new Component(this.tag, this.props, this.children)
         clone.children = this.children.map((child) => child.clone())
         clone.parent = this.parent
         return clone
+    }
+
+    updateStyle(style){
+        document.getElementById(this.props.id).style = style;
     }
 }

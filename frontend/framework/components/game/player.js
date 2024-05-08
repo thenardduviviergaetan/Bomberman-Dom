@@ -7,6 +7,13 @@ const FRAME_WIDTH = 32;
 const MOVEMENT_SIZE = 2;
 const ANIMATION_FRAME_RATE = 8
 
+const ANIMATION_FRAMES = {
+    "down": Array.from({ length: FRAME_COUNT }, (_, i) => ({ offsetX: i * FRAME_WIDTH, offsetY: 0 })),
+    "up": Array.from({ length: FRAME_COUNT }, (_, i) => ({ offsetX: i * FRAME_WIDTH, offsetY: FRAME_WIDTH })),
+    "right": Array.from({ length: FRAME_COUNT }, (_, i) => ({ offsetX: (i + 3) * FRAME_WIDTH, offsetY: 0 })),
+    "left": Array.from({ length: FRAME_COUNT }, (_, i) => ({ offsetX: (i + 3) * FRAME_WIDTH, offsetY: FRAME_WIDTH }))
+}
+
 const DIRECTION_MAP = {
     "ArrowUp": "up",
     "z": "up",
@@ -35,6 +42,8 @@ export class Player extends Component {
 
         this.frameIndex = 0
         this.animationCounter = 0
+        this.frameCycle = [0, 1, 0, 2]
+        this.cycleIndex = 0
 
     }
 
@@ -42,51 +51,33 @@ export class Player extends Component {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
     }
 
+
     animate(direction) {
         this.animationCounter++
         if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
             this.prevDirection = direction;
-
-            this.frameIndex = (this.frameIndex + 1) % FRAME_COUNT;
-            let offsetX = this.frameIndex * FRAME_WIDTH;
-
-            let offsetY = 0;
-
-            switch (direction) {
-                case "down":
-                    offsetY = 0;
-                    break;
-                case "up":
-                    offsetY = FRAME_WIDTH;
-                    break;
-                case "right":
-                    offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
-                    break;
-                case "left":
-                    offsetX = (this.frameIndex + 3) * FRAME_WIDTH;
-                    offsetY = FRAME_WIDTH;
-                    break;
-            }
-            this.props.style = `${this.props.style} background-position: -${offsetX}px -${offsetY}px;`;
+            this.frameIndex = this.frameCycle[this.cycleIndex];
+            this.cycleIndex = (this.cycleIndex + 1) % this.frameCycle.length;
         }
     }
 
-    move(direction, position) {
+    async move(direction, position) {
         this.posX = position.x;
         this.posY = position.y;
-        requestAnimationFrame(() => {
-            this.animate(direction)
-            this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
-            this.updateDOM();
-        });
+        this.animate(direction);
+        const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
+        this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
+        this.updateStyle(this.props.style);
     }
 }
+
 export class CurrentPlayer extends Player {
     constructor(props, ws, username, parent) {
         super(props, ws, username);
         this.direction = null
         this.isMoving = false;
         this.parent = parent;
+        this.frameID = null;
         this.bombCooldown = 0;
 
         window.addEventListener("keydown", debounce((event) => {
@@ -97,35 +88,41 @@ export class CurrentPlayer extends Player {
             }
             this.direction = DIRECTION_MAP[event.key];
             if (!this.isMoving) this.updatePosition();
-            // if (DROP_BOMB[event.key] && (this.bomb <= this.maxBomb && this.bombCooldown - new Date().getTime() <= 0)) {
-        }), 10)
+        }), 500)
 
         window.addEventListener("keyup", debounce((event) => {
             if (this.direction === DIRECTION_MAP[event.key]) {
                 this.direction = null;
             }
-        }), 10)
+        }), 500)
+    }
+
+    moveCurrent() {
+        const playerGround = checkGround(this);
+        if (!this.direction) {
+            this.isMoving = false;
+            return;
+        }
+        const oldPosX = this.posX;
+        const oldPosY = this.posY;
+        this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
+        this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
+        if (this.posX !== oldPosX || this.posY !== oldPosY) {
+            this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
+        }
     }
 
     updatePosition() {
         this.isMoving = true;
-        let lastSendTime = performance.now();
-        const move = () => {
-            const playerGround = checkGround(this);
-            if (!this.direction) {
-                this.isMoving = false;
-                return;
-            }
-            this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
-            this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
-            // this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
-            if (Date.now() - lastSendTime >= 1000 / 60) {
-                this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
-                lastSendTime = performance.now();
-            }
-            requestAnimationFrame(move);
+        const oldPosX = this.posX;
+        const oldPosY = this.posY;
+        this.moveCurrent();
+        if (this.posX !== oldPosX || this.posY !== oldPosY) {
+            this.frameID = requestAnimationFrame(() => this.updatePosition());
+        } else {
+            cancelAnimationFrame(this.frameID);
+            this.isMoving = false;
         }
-        requestAnimationFrame(move);
     }
     dropBomb() {
         this.ws.sendMessage({

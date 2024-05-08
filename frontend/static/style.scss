@@ -140,7 +140,27 @@ body {
         cursor: pointer;
     }
 }
+#restart-button{
+    z-index: 2;
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    background-color: rgba($color: $chat-color2, $alpha: .9);
+    border: none;
+    border-radius: 10px;
+    right: 100px;
+    margin-top: 15px;
+    margin-right: 15px;
+    padding: 10px;
+    transition: background-color 0.3s;
+    color: white;
+    font-weight: bold;
 
+    &:hover {
+        background-color: rgba($color: $chat-color2, $alpha: .7);
+        cursor: pointer;
+    }
+}
 #container {
     width: 100%;
     height: 100%;

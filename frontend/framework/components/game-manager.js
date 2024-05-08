@@ -31,11 +31,11 @@ export default class GameManager {
             this.ws.onClose(() => {
                 console.log('Disconnected from server');
                 this.ws.sendMessage({ type: 'leave', username: this.username });
-                
+
             })
             this.app.clear()
             this.launchgame()
-            
+
         }).catch((e) => {
             this.render()
         });
@@ -48,10 +48,24 @@ export default class GameManager {
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
             this.ws.close();
+            container.clear();//this is to clear the map which does not remove with app.clear()
             this.app.clear();
             this.launchMenu();
         })
+        const restart = new Component("button", { id: "restart-button" }, ["Restart"])
+        restart.actionListener('click', () => {
+            this.ws.sendMessage({ type: "restart" });
+        })
 
+        this.ws.onMessage((message) => {
+            if (message.type === "restart") {
+                container.clear(); //this is to clear the map which does not remove with app.clear()
+                this.app.clear();
+                this.ws.close();
+                this.ws = new WS(`ws://localhost:8080/api/ws?username=${this.username}`)
+                this.launchgame();
+            }
+        })
         const ready = new Promise((resolve, reject) => {
             waitRoom.initialize(resolve, reject);
         });
@@ -63,6 +77,7 @@ export default class GameManager {
         });
 
         container.addElement(chat, waitRoom);
+        this.app.addComponent(restart);
         this.app.addComponent(leaveButton);
         this.app.addComponent(container);
 

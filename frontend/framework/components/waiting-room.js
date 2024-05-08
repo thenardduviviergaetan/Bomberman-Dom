@@ -23,23 +23,26 @@ export default class WaitingRoom extends Component {
             switch (message.type) {
                 case "join":
                 case "leave":
-                    this.newPlayerJoin(message.connected)
+                    if (!this.started)this.newPlayerJoin(message.connected)
                     break
                 case "update-timer":
+                    if (!this.started) {
                     console.log("INNER TIMER:", message.body);
-                    if (message.body === 0) {
-                        this.resolve();
-                    }
-                    if (message.body === -1) {
-                        this.counter.children = [" "]
-                    } else {
-                        if (message.body <= 10) {
-                            this.counter.children = [message.body.toString()]
-                        } else {
-                            this.counter.children = [""];
+                        if (message.body === 0) {
+                            this.started = true;
+                            this.resolve();
                         }
+                        if (message.body === -1) {
+                            this.counter.children = [" "]
+                        } else {
+                            if (message.body <= 10) {
+                                this.counter.children = [message.body.toString()]
+                            } else {
+                                this.counter.children = [""];
+                            }
+                        }
+                        this.update();
                     }
-                    this.update();
                     break;
             }
         })
