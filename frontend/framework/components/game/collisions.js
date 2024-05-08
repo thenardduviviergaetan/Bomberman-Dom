@@ -1,9 +1,7 @@
 import { initCross } from "../function.js";
-
 const FRAME_WIDTH = 32;
 const keys = ["top", "left", "in", "right", "bottom"];
 const solid = ["wall", "block"];
-
 export function checkGround(player) {
     const groundObj = {
         groundLeft: false,
@@ -12,18 +10,6 @@ export function checkGround(player) {
         groundDown: false
     }
     const playerBorder = getPlayerBorder(player);
-    // const maxY = player.parent.atlas.length;
-    // const maxX = player.parent.atlas[0].length;
-    // const indexX = parseInt((player.posX + FRAME_WIDTH / 2) / player.parent.tileSize);
-    // const indexY = maxY - (parseInt((player.posY * -1 + FRAME_WIDTH) / player.parent.tileSize) - 1);
-    // const check = (indexX >= 0 && indexX < maxX) && (indexY >= 0 && indexY < maxY);
-    // const cross = {
-    //     "top": indexY - 1 >= 0 && check ? getBorder(player.parent.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
-    //     "left": indexX - 1 >= 0 && check ? getBorder(player.parent.children[indexY].children[indexX - 1], indexY, indexX - 1) : undefined,
-    //     "in": check ? getBorder(player.parent.children[indexY].children[indexX], indexY, indexX) : undefined,
-    //     "right": indexX + 1 < maxX && check ? getBorder(player.parent.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
-    //     "bottom": indexY + 1 < maxY && check ? getBorder(player.parent.children[indexY + 1].children[indexX], indexY-1, indexX) : undefined,
-    // }
     const indexX = parseInt((player.posX + FRAME_WIDTH / 2) / player.parent.tileSize);
     const indexY = player.parent.atlas.length - (parseInt((player.posY * -1 + FRAME_WIDTH) / player.parent.tileSize) - 1);
     const cross = initCross(indexX, indexY, player.parent);
@@ -33,15 +19,18 @@ export function checkGround(player) {
         if (blockBorder === undefined || solid.filter((el) => el == blockBorder.type).length === 0) return;
         switch (key) {
             case "top":
-                groundObj.groundUp = blockBorder.borderDown - 20 >= playerBorder.up
+                // groundObj.groundUp = blockBorder.borderDown - 16 >= playerBorder.up
+                groundObj.groundUp = blockBorder.borderDown >= playerBorder.up
                 break;
             case "left":
-                groundObj.groundLeft = blockBorder.borderRight - 8 >= playerBorder.left
+                // groundObj.groundLeft = blockBorder.borderRight - 8 >= playerBorder.left
+                groundObj.groundLeft = blockBorder.borderRight >= playerBorder.left
                 break;
             // case "in":
             //     break;
             case "right":
-                groundObj.groundRight = blockBorder.borderLeft + 8 <= playerBorder.right
+                // groundObj.groundRight = blockBorder.borderLeft + 8 <= playerBorder.right
+                groundObj.groundRight = blockBorder.borderLeft <= playerBorder.right
                 break;
             case "bottom":
                 groundObj.groundDown = blockBorder.borderUp <= playerBorder.down
@@ -50,33 +39,39 @@ export function checkGround(player) {
     });
     return groundObj;
 }
-
 function getPlayerBorder(player) {
     return {
-        left: player.posX,
-        right: player.posX + FRAME_WIDTH,
-        // up: player.posY * -1,
-        // down: (player.posY - FRAME_WIDTH) * -1,
-        up: player.posY + 608,
+        left: player.posX + 8,
+        right: player.posX + FRAME_WIDTH - 8,
+        up: player.posY + 608 + 20,
         down: (player.posY - FRAME_WIDTH) + 608,
-
     }
 }
-
-export function checkTrigger(player, obj) {
+export function checkTrigger(player, objBorder) {
     const playerBorder = getPlayerBorder(player);
-    const triggerTop = obj.borderUp <= playerBorder.up && playerBorder.up <= obj.borderDown;
-    const triggerBottom = obj.borderUp <= playerBorder.down && playerBorder.down <= obj.borderDown;
-    const triggerLeft = obj.borderLeft <= playerBorder.left && playerBorder.left <= obj.borderRight;
-    const triggerRight = obj.borderLeft <= playerBorder.right && playerBorder.right <= obj.borderRight;
+    const triggerTop = objBorder.borderUp <= playerBorder.up && playerBorder.up <= objBorder.borderDown;
+    const triggerBottom = objBorder.borderUp <= playerBorder.down && playerBorder.down <= objBorder.borderDown;
+    const triggerLeft = objBorder.borderLeft <= playerBorder.left && playerBorder.left <= objBorder.borderRight;
+    const triggerRight = objBorder.borderLeft <= playerBorder.right && playerBorder.right <= objBorder.borderRight;
     // console.log("(triggerTop || triggerBottom) && (triggerLeft || triggerRight)")
-    // console.log(triggerTop, triggerBottom, triggerLeft, triggerRight)
+    // console.log(triggerTop , triggerBottom ,triggerLeft , triggerRight)
     if (
         (triggerTop || triggerBottom) &&
         (triggerLeft || triggerRight)
     ) {
+        if (triggerTop) console.log("triggerTop :")
+        if (triggerTop) console.log("objBorder.borderUp, playerBorder.up, objBorder.borderDown")
+        if (triggerTop) console.log(objBorder.borderUp, playerBorder.up, objBorder.borderDown)
+        if (triggerBottom) console.log("triggerBottom :")
+        if (triggerBottom) console.log("objBorder.borderUp, playerBorder.down, objBorder.borderDown")
+        if (triggerBottom) console.log(objBorder.borderUp, playerBorder.down, objBorder.borderDown)
+        if (triggerLeft) console.log("triggerLeft :")
+        if (triggerLeft) console.log("objBorder.borderLeft, playerBorder.left, objBorder.borderRight")
+        if (triggerLeft) console.log(objBorder.borderLeft, playerBorder.left, objBorder.borderRight)
+        if (triggerRight) console.log("triggerRight :")
+        if (triggerRight) console.log("objBorder.borderLeft, playerBorder.right, objBorder.borderRight")
+        if (triggerRight) console.log(objBorder.borderLeft, playerBorder.right, objBorder.borderRight)
         return true;
     }
-    // console.log(obj);
     return false;
 }

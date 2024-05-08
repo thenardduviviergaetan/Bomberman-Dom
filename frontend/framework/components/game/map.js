@@ -1,5 +1,4 @@
 import Component from "../component.js";
-
 const TILE_TYPES = {
     WALL: 1,
     BLOCK: 2,
@@ -7,7 +6,6 @@ const TILE_TYPES = {
     SPAWN: 0,
     SAFE_ZONE: 4
 }
-
 export default class Map extends Component {
     constructor(atlas) {
         super("div", { class: "map-container", id: "map" })
@@ -17,13 +15,13 @@ export default class Map extends Component {
         this.initMap();
         return this;
     }
-
     initMap() {
         const wall = new Component("div", { class: "wall", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const shadow = new Component("div", { class: "shadow", style: `background-image: ${this.tileSetImage}; background-position: -${64}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const spawn = new Component("div", { class: "spawn", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
-
+        this.shadow = shadow;
+        this.path = path;
         for (let y = 0; y < this.atlas.length; y++) {
             const lineMap = new Component("div", { class: "line" })
             for (let x = 0; x < this.atlas[y].length; x++) {
