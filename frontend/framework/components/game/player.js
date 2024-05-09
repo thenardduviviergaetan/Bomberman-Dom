@@ -29,6 +29,15 @@ const DROP_BOMB = {
     "Shift": true,
     " ": true
 }
+const TEMP = {
+    "ù": true,
+    "$": true,
+    "=": true,
+    ")": true,
+    "(": true,
+    "-": true,
+
+}
 
 export class Player extends Component {
     constructor(props, ws, username) {
@@ -49,11 +58,10 @@ export class Player extends Component {
 
     }
 
-
     addLife(nb) {
         this.life += nb;
     }
-    
+
     rmLife(nb) {
         this.life -= nb;
     }
@@ -61,7 +69,6 @@ export class Player extends Component {
     draw() {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
     }
-
 
     animate(direction) {
         this.animationCounter++
@@ -91,15 +98,47 @@ export class CurrentPlayer extends Player {
         this.frameID = null;
 
         this.bombCooldown = 0;
+        this.maxBombNumber = 1;
+        this.bombNumber = 0;
+        this.bombType = 0;
+        this.blastRange = 1;
         this.cooldownDegats = 0;
 
         window.addEventListener("keydown", debounce((event) => {
             // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
-            if (DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0)) {
+            //if Temporaire pour tester
+            if (TEMP[event.key]) {
+                switch (event.key) {
+                    case "ù":
+                        this.addMaxBombNumber();
+                        break;
+                    case "$":
+                        this.rmMaxBombNumber();
+                        break;
+                    case "=":
+                        this.addBlastRange(1);
+                        break;
+                    case ")":
+                        this.resetBlastRange();
+                        break;
+                    case "(":
+                        this.bombType++;
+                        break;
+                    case "-":
+                        this.bombType--;
+                        break;
+                }
+                console.log("bombType :", this.bombType);
+                console.log("maxBombNumber :", this.maxBombNumber);
+                console.log("blastRange :", this.blastRange);
+                return;
+            }
+            if (DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) {
+                this.bombNumber++;
                 this.dropBomb();
                 this.bombCooldown = new Date().getTime() + 1500;
                 return;
-            }
+            } else if (DROP_BOMB[event.key]) return;
             this.direction = DIRECTION_MAP[event.key];
             if (!this.isMoving) this.updatePosition();
         }), 500)
@@ -110,7 +149,24 @@ export class CurrentPlayer extends Player {
             }
         }), 500)
     }
-
+    addMaxBombNumber() {
+        this.maxBombNumber++;
+    }
+    rmMaxBombNumber() {
+        this.maxBombNumber--;
+    }
+    setBombType(type) {
+        this.bombType = type;
+    }
+    bombExplode() {
+        this.bombNumber -= 1;
+    }
+    addBlastRange(nb) {
+        this.blastRange += nb;
+    }
+    resetBlastRange() {
+        this.blastRange = 1;
+    }
     moveCurrent() {
         const playerGround = checkGround(this);
         if (!this.direction) {
@@ -141,10 +197,11 @@ export class CurrentPlayer extends Player {
     dropBomb() {
         this.ws.sendMessage({
             type: "bomb",
-            bombType: 0,
+            bombType: this.bombType,
             sender: this.username,
             position: { "x": this.posX, "y": this.posY + 608 },
-            date: new Date().getTime()
+            date: new Date().getTime(),
+            blastRange: this.blastRange
         });
     }
     triggerBlast() {
@@ -154,7 +211,7 @@ export class CurrentPlayer extends Player {
             this.rmLife(1);
             if (this.life <= 0) {
                 this.playerDeath("blast");
-            }else{
+            } else {
                 this.ws.sendMessage({
                     type: "degats",
                     sender: this.username,

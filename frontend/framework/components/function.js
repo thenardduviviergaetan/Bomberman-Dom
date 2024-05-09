@@ -13,21 +13,65 @@ const FRAME_WIDTH = 32;
 //     };
 //     return cross;
 // }
-
-export function initCrossBlast(posX, posY, map) {
+const crossKeys = ["top", "left", "right", "bottom"]
+export function initCrossBlast(posX, posY, map, range) {
     const maxY = map.atlas.length;
     const maxX = map.atlas[0].length;
     const indexX = parseInt((posX + FRAME_WIDTH / 2) / FRAME_WIDTH);
     const indexY = parseInt((posY * -1 + FRAME_WIDTH) / FRAME_WIDTH) - 1;
     const check = (indexX >= 0 && indexX < maxX) && (indexY >= 0 && indexY < maxY);
 
+    // const cross = {
+    //     "top": indexY - 1 >= 0 && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
+    //     "left": indexX - 1 >= 0 && check ? getBorder(map.children[indexY].children[indexX - 1], indexY, indexX - 1) : undefined,
+    //     "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
+    //     "right": indexX + 1 < maxX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
+    //     "bottom": indexY + 1 < maxY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY + 1, indexX) : undefined,
+    // };
     const cross = {
-        "top": indexY - 1 >= 0 && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
-        "left": indexX - 1 >= 0 && check ? getBorder(map.children[indexY].children[indexX - 1], indexY, indexX - 1) : undefined,
-        "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
-        "right": indexX + 1 < maxX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
-        "bottom": indexY + 1 < maxY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY + 1, indexX) : undefined,
-    };
+        "top": [],
+        "left": [],
+        "in": [],
+        "right": [],
+        "bottom": [],
+    }
+    if (check) cross.in.push(getBorder(map.children[indexY].children[indexX], indexY, indexX));
+    crossKeys.forEach((key) => {
+        let compt = 0;
+        let next = true;
+        let tempY = indexY;
+        let tempX = indexX;
+        while (next) {
+            compt++;
+            switch (key) {
+                case "top":
+                    tempY--;
+                    next = tempY >= 0 && check;
+                    break;
+                case "left":
+                    tempX--;
+                    next = tempX >= 0 && check;
+                    break;
+                case "right":
+                    tempX++;
+                    next = tempX < maxX && check;
+                    break;
+                case "bottom":
+                    tempY++;
+                    next = tempY < maxY && check;
+                    break;
+            }
+            if (next) {
+                let mapCase = map.children[tempY].children[tempX];
+                if (mapCase.props.class !== "wall") {
+                    cross[key].push(getBorder(mapCase, tempY, tempX));
+                }else{
+                    next = false;
+                }
+            }
+            next = !next ? false : compt < range;
+        }
+    });
     return cross;
 }
 
