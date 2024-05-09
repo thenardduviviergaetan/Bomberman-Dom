@@ -1,10 +1,8 @@
 import GameManager from './framework/components/game-manager.js';
-
 // const app = new Framework();
 
 const start = new GameManager()
 start.launchMenu()
-
 // const ws = new WS("ws://localhost:8080/api/ws");
 
 

@@ -87,6 +87,10 @@ func (h *Hub) Run() {
 				for _, client := range h.Clients {
 					client.send <- message
 				}
+			case "test":
+				for _, client := range h.Clients {
+					client.send <- message
+				}
 			}
 
 		}

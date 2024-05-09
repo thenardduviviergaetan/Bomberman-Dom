@@ -22,6 +22,7 @@ export default class Game extends Component {
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
 
+        this.ws.onClose(()=>this.stop = true)
         this.ws.onMessage((message) => {
             if (message.type === "map") {
                 this.initMap(message)
@@ -31,7 +32,7 @@ export default class Game extends Component {
                 this.updatePlayers(message)
             }
 
-            if (message.type === "restart") {
+            if (message.type === "restart" || message.type === "test") { //TODO replace this by the endgame msg
                 this.stop = true;
             }
         })
