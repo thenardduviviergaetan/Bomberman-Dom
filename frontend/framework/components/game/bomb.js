@@ -7,11 +7,11 @@ const yellowFlammeSprite = new TabSprite("./framework/components/game/assets/bla
 const blueFlammeSprite = new TabSprite("./framework/components/game/assets/blast-bleu-32x32.png", 32, 128, 288).tab;
 
 const ANIMATION_FRAME_BOMB = {
-    0: { tab: [0, 1, 2], flame: "yellow" },
-    1: { tab: [3, 4, 5], flame: "yellow" },
-    2: { tab: [6, 7, 8], flame: "blue" },
-    3: { tab: [9, 10, 11], flame: "yellow" },
-    4: { tab: [12, 13, 14], flame: "blue" }
+    0: { tab: [0, 1, 2], flame: "yellow", blastRange: 1, bombTimer: 1500, blastTimer:1000 },
+    1: { tab: [3, 4, 5], flame: "yellow", blastRange: 1, bombTimer: 1500, blastTimer:1000 },
+    2: { tab: [6, 7, 8], flame: "blue", blastRange: 1, bombTimer: 1500, blastTimer:1000 },
+    3: { tab: [9, 10, 11], flame: "yellow", blastRange: 1, bombTimer: 1500, blastTimer:1000 },
+    4: { tab: [12, 13, 14], flame: "blue", blastRange: 38, bombTimer: 500, blastTimer:1000 },
 }
 
 
@@ -60,7 +60,7 @@ export default class TabBomb extends Component {
                 BombMessage.position.y,
                 BombMessage.date,
                 bombSprite,
-                BombMessage.blastRange,
+                BombMessage.blastRangeBonus+ANIMATION_FRAME_BOMB[BombMessage.bombType].blastRange,
                 this,
             )
         );
@@ -82,7 +82,7 @@ export default class TabBomb extends Component {
             this.children = newChild;
             tabExplodeBomb.forEach((bomb) => {
                 if (this.curentPlayer.username === bomb.sender) this.curentPlayer.bombExplode();
-                this.addElement(new Blast(bomb.posX, bomb.posY, ANIMATION_FRAME_BOMB[bomb.bombType].flame, bomb.blastRange, this))
+                this.addElement(new Blast(bomb.posX, bomb.posY, ANIMATION_FRAME_BOMB[bomb.bombType].flame, bomb.blastRange, ANIMATION_FRAME_BOMB[bomb.bombType].blastTimer,this))
             });
             this.update();
         }
@@ -109,25 +109,14 @@ class Bomb extends Component {
         this.animationId = 0
         this.props.style = `${spriteAnimation[0].style} top: ${this.posY}px; left: ${this.posX}px;`
         this.spriteAnimation = spriteAnimation;
+        this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer/ANIMATION_FRAME_BOMB[this.bombType].tab.length);
     }
     tick() {
         let time = new Date().getTime()
-        let updateFrame = false;
-        switch (true) {
-            case time - this.dateCreateBomb > 1500 && this.animationId < 3:
-                updateFrame = true;
-                this.animationId = 3;
-                break;
-            case time - this.dateCreateBomb > 1000 && this.animationId < 2:
-                updateFrame = true;
-                this.animationId = 2;
-                break;
-            case time - this.dateCreateBomb > 500 && this.animationId < 1:
-                updateFrame = true;
-                this.animationId = 1;
-                break;
-        }
-        if (updateFrame) {
+        // let updateFrame = false;
+        if (time - this.dateCreateBomb > this.timer){
+            this.animationId++;
+            this.dateCreateBomb = time;
             if (this.animationId > this.spriteAnimation.length - 1) {
                 return true;
             } else {
@@ -135,12 +124,34 @@ class Bomb extends Component {
                 this.update();
             }
         }
+        // switch (true) {
+        //     case time - this.dateCreateBomb > 1500 && this.animationId < 3:
+        //         updateFrame = true;
+        //         this.animationId = 3;
+        //         break;
+        //     case time - this.dateCreateBomb > 1000 && this.animationId < 2:
+        //         updateFrame = true;
+        //         this.animationId = 2;
+        //         break;
+        //     case time - this.dateCreateBomb > 500 && this.animationId < 1:
+        //         updateFrame = true;
+        //         this.animationId = 1;
+        //         break;
+        // }
+        // if (updateFrame) {
+        //     if (this.animationId > this.spriteAnimation.length - 1) {
+        //         return true;
+        //     } else {
+        //         this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`
+        //         this.update();
+        //     }
+        // }
         return false;
     }
 }
 
 class Blast extends Component {
-    constructor(posX, posY, typeflame, blastRange, parent) {
+    constructor(posX, posY, typeflame, blastRange, timer,parent) {
         super("div", { id: `${parent.props.id}blast` }, [])
         this.dateCreateBomb = new Date().getTime();
         this.posX = posX;
@@ -150,6 +161,7 @@ class Blast extends Component {
         this.crossElement = [];
         this.animationId = 0;
         this.blastRange = blastRange;
+        this.timer = parseInt(timer/4);
         this.aLive = new Date().getTime();
         this.initBlast();
     }
@@ -159,7 +171,7 @@ class Blast extends Component {
         console.log(cross)
         keys.forEach(key => {
             cross[key].forEach((blockBorder, index) => {
-                let spkey = index < cross[key].length-1 ? "mid" : "end"
+                let spkey = index < cross[key].length - 1 ? "mid" : "end"
                 const spriteAnimation = [];
                 ANIMATION_FRAME_BLAST[key][spkey].forEach(idsprite => {
                     spriteAnimation.push(this.typeflame === "yellow" ? yellowFlammeSprite[idsprite] : blueFlammeSprite[idsprite])
@@ -174,27 +186,12 @@ class Blast extends Component {
                     this.parent.parent.update();
                 }
             });
-            // const blockBorder = cross[key];
-            // if (blockBorder === undefined || expose.filter((el) => el == blockBorder.type).length === 0) return;
-            // const spriteAnimation = [];
-            // ANIMATION_FRAME_BLAST[key].forEach(idsprite => {
-            //     spriteAnimation.push(this.typeflame === "yellow" ? yellowFlammeSprite[idsprite] : blueFlammeSprite[idsprite])
-            // });
-            // this.addElement(new Fire(blockBorder.borderLeft, blockBorder.borderUp, spriteAnimation, blockBorder, this.parent));
-            // if (blockBorder.type === "block") {
-            //     console.log(map.children[blockBorder.indexY - 1]);
-            //     const top = map.children[blockBorder.indexY - 1].children[blockBorder.indexX]
-            //     const bottom = map.children[blockBorder.indexY + 1].children[blockBorder.indexX]
-            //     this.parent.parent.children[blockBorder.indexY].children[blockBorder.indexX] = top.props.class === "block" || top.props.class === "wall" ? map.shadow : map.path;
-            //     if (bottom.props.class === "shadow") this.parent.parent.children[blockBorder.indexY + 1].children[blockBorder.indexX] = map.path;
-            //     this.parent.parent.update();
-            // }
         });
     }
     tick() {
         const time = new Date().getTime();
         let updateFrame = false;
-        if (time - this.aLive >= 200) {
+        if (time - this.aLive >= this.timer) {
             updateFrame = true;
             this.aLive = time;
         }
@@ -219,9 +216,7 @@ class Fire extends Component {
         this.spriteAnimation = spriteAnimation;
         this.border = border;
         this.parent = parent;
-        // console.log(this.spriteAnimation)
         this.props.style = `${this.spriteAnimation[0].style} top: ${this.posY}px; left: ${this.posX}px;`
-        // console.log(this.props)
 
     }
     tick(animationId) {

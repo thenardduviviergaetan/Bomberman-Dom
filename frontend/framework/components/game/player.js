@@ -101,7 +101,7 @@ export class CurrentPlayer extends Player {
         this.maxBombNumber = 1;
         this.bombNumber = 0;
         this.bombType = 0;
-        this.blastRange = 1;
+        this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
 
         window.addEventListener("keydown", debounce((event) => {
@@ -130,7 +130,7 @@ export class CurrentPlayer extends Player {
                 }
                 console.log("bombType :", this.bombType);
                 console.log("maxBombNumber :", this.maxBombNumber);
-                console.log("blastRange :", this.blastRange);
+                console.log("blastRangeBonus :", this.blastRangeBonus);
                 return;
             }
             if (DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) {
@@ -162,10 +162,10 @@ export class CurrentPlayer extends Player {
         this.bombNumber -= 1;
     }
     addBlastRange(nb) {
-        this.blastRange += nb;
+        this.blastRangeBonus += nb;
     }
     resetBlastRange() {
-        this.blastRange = 1;
+        this.blastRangeBonus = 0;
     }
     moveCurrent() {
         const playerGround = checkGround(this);
@@ -201,7 +201,7 @@ export class CurrentPlayer extends Player {
             sender: this.username,
             position: { "x": this.posX, "y": this.posY + 608 },
             date: new Date().getTime(),
-            blastRange: this.blastRange
+            blastRangeBonus: this.blastRangeBonus
         });
     }
     triggerBlast() {
