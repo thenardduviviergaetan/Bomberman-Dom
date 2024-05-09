@@ -2,6 +2,8 @@ import Component from "../component.js";
 import { initCrossBlast } from "../function.js";
 import { checkTrigger } from "./collisions.js";
 import TabSprite from "./sprite.js";
+import Bonus from './bonus.js'
+
 const keys = ["top", "left", "in", "right", "bottom"];
 const expose = ["path", "block", "shadow", "spawn"];
 const yellowFlammeSprite = new TabSprite("./framework/components/game/assets/blast-jaune-32x32.png", 32, 128, 288).tab;
@@ -157,9 +159,18 @@ class Blast extends Component {
                 if (blockBorder.type === "block") {
                     const top = map.children[blockBorder.indexY - 1].children[blockBorder.indexX]
                     const bottom = map.children[blockBorder.indexY + 1].children[blockBorder.indexX]
-                    this.parent.parent.children[blockBorder.indexY].children[blockBorder.indexX] = top.props.class === "block" || top.props.class === "wall" ? map.shadow : map.path;
-                    if (bottom.props.class === "shadow") this.parent.parent.children[blockBorder.indexY + 1].children[blockBorder.indexX] = map.path;
-                    this.parent.parent.update();
+                    map.children[blockBorder.indexY].children[blockBorder.indexX] = top.props.class === "block" || top.props.class === "wall" ? map.shadow : map.path;
+                    if (bottom.props.class === "shadow") map.children[blockBorder.indexY + 1].children[blockBorder.indexX] = map.path;
+                    map.update();
+                }
+                if (blockBorder.type === "bonus") {
+                    const bonus = map.children[blockBorder.indexY].children[blockBorder.indexX];
+                    if (Array.from(bonus.children).some(child => child.props.class === "block-cover")) {
+                        bonus.children = Array.from(bonus.children).filter(child => child.props.class !== "block-cover");
+                    } else {
+                        console.log("NOOOOOOOO");
+                    }
+                    map.update();
                 }
             });
         });

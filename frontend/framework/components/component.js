@@ -34,6 +34,10 @@ export default class Component {
         this.children.push(...children);
     }
 
+    removeElement(...children){
+        this.children = this.children.filter((child) => !children.includes(child))
+    }
+
     async replaceChildren(c1, c2){
         this.children = this.children.filter((c) => c !== c1)
         this.addElement(c2)

@@ -1,11 +1,15 @@
 import Component from "../component.js";
+import Bonus from "./bonus.js";
 
 const TILE_TYPES = {
     WALL: 1,
     BLOCK: 2,
     PATH: 3,
     SPAWN: 0,
-    SAFE_ZONE: 4
+    SAFE_ZONE: 4,
+    BONUS_1: 5,
+    BONUS_2: 6,
+    BONUS_3: 7
 }
 
 export default class Map extends Component {
@@ -46,6 +50,17 @@ export default class Map extends Component {
                     case TILE_TYPES.SAFE_ZONE:
                         (y > 0 && (this.atlas[y - 1][x] === 1 || this.atlas[y - 1][x] === 2)) ? block = shadow : block = path;
                         break;
+                    case TILE_TYPES.BONUS_1:
+                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 1);
+                        break;
+                    case TILE_TYPES.BONUS_2:
+                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 2);
+                        break;
+                    case TILE_TYPES.BONUS_3:
+                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 3);
+                        break;
+                    // block = new Bonus(this.atlas, this.tileSize, this.tileSetImage);
+                    // block = new Component("div", { class: "block-bonus", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
                     default:
                         break;
                 }
