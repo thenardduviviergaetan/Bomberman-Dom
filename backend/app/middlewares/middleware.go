@@ -33,8 +33,12 @@ func RandomizeMap() [][]int {
 	for y, line := range baseMap {
 		for x, block := range line {
 			var r = rand.Intn(100)
-			if block == 3 && r < 30 {
-				baseMap[y][x] = 2
+			if block == 3 {
+				if r < 25 {
+					baseMap[y][x] = 2
+				} else if r >= 25 && r < 30 {
+					baseMap[y][x] = rand.Intn(3) + 5
+				}
 			}
 		}
 	}
