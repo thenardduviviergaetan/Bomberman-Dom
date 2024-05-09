@@ -49,15 +49,24 @@ export default class GameManager {
     }
 
     launchgame() {
-        const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
+        const leaveButton = new Component("button", { id: "leave-button" }, ["End Game"])
+        // const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
         const container = new Component("div", { id: "container" });
         const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
             // this.ws.close();
-            container.clear();//this is to clear the map which does not remove with app.clear()
-            this.app.clear();
-            this.launchEnd();
+            // container.clear();//this is to clear the map which does not remove with app.clear()
+            // this.app.clear();
+            // this.launchEnd();
+        })
+
+        this.ws.onMessage(message=>{
+            if (message.type === "end") {
+                container.clear();//this is to clear the map which does not remove with app.clear()
+                this.app.clear();
+                this.launchEnd();
+            }
         })
 
         const ready = new Promise((resolve, reject) => {
