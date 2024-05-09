@@ -57,23 +57,6 @@ export function checkGround(player) {
     return groundObj;
 }
 
-// function getPlayerBorder(player) {
-//     // return {
-//     //     left: player.posX + 8,
-//     //     right: player.posX + FRAME_WIDTH - 8,
-//     //     up: player.posY + 608 + 20,
-//     //     down: (player.posY - FRAME_WIDTH) + 608,
-
-//     // }
-    // return {
-    //     left: player.posX,
-    //     right: player.posX + FRAME_WIDTH,
-    //     up: player.posY + 608,
-    //     down: (player.posY - FRAME_WIDTH) + 608,
-
-    // }
-// }
-
 export function checkTrigger(player, objBorder) {
     const playerBorder = {
         left: player.posX,
@@ -82,40 +65,14 @@ export function checkTrigger(player, objBorder) {
         down: (player.posY ) + 672,
 
     }
-    // player.up += 32;
-    // player.down += 32;
-    // const triggerTop = objBorder.borderUp < playerBorder.up+8 && playerBorder.up+8 < objBorder.borderDown;
-    // const triggerBottom = objBorder.borderUp < playerBorder.down && playerBorder.down < objBorder.borderDown;
-    // const triggerLeft = objBorder.borderLeft< playerBorder.left +8 && playerBorder.left+8 < objBorder.borderRight;
-    // const triggerRight = objBorder.borderLeft< playerBorder.right-8 && playerBorder.right-8 < objBorder.borderRight;
     const triggerTop = objBorder.borderUp <= playerBorder.down;
     const triggerBottom = objBorder.borderDown >= playerBorder.up;
     const triggerLeft = objBorder.borderLeft <= playerBorder.right;
     const triggerRight = objBorder.borderRight >= playerBorder.left;
-    // console.log("triggerTop :",triggerTop,"objBorder.borderUp <= playerBorder.down",objBorder.borderUp , playerBorder.down)
-    // console.log("triggerBottom :",triggerBottom,"objBorder.borderDown >= playerBorder.up",objBorder.borderDown , playerBorder.up)
-    // console.log("triggerLeft :",triggerLeft,"objBorder.borderLeft <= playerBorder.right",objBorder.borderLeft , playerBorder.right)
-    // console.log("triggerRight :",triggerRight,"objBorder.borderRight >= playerBorder.left",objBorder.borderRight , playerBorder.left)
-    // console.log("(triggerTop || triggerBottom) && (triggerLeft || triggerRight)")
-    // console.log(triggerTop , triggerBottom ,triggerLeft , triggerRight)
     if (
-        // (triggerTop || triggerBottom) &&
-        // (triggerLeft || triggerRight)
         (triggerTop && triggerBottom) &&
         (triggerLeft && triggerRight)
     ) {
-        // if (triggerTop) console.log("triggerTop :")
-        // if (triggerTop) console.log("objBorder.borderUp, playerBorder.up, objBorder.borderDown")
-        // if (triggerTop) console.log(objBorder.borderUp, playerBorder.up, objBorder.borderDown)
-        // if (triggerBottom) console.log("triggerBottom :")
-        // if (triggerBottom) console.log("objBorder.borderUp, playerBorder.down, objBorder.borderDown")
-        // if (triggerBottom) console.log( objBorder.borderUp, playerBorder.down, objBorder.borderDown)
-        // if (triggerLeft) console.log("triggerLeft :")
-        // if (triggerLeft) console.log("objBorder.borderLeft, playerBorder.left, objBorder.borderRight")
-        // if (triggerLeft) console.log( objBorder.borderLeft, playerBorder.left, objBorder.borderRight)
-        // if (triggerRight) console.log("triggerRight :")
-        // if (triggerRight) console.log("objBorder.borderLeft, playerBorder.right, objBorder.borderRight")
-        // if (triggerRight) console.log( objBorder.borderLeft, playerBorder.right, objBorder.borderRight)
         return true;
     }
     return false;

@@ -114,7 +114,6 @@ class Bomb extends Component {
     }
     tick() {
         let time = new Date().getTime()
-        // let updateFrame = false;
         if (time - this.dateCreateBomb > this.timer) {
             this.animationId++;
             this.dateCreateBomb = time;
@@ -125,28 +124,6 @@ class Bomb extends Component {
                 this.update();
             }
         }
-        // switch (true) {
-        //     case time - this.dateCreateBomb > 1500 && this.animationId < 3:
-        //         updateFrame = true;
-        //         this.animationId = 3;
-        //         break;
-        //     case time - this.dateCreateBomb > 1000 && this.animationId < 2:
-        //         updateFrame = true;
-        //         this.animationId = 2;
-        //         break;
-        //     case time - this.dateCreateBomb > 500 && this.animationId < 1:
-        //         updateFrame = true;
-        //         this.animationId = 1;
-        //         break;
-        // }
-        // if (updateFrame) {
-        //     if (this.animationId > this.spriteAnimation.length - 1) {
-        //         return true;
-        //     } else {
-        //         this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`
-        //         this.update();
-        //     }
-        // }
         return false;
     }
 }
@@ -169,7 +146,6 @@ class Blast extends Component {
     initBlast() {
         const map = this.parent.parent;
         const cross = initCrossBlast(this.posX, -this.posY, map, this.blastRange);
-        // console.log(cross)
         keys.forEach(key => {
             cross[key].forEach((blockBorder, index) => {
                 let spkey = index < cross[key].length - 1 ? "mid" : "end"
@@ -179,7 +155,6 @@ class Blast extends Component {
                 });
                 this.addElement(new Fire(blockBorder.borderLeft, blockBorder.borderUp, spriteAnimation, blockBorder, this.parent, key));
                 if (blockBorder.type === "block") {
-                    // console.log(map.children[blockBorder.indexY - 1]);
                     const top = map.children[blockBorder.indexY - 1].children[blockBorder.indexX]
                     const bottom = map.children[blockBorder.indexY + 1].children[blockBorder.indexX]
                     this.parent.parent.children[blockBorder.indexY].children[blockBorder.indexX] = top.props.class === "block" || top.props.class === "wall" ? map.shadow : map.path;

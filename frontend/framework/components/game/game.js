@@ -24,23 +24,6 @@ export default class Game extends Component {
         this.playerMoveQueue = []
 
         this.ws.onMessage((message) => {
-            // if (message.type === "map") {
-            //     this.initMap(message)
-            // }
-
-            // if (message.type === "move") {
-            //     this.updatePlayers(message)
-            // }
-
-            // if (message.type === "restart") {
-            //     this.stop = true;
-            // }
-            // if (message.type === "bomb") {
-            //     this.tabBomb.newBomb(message);
-            // }
-            // if (message.type === "death" || message.type === "degats") {
-            //     console.log(message);
-            // }
             switch (message.type) {
                 case "map":
                     this.initMap(message)
