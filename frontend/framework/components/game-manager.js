@@ -59,6 +59,7 @@ export default class GameManager {
             // container.clear();//this is to clear the map which does not remove with app.clear()
             // this.app.clear();
             // this.launchEnd();
+            this.ws.sendMessage({type:"end"})
         })
 
         this.ws.onMessage(message=>{
