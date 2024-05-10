@@ -2,7 +2,7 @@ import { initSquareCollision } from "../function.js";
 
 const FRAME_WIDTH = 32;
 const keys = ["top-left", "top", "top-right", "left", "in", "right", "bottom-left", "bottom", "bottom-right"];
-const solid = ["wall", "block"];
+const solid = ["wall", "block", "covered"];
 
 export function checkGround(player) {
     const groundObj = {
@@ -63,18 +63,13 @@ export function checkTrigger(player, objBorder) {
         left: player.posX,
         right: player.posX + FRAME_WIDTH,
         up: player.posY - FRAME_WIDTH + 640,
-        down: (player.posY ) + 640,
+        down: player.posY + 640,
+    };
 
-    }
     const triggerTop = objBorder.borderUp <= playerBorder.down;
     const triggerBottom = objBorder.borderDown >= playerBorder.up;
     const triggerLeft = objBorder.borderLeft <= playerBorder.right;
     const triggerRight = objBorder.borderRight >= playerBorder.left;
-    if (
-        (triggerTop && triggerBottom) &&
-        (triggerLeft && triggerRight)
-    ) {
-        return true;
-    }
-    return false;
+
+    return triggerTop && triggerBottom && triggerLeft && triggerRight;
 }

@@ -10,10 +10,11 @@ export default class Component {
      * @param {Object} props - The properties of the component.
      * @param {Array} children - The child components of the component.
      */
-    constructor(tag, props = {}, children = []) {
+    constructor(tag, props = {}, children = [], parent=null) {
         this.tag = tag;
         this.props = props;
         this.children = children;
+        this.parent = parent;
         this.domNode = render(this);
     }
     /**
@@ -105,5 +106,9 @@ export default class Component {
 
     updateStyle(style){
         document.getElementById(this.props.id).style = style;
+    }
+
+    getParent(){
+        return this.parent;
     }
 }

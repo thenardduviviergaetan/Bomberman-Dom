@@ -168,7 +168,7 @@ export class CurrentPlayer extends Player {
         this.blastRangeBonus = 0;
     }
 
-    speedUp(){
+    speedUp() {
         this.speedBonus++;
     }
     moveCurrent(bonusMap) {
@@ -181,11 +181,33 @@ export class CurrentPlayer extends Player {
         const oldPosY = this.posY;
 
 
-        // FIXME
+        // console.log("PLAYER:",this.parent.bonusMap);
         this.parent.bonusMap.forEach(bonus => {
-            if (checkTrigger(this, bonus)) {
-                console.log(bonus);
-                this.ws.sendMessage({ type: "bonus", sender: this.username, position: bonus });
+            if (checkTrigger(this, bonus) && bonus.parent.children.length == 1) {
+                // console.log("BONUS:", bonus);
+                switch (bonus.bonus) {
+                    case "bomb":
+                        console.log("BOMB BONUS");
+                        this.addMaxBombNumber();
+                        break;
+                    case "blast":
+                        console.log("BLAST BONUS");
+                        this.addBlastRange(1)
+                        break;
+                    case "speed":
+                        console.log("SPEED BONUS");
+                        this.speedUp();
+                        break;
+                    default:
+                        break
+                }
+                this.parent.bonusMap = this.parent.bonusMap.filter((el) => el != bonus);
+                let bonusData = {
+                    indexX: bonus.indexX,
+                    indexY: bonus.indexY,
+                }
+
+                this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
             }
         })
 

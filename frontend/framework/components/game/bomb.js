@@ -163,7 +163,7 @@ class Blast extends Component {
                     if (bottom.props.class === "shadow") map.children[blockBorder.indexY + 1].children[blockBorder.indexX] = map.path;
                     map.update();
                 }
-                if (blockBorder.type === "bonus covered") {
+                if (blockBorder.type === "covered") {
                     const bonus = map.children[blockBorder.indexY].children[blockBorder.indexX];
                     if (Array.from(bonus.children).some(child => child.props.class === "block-cover")) {
                         bonus.children = Array.from(bonus.children).filter(child => child.props.class !== "block-cover");

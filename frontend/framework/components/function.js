@@ -84,6 +84,8 @@ export function getBorder(obj, posY, posX) {
     return {
         type: obj.props.class,
         bonus: obj.props.bonus,
+        children: obj.children,
+        parent: obj.parent,
         borderLeft: posX * FRAME_WIDTH,
         borderRight: (posX + 1) * FRAME_WIDTH,
         borderUp: posY * FRAME_WIDTH,

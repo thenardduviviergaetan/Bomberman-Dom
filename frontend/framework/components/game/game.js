@@ -45,25 +45,10 @@ export default class Game extends Component {
                 case "degats":
                     console.log(message);
                     break;
-                case "bonus"://FIXME
-                    console.log(message);
-
-                    switch (message.position.bonus){
-                        case "bomb":
-                            this.currentPlayer.addMaxBombNumber()
-                            break;
-                        case "blast":
-                            this.currentPlayer.addBlastRange()
-                            break;
-                        case "speed":
-                            this.currentPlayer.speedUp();
-                            break;
-                        default:
-                            break
-                    }
-
-                    this.map.removeBonus(message.position);
-
+                case "bonus":
+                    // console.log("WS MSG:", message);
+                    this.map.removeBonus(message.data);
+                default:
                     break;
             }
         })
@@ -112,6 +97,7 @@ export default class Game extends Component {
         this.tabBomb = new TabBomb(this.map, this.currentPlayer);
         this.map.addElement(this.tabBomb)
         this.addElement(this.map)
+        console.log(this.map.bonusMap);
         this.update()
     }
 
