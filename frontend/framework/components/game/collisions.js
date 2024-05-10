@@ -57,12 +57,13 @@ export function checkGround(player) {
     return groundObj;
 }
 
+//FIXME
 export function checkTrigger(player, objBorder) {
     const playerBorder = {
         left: player.posX,
         right: player.posX + FRAME_WIDTH,
-        up: player.posY - FRAME_WIDTH + 672,
-        down: (player.posY ) + 672,
+        up: player.posY - FRAME_WIDTH + 640,
+        down: (player.posY ) + 640,
 
     }
     const triggerTop = objBorder.borderUp <= playerBorder.down;

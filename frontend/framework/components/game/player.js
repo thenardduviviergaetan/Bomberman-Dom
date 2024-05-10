@@ -167,6 +167,10 @@ export class CurrentPlayer extends Player {
     resetBlastRange() {
         this.blastRangeBonus = 0;
     }
+
+    speedUp(){
+        this.speedBonus++;
+    }
     moveCurrent(bonusMap) {
         const playerGround = checkGround(this);
         if (!this.direction) {
@@ -180,11 +184,8 @@ export class CurrentPlayer extends Player {
         // FIXME
         this.parent.bonusMap.forEach(bonus => {
             if (checkTrigger(this, bonus)) {
-                // this.parent.removeElement(bonus);
-                // this.parent.bonusMap = this.parent.bonusMap.filter(b => b !== bonus);
-                // console.log("trigger bonus:", this.parent.bonusMap);
-                
-                this.ws.sendMessage({ type: "bonus", sender: this.username, bonusType: "test", position: { x: this.posX, y: this.posY }});
+                console.log(bonus);
+                this.ws.sendMessage({ type: "bonus", sender: this.username, position: bonus });
             }
         })
 

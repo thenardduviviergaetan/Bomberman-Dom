@@ -48,7 +48,21 @@ export default class Game extends Component {
                 case "bonus"://FIXME
                     console.log(message);
 
-                    // this.map.removeBonus(message.position);
+                    switch (message.position.bonus){
+                        case "bomb":
+                            this.currentPlayer.addMaxBombNumber()
+                            break;
+                        case "blast":
+                            this.currentPlayer.addBlastRange()
+                            break;
+                        case "speed":
+                            this.currentPlayer.speedUp();
+                            break;
+                        default:
+                            break
+                    }
+
+                    this.map.removeBonus(message.position);
 
                     break;
             }

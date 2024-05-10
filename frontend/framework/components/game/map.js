@@ -57,7 +57,7 @@ export default class Map extends Component {
                     case TILE_TYPES.BONUS_2:
                     case TILE_TYPES.BONUS_3:
                         block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
-                        this.bonusMap.push(getBorder(block, y, x))
+                        this.bonusMap.push(getBorder(block.children[0], y, x))
                         break
                     default:
                         break;
@@ -71,7 +71,18 @@ export default class Map extends Component {
     }
 
     removeBonus(position) {  //FIXME
-        const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` })
-        
+
+        this.bonusMap = this.bonusMap.filter((bonus) => {
+            // console.log("BONUS:", bonus);
+            if (bonus.indexX === position.indexX && bonus.indexY === position.indexY) {
+                // this.children[position.indexY].children[position.indexX] = this.path
+                const top = this.children[position.indexY - 1].children[position.indexX]
+                this.children[position.indexY].children[position.indexX] = top.props.class === "block" || top.props.class === "wall" ? this.shadow : this.path;
+                this.update()
+                return false
+            }
+            return true
+        })
+
     }
 }
