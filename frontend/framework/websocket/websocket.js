@@ -9,7 +9,11 @@ export default class WS extends WebSocket{
 
     onMessage(callback){
         this.addEventListener('message', function(event){
-            callback(JSON.parse(event.data));
+            try{
+                callback(JSON.parse(event.data));
+            } catch(err){
+                return
+            } //FIXME potential fix for the doubled message
         });
     }
 

@@ -23,6 +23,7 @@ export default class Game extends Component {
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
 
+        this.ws.onClose(()=>this.stop = true)
         this.ws.onMessage((message) => {
             switch (message.type) {
                 case "map":
@@ -31,7 +32,7 @@ export default class Game extends Component {
                 case "move":
                     this.updatePlayers(message)
                     break;
-                case "restart":
+                case "end":
                     this.stop = true;
                     break;
                 case "bomb":
