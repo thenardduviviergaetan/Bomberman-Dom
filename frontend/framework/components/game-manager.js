@@ -87,7 +87,7 @@ export default class GameManager {
         const leaveButton = new Component("button", { id: "leave-button", className: "end" }, ["Leave Game"])
 
         leaveButton.actionListener('click', () => {
-            this.ws.close();
+            // this.ws.close();
             container.clear();//this is to clear the map which does not remove with app.clear()
             this.app.clear();
             this.launchMenu();

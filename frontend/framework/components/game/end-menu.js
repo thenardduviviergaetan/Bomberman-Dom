@@ -13,7 +13,7 @@ export default class EndMenu extends Component{
         const title = new Component("h2", {id:"end-title"}, [`Game's over folks ! ${this.winner} wins !`])
         const winText = new Component("p", {id:"end-prompt"}, ["You can choose either to restart the game or to leave this game :"])
         const buttons = new Component("div",{id:"button-container"},[this.restartButton,this.leaveButton])
-        this.addElement(title,winText,warning,buttons)
+        this.addElement(title,winText,buttons)
     }
 
 }
