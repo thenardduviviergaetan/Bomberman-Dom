@@ -103,6 +103,9 @@ export class CurrentPlayer extends Player {
         this.bombType = 0;
         this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
+        // this.speedBonus = 0;
+
+        this.speed = MOVEMENT_SIZE;
 
         window.addEventListener("keydown", debounce((event) => {
             // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
@@ -169,9 +172,9 @@ export class CurrentPlayer extends Player {
     }
 
     speedUp() {
-        this.speedBonus++;
+        this.speed++;
     }
-    moveCurrent(bonusMap) {
+    moveCurrent() {
         const playerGround = checkGround(this);
         if (!this.direction) {
             this.isMoving = false;
@@ -210,9 +213,9 @@ export class CurrentPlayer extends Player {
                 this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
             }
         })
-
-        this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
-        this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
+        
+        this.posY += this.direction === "up" && !playerGround.groundUp ? -this.speed : this.direction === "down" && !playerGround.groundDown ? this.speed : 0;
+        this.posX += this.direction === "left" && !playerGround.groundLeft ? -this.speed : this.direction === "right" && !playerGround.groundRight ? this.speed : 0;
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
         }
