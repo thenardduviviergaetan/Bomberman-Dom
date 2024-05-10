@@ -11,13 +11,13 @@ export default class Bonus extends Component {
         // this.cover = new Component("div", { class: "block-cover", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         switch (this.bonusType) {
             case 1:
-                this.bonusImage = new Component("div", { style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30; background-position: -${0}px -${0}px;` });
+                this.bonusImage = new Component("div", { class: "bonus-item", type: "bomb", style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30; background-position: -${0}px -${0}px;` });
                 break;
             case 2:
-                this.bonusImage = new Component("div", { style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30; background-position: -${16}px -${0}px;` });
+                this.bonusImage = new Component("div", { class: "bonus-item", type: "blast", style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30; background-position: -${16}px -${0}px;` });
                 break;
             case 3:
-                this.bonusImage = new Component("div", { style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30;background-position: -${48}px -${0}px;` });
+                this.bonusImage = new Component("div", { class: "bonus-item", type: "speed", style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30;background-position: -${48}px -${0}px;` });
                 break;
             default:
                 break;

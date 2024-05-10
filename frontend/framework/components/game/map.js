@@ -1,5 +1,7 @@
 import Component from "../component.js";
 import Bonus from "./bonus.js";
+import { getBorder } from '../function.js'
+
 
 const TILE_TYPES = {
     WALL: 1,
@@ -18,6 +20,7 @@ export default class Map extends Component {
         this.atlas = atlas;
         this.tileSize = 32;
         this.tileSetImage = 'url(./framework/components/game/assets/world1-32x32.png)'
+        this.bonusMap = []
         this.initMap();
         return this;
     }
@@ -51,16 +54,11 @@ export default class Map extends Component {
                         (y > 0 && (this.atlas[y - 1][x] === 1 || this.atlas[y - 1][x] === 2)) ? block = shadow : block = path;
                         break;
                     case TILE_TYPES.BONUS_1:
-                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 1);
-                        break;
                     case TILE_TYPES.BONUS_2:
-                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 2);
-                        break;
                     case TILE_TYPES.BONUS_3:
-                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, 3);
-                        break;
-                    // block = new Bonus(this.atlas, this.tileSize, this.tileSetImage);
-                    // block = new Component("div", { class: "block-bonus", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
+                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
+                        this.bonusMap.push(getBorder(block, y, x))
+                        break
                     default:
                         break;
                 }
@@ -70,5 +68,10 @@ export default class Map extends Component {
             }
             this.addElement(lineMap);
         }
+    }
+
+    removeBonus(position) {  //FIXME
+        const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` })
+        
     }
 }

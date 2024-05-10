@@ -2,6 +2,8 @@ import Component from "../component.js";
 import Map from "./map.js";
 import { CurrentPlayer, Player } from "./player.js";
 import TabBomb from "./bomb.js";
+import { checkTrigger } from "./collisions.js";
+import { getBorder } from '../function.js'
 
 const FRAMERATE = 1000 / 60;
 const positions = [
@@ -42,6 +44,12 @@ export default class Game extends Component {
                     break;
                 case "degats":
                     console.log(message);
+                    break;
+                case "bonus"://FIXME
+                    console.log(message);
+
+                    // this.map.removeBonus(message.position);
+
                     break;
             }
         })
@@ -110,11 +118,11 @@ export default class Game extends Component {
             this.fps.textContent = "";
             return
         }
-        if (this.tabBomb !== undefined) this.tabBomb.tick();
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
 
     async updateState() {
+        if (this.tabBomb !== undefined) this.tabBomb.tick();
         await Promise.all(this.playerMoveQueue.map(player => player.player.move(player.direction, player.position)));
         this.playerMoveQueue = [];
     }

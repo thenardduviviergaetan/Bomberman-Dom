@@ -80,7 +80,7 @@ export function initSquareCollision(posX, posY, map) {
     return cross;
 }
 
-function getBorder(obj, posY, posX) {
+export function getBorder(obj, posY, posX) {
     return {
         type: obj.props.class,
         borderLeft: posX * FRAME_WIDTH,

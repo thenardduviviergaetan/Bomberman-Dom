@@ -1,6 +1,6 @@
 import Component from "../component.js";
 import { debounce } from "../../engine/utils.js";
-import { checkGround } from "./collisions.js";
+import { checkGround, checkTrigger } from "./collisions.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
@@ -167,7 +167,7 @@ export class CurrentPlayer extends Player {
     resetBlastRange() {
         this.blastRangeBonus = 0;
     }
-    moveCurrent() {
+    moveCurrent(bonusMap) {
         const playerGround = checkGround(this);
         if (!this.direction) {
             this.isMoving = false;
@@ -175,6 +175,19 @@ export class CurrentPlayer extends Player {
         }
         const oldPosX = this.posX;
         const oldPosY = this.posY;
+
+
+        // FIXME
+        this.parent.bonusMap.forEach(bonus => {
+            if (checkTrigger(this, bonus)) {
+                // this.parent.removeElement(bonus);
+                // this.parent.bonusMap = this.parent.bonusMap.filter(b => b !== bonus);
+                // console.log("trigger bonus:", this.parent.bonusMap);
+                
+                this.ws.sendMessage({ type: "bonus", sender: this.username, bonusType: "test", position: { x: this.posX, y: this.posY }});
+            }
+        })
+
         this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
         this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
@@ -227,4 +240,5 @@ export class CurrentPlayer extends Player {
             cause: cause
         });
     }
+
 }
