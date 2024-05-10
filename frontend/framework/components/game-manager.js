@@ -28,17 +28,11 @@ export default class GameManager {
             this.ws = new WS(`ws://localhost:8080/api/ws?username=${this.username}`);
             this.ws.onOpen(() => {
                 console.log('Connected to server:', this.username);
-                this.ws.sendMessage({ type: 'join', username: this.username });//FIXME error ws in opening state or whatever, check it after meal
-                // setTimeout(() => {
-                //     this.ws.sendMessage({ type: 'join', username: this.username });//FIXME error ws in opening state or whatever, check it after meal
-                // }, 1000);
+                this.ws.sendMessage({ type: 'join', username: this.username });
             });
             this.ws.onClose(() => {
                 console.log('Disconnected from server');
-                this.ws.sendMessage({ type: 'leave', username: this.username });//FIXME error ws in opening state or whatever, check it after meal
-                // setTimeout(() => {
-                //     this.ws.sendMessage({ type: 'leave', username: this.username });//FIXME error ws in opening state or whatever, check it after meal
-                // }, 1000);
+                this.ws.sendMessage({ type: 'leave', username: this.username });
             })
             this.app.clear()
             this.launchgame()
@@ -49,22 +43,21 @@ export default class GameManager {
     }
 
     launchgame() {
-        const leaveButton = new Component("button", { id: "leave-button" }, ["End Game"])
-        // const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
+        const leaveButton = new Component("button", { id: "leave-button" }, ["Leave Game"])
+        const endButton = new Component("button", { id: "end-button" }, ["End Game"])
         const container = new Component("div", { id: "container" });
         const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const waitRoom = new WaitingRoom(this.ws, this.username)
         leaveButton.actionListener('click', () => {
-            // this.ws.close();
-            // container.clear();//this is to clear the map which does not remove with app.clear()
-            // this.app.clear();
-            // this.launchEnd();
-            this.ws.sendMessage({type:"end"})
+            this.ws.close();
+            container.clear();//this is to clear the map which does not remove with app.clear()
+            this.app.clear();
+            this.launchMenu();
         })
-
-        this.ws.onMessage(message=>{
+        endButton.actionListener('click',()=>this.ws.sendMessage({ type: "end" }))
+        this.ws.onMessage(message => {
             if (message.type === "end") {
-                console.log(message)
+                this.ws.close();
                 container.clear(); //this is to clear the map which does not remove with app.clear()
                 this.app.clear();
                 this.launchEnd();
@@ -83,6 +76,7 @@ export default class GameManager {
 
         container.addElement(chat, waitRoom);
         this.app.addComponent(leaveButton);
+        this.app.addComponent(endButton);
         this.app.addComponent(container);
 
         this.render();
@@ -100,24 +94,16 @@ export default class GameManager {
         })
         const restart = new Component("button", { id: "restart-button", className: "end" }, ["Restart"])
         restart.actionListener('click', () => {
-            this.ws.sendMessage({ type: "restart" });
+            container.clear(); //this is to clear the map which does not remove with app.clear()
+            this.app.clear();
+            this.ws = new WS(`ws://localhost:8080/api/ws?username=${this.username}`);
+            this.launchgame();
         })
 
-        this.ws.onMessage((message) => {
-            if (message.type === "restart") {
-                this.ws.close();
-                container.clear(); //this is to clear the map which does not remove with app.clear()
-                this.app.clear();
-                this.ws = new WS(`ws://localhost:8080/api/ws?username=${this.username}`);
-                this.launchgame();
-                //FIXME when 4 players, this does not work bc it's wanting to send directly 
-            }
-        })
         const container = new Component("div", { id: "container" });
 
-        const chat = new Chat({ id: "chat" }, this.ws, this.username);
         const endMenu = new EndMenu(leaveButton, restart, this.username);//Change "this.username" by the winner
-        container.addElement(chat, endMenu)
+        container.addElement(endMenu)
         this.app.addComponent(container)
         this.render()
     }

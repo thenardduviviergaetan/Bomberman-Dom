@@ -4,7 +4,6 @@ export default class WS extends WebSocket{
     }
 
     sendMessage(data){
-        console.log("data :",data)
         this.send(JSON.stringify(data));
     }
 

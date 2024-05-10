@@ -32,7 +32,7 @@ export default class Game extends Component {
                 this.updatePlayers(message)
             }
 
-            if (message.type === "restart") { 
+            if (message.type === "end") { 
                 this.stop = true;
             }
         })
