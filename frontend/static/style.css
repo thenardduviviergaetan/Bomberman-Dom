@@ -184,14 +184,6 @@ body {
   font-size: large;
   font-weight: bolder;
 }
-#end-menu #warning-end {
-  color: red;
-  font-weight: bold;
-  text-align: center;
-  width: 70%;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 #end-menu .end {
   background-color: rgba(255, 199, 70, 0.8);
   width: 100px;
