@@ -54,6 +54,32 @@ export function initCrossBlast(posX, posY, map, range) {
     return cross;
 }
 
+// export function initSquareCollision(posX, posY, map) {
+//     const maxY = map.atlas.length;
+//     const maxX = map.atlas[0].length;
+//     const indexX = parseInt((posX + FRAME_WIDTH / 2) / FRAME_WIDTH);
+//     const indexY = maxY - (parseInt((posY * -1 + FRAME_WIDTH) / FRAME_WIDTH) - 1);
+//     const check = (indexX >= 0 && indexX < maxX) && (indexY >= 0 && indexY < maxY);
+//     const mX = indexX - 1 >= 0;
+//     const mY = indexY - 1 >= 0;
+//     const gX = indexX + 1 < maxX;
+//     const gY = indexY + 1 < maxY;
+//     const cross = {
+//         "top-left": mY && check && mX ? getBorder(map.children[indexY - 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
+//         "top": mY && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
+//         "top-right": mY && check && gX ? getBorder(map.children[indexY - 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
+
+//         "left": mX && check ? getBorder(map.children[indexY].children[indexX - 1], indexY, indexX - 1) : undefined,
+//         "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
+//         "right": gX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
+
+//         "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
+//         "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY - 1, indexX) : undefined,
+//         "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
+//     };
+//     return cross;
+// }
+
 export function initSquareCollision(posX, posY, map) {
     const maxY = map.atlas.length;
     const maxX = map.atlas[0].length;
@@ -64,7 +90,7 @@ export function initSquareCollision(posX, posY, map) {
     const mY = indexY - 1 >= 0;
     const gX = indexX + 1 < maxX;
     const gY = indexY + 1 < maxY;
-    const cross = {
+    const square = {
         "top-left": mY && check && mX ? getBorder(map.children[indexY - 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
         "top": mY && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
         "top-right": mY && check && gX ? getBorder(map.children[indexY - 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
@@ -73,11 +99,11 @@ export function initSquareCollision(posX, posY, map) {
         "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
         "right": gX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
 
-        "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
-        "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY - 1, indexX) : undefined,
-        "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
+        "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY + 1, indexX - 1) : undefined,
+        "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY + 1, indexX) : undefined,
+        "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY + 1, indexX + 1) : undefined,
     };
-    return cross;
+    return square;
 }
 
 export function getBorder(obj, posY, posX) {

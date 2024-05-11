@@ -213,9 +213,23 @@ export class CurrentPlayer extends Player {
                 this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
             }
         })
-        
-        this.posY += this.direction === "up" && !playerGround.groundUp ? -this.speed : this.direction === "down" && !playerGround.groundDown ? this.speed : 0;
-        this.posX += this.direction === "left" && !playerGround.groundLeft ? -this.speed : this.direction === "right" && !playerGround.groundRight ? this.speed : 0;
+
+        // this.posY += this.direction === "up" && !playerGround.groundUp ? -this.speed : this.direction === "down" && !playerGround.groundDown ? this.speed : 0;
+        // this.posX += this.direction === "left" && !playerGround.groundLeft ? -this.speed : this.direction === "right" && !playerGround.groundRight ? this.speed : 0;
+        switch (this.direction) {
+            case "up":
+                this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
+                break;
+            case "down":
+                this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
+                break;
+            case "left":
+                this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
+                break;
+            case "right":
+                this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
+                break;
+        }
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
         }

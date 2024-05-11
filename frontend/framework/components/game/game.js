@@ -37,6 +37,7 @@ export default class Game extends Component {
                     this.stop = true;
                     break;
                 case "bomb":
+                    // console.log(message)
                     this.tabBomb.newBomb(message);
                     break;
                 case "death":
