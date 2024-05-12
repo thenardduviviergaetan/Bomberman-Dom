@@ -20,77 +20,7 @@ export function checkGround(player) {
     const square = initSquareCollision(player.posX, player.posY, player.parent)
     keys.forEach(key => {
         const blockBorder = square[key]
-        // const top = () => {
-        //     if (!groundObj.groundUp && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
-        //         groundObj.groundUp = true;
-        //         groundObj.up = blockBorder.borderDown - 12 - playerBorder.up;
-        //     }
-        // }
-        // const bottom = () => {
-        //     if (!groundObj.groundDown && blockBorder.borderUp < playerBorder.down + player.speed) {
-        //         groundObj.groundDown = true;
-        //         groundObj.down = playerBorder.down - blockBorder.borderUp;
-        //     }
-        // }
-        // const left = () => {
-        //     if (!groundObj.groundLeft && blockBorder.borderRight > playerBorder.left - player.speed) {
-        //         groundObj.groundLeft = true;
-        //         groundObj.left = blockBorder.borderRight - playerBorder.left;
-        //     }
-        // }
-        // const right = () => {
-        //     if (!groundObj.groundRight && blockBorder.borderLeft < playerBorder.right + player.speed) {
-        //         groundObj.groundRight = true;
-        //         groundObj.right = blockBorder.borderLeft - playerBorder.right;
-        //     }
-        // }
-        // const corner = (corner) => {
-        //     switch (corner) {
-        //         case "top-right":
-        //             if (!groundObj.groundUp && blockBorder.borderLeft < playerBorder.right && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
-        //                 groundObj.groundUp = true;
-        //                 groundObj.right = !groundObj.groundRight ? blockBorder.borderLeft - playerBorder.right : groundObj.right;
-        //             }
-        //             if (!groundObj.groundRight && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderLeft < playerBorder.right + player.speed) {
-        //                 groundObj.groundRight = true;
-        //                 groundObj.up = !groundObj.groundUp ? blockBorder.borderDown - 12 - playerBorder.up : groundObj.up;
-        //             }
-        //             break;
-        //         case "top-left":
-        //             if (!groundObj.groundUp && blockBorder.borderRight > playerBorder.left && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
-        //                 groundObj.groundUp = true;
-        //                 groundObj.left = !groundObj.groundLeft ? blockBorder.borderRight - playerBorder.left : groundObj.left;
-        //             }
-        //             if (!groundObj.groundLeft && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderRight > playerBorder.left - player.speed) {
-        //                 groundObj.groundLeft = true;
-        //                 groundObj.up = !groundObj.groundUp ? blockBorder.borderDown - 12 - playerBorder.up : groundObj.up;
-        //             }
-        //             break;
-        //         case "bottom-right":
-        //             if (!groundObj.groundDown && blockBorder.borderLeft < playerBorder.right && blockBorder.borderUp < playerBorder.down + player.speed){
-        //                 groundObj.groundDown = true;
-        //                 groundObj.right = !groundObj.groundRight ? blockBorder.borderLeft - playerBorder.right : groundObj.right;
-        //             }
-        //             if (!groundObj.groundRight && blockBorder.borderUp < playerBorder.down && blockBorder.borderLeft < playerBorder.right + player.speed) {
-        //                 groundObj.groundRight = true;
-        //                 groundObj.down = !groundObj.groundDown ? playerBorder.down - blockBorder.borderUp : groundObj.down;
-        //             }
-        //             break;
-        //         case "bottom-left":
-        //             if (!groundObj.groundDown && blockBorder.borderRight > playerBorder.left && blockBorder.borderUp < playerBorder.down + player.speed) {
-        //                 groundObj.groundDown = true;
-        //                 groundObj.left = !groundObj.groundLeft ? blockBorder.borderRight - playerBorder.left : groundObj.left;
-        //             }
-        //             if (!groundObj.groundLeft && blockBorder.borderUp < playerBorder.down && blockBorder.borderRight > playerBorder.left - player.speed) {
-        //                 groundObj.groundLeft = true;
-        //                 groundObj.down = !groundObj.groundDown ? playerBorder.down - blockBorder.borderUp : groundObj.down;
-        //             }
-        //             break;
-
-        //     }
-        // }
         if (blockBorder === undefined || !solid.has(blockBorder.type)) return;
-        // if (blockBorder === undefined || solid.filter((el) => el == blockBorder.type).length === 0) return;
         switch (key) {
             case "top":
                 top(groundObj, blockBorder, playerBorder, player.speed);
@@ -136,28 +66,24 @@ function getPlayerBorder(player) {
 
 const top = (groundObj, blockBorder, playerBorder, playerSpeed) => {
     if (!groundObj.groundUp && blockBorder.borderDown - 12 > playerBorder.up - playerSpeed) {
-    // if (!groundObj.groundUp && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
         groundObj.groundUp = true;
         groundObj.up = blockBorder.borderDown - 12 - playerBorder.up;
     }
 }
 const bottom = (groundObj, blockBorder, playerBorder,playerSpeed) => {
     if (!groundObj.groundDown && blockBorder.borderUp < playerBorder.down + playerSpeed) {
-    // if (!groundObj.groundDown && blockBorder.borderUp < playerBorder.down + player.speed) {
         groundObj.groundDown = true;
         groundObj.down = playerBorder.down - blockBorder.borderUp;
     }
 }
 const left = (groundObj, blockBorder, playerBorder,playerSpeed) => {
     if (!groundObj.groundLeft && blockBorder.borderRight > playerBorder.left - playerSpeed) {
-    // if (!groundObj.groundLeft && blockBorder.borderRight > playerBorder.left - player.speed) {
         groundObj.groundLeft = true;
         groundObj.left = blockBorder.borderRight - playerBorder.left;
     }
 }
 const right = (groundObj, blockBorder, playerBorder,playerSpeed) => {
     if (!groundObj.groundRight && blockBorder.borderLeft < playerBorder.right + playerSpeed) {
-    // if (!groundObj.groundRight && blockBorder.borderLeft < playerBorder.right + player.speed) {
         groundObj.groundRight = true;
         groundObj.right = blockBorder.borderLeft - playerBorder.right;
     }
@@ -166,48 +92,40 @@ const corner = (corner, groundObj, blockBorder, playerBorder, playerSpeed) => {
     switch (corner) {
         case "top-right":
             if (!groundObj.groundUp && blockBorder.borderLeft < playerBorder.right && blockBorder.borderDown - 12 > playerBorder.up - playerSpeed) {
-            // if (!groundObj.groundUp && blockBorder.borderLeft < playerBorder.right && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
                 groundObj.groundUp = true;
                 groundObj.right = !groundObj.groundRight ? blockBorder.borderLeft - playerBorder.right : groundObj.right;
             }
             if (!groundObj.groundRight && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderLeft < playerBorder.right + playerSpeed) {
-            // if (!groundObj.groundRight && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderLeft < playerBorder.right + player.speed) {
                 groundObj.groundRight = true;
                 groundObj.up = !groundObj.groundUp ? blockBorder.borderDown - 12 - playerBorder.up : groundObj.up;
             }
             break;
         case "top-left":
             if (!groundObj.groundUp && blockBorder.borderRight > playerBorder.left && blockBorder.borderDown - 12 > playerBorder.up - playerSpeed) {
-            // if (!groundObj.groundUp && blockBorder.borderRight > playerBorder.left && blockBorder.borderDown - 12 > playerBorder.up - player.speed) {
                 groundObj.groundUp = true;
                 groundObj.left = !groundObj.groundLeft ? blockBorder.borderRight - playerBorder.left : groundObj.left;
             }
             if (!groundObj.groundLeft && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderRight > playerBorder.left - playerSpeed) {
-            // if (!groundObj.groundLeft && blockBorder.borderDown - 12 > playerBorder.up && blockBorder.borderRight > playerBorder.left - player.speed) {
                 groundObj.groundLeft = true;
                 groundObj.up = !groundObj.groundUp ? blockBorder.borderDown - 12 - playerBorder.up : groundObj.up;
             }
             break;
         case "bottom-right":
             if (!groundObj.groundDown && blockBorder.borderLeft < playerBorder.right && blockBorder.borderUp < playerBorder.down + playerSpeed) {
-            // if (!groundObj.groundDown && blockBorder.borderLeft < playerBorder.right && blockBorder.borderUp < playerBorder.down + player.speed) {
                 groundObj.groundDown = true;
                 groundObj.right = !groundObj.groundRight ? blockBorder.borderLeft - playerBorder.right : groundObj.right;
             }
             if (!groundObj.groundRight && blockBorder.borderUp < playerBorder.down && blockBorder.borderLeft < playerBorder.right + playerSpeed) {
-            // if (!groundObj.groundRight && blockBorder.borderUp < playerBorder.down && blockBorder.borderLeft < playerBorder.right + player.speed) {
                 groundObj.groundRight = true;
                 groundObj.down = !groundObj.groundDown ? playerBorder.down - blockBorder.borderUp : groundObj.down;
             }
             break;
         case "bottom-left":
             if (!groundObj.groundDown && blockBorder.borderRight > playerBorder.left && blockBorder.borderUp < playerBorder.down + playerSpeed) {
-            // if (!groundObj.groundDown && blockBorder.borderRight > playerBorder.left && blockBorder.borderUp < playerBorder.down + player.speed) {
                 groundObj.groundDown = true;
                 groundObj.left = !groundObj.groundLeft ? blockBorder.borderRight - playerBorder.left : groundObj.left;
             }
             if (!groundObj.groundLeft && blockBorder.borderUp < playerBorder.down && blockBorder.borderRight > playerBorder.left - playerSpeed) {
-            // if (!groundObj.groundLeft && blockBorder.borderUp < playerBorder.down && blockBorder.borderRight > playerBorder.left - player.speed) {
                 groundObj.groundLeft = true;
                 groundObj.down = !groundObj.groundDown ? playerBorder.down - blockBorder.borderUp : groundObj.down;
             }
