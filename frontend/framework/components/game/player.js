@@ -1,6 +1,6 @@
 import Component from "../component.js";
 import { debounce } from "../../engine/utils.js";
-import { checkGround } from "./collisions.js";
+import { checkGround, checkTrigger } from "./collisions.js";
 
 const FRAME_COUNT = 3;
 const FRAME_WIDTH = 32;
@@ -103,6 +103,9 @@ export class CurrentPlayer extends Player {
         this.bombType = 0;
         this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
+        // this.speedBonus = 0;
+
+        this.speed = MOVEMENT_SIZE;
 
         window.addEventListener("keydown", debounce((event) => {
             // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
@@ -167,6 +170,10 @@ export class CurrentPlayer extends Player {
     resetBlastRange() {
         this.blastRangeBonus = 0;
     }
+
+    speedUp() {
+        this.speed += 0.2;
+    }
     moveCurrent() {
         const playerGround = checkGround(this);
         if (!this.direction) {
@@ -175,8 +182,50 @@ export class CurrentPlayer extends Player {
         }
         const oldPosX = this.posX;
         const oldPosY = this.posY;
-        this.posY += this.direction === "up" && !playerGround.groundUp ? -MOVEMENT_SIZE : this.direction === "down" && !playerGround.groundDown ? MOVEMENT_SIZE : 0;
-        this.posX += this.direction === "left" && !playerGround.groundLeft ? -MOVEMENT_SIZE : this.direction === "right" && !playerGround.groundRight ? MOVEMENT_SIZE : 0;
+
+
+        this.parent.bonusMap.forEach(bonus => {
+            if (checkTrigger(this, bonus) && bonus.parent.children.length == 1) {
+                switch (bonus.bonus) {
+                    case "bomb":
+                        console.log("BOMB BONUS");
+                        this.addMaxBombNumber();
+                        break;
+                    case "blast":
+                        console.log("BLAST BONUS");
+                        this.addBlastRange(1)
+                        break;
+                    case "speed":
+                        console.log("SPEED BONUS");
+                        this.speedUp();
+                        break;
+                    default:
+                        break
+                }
+                this.parent.bonusMap = this.parent.bonusMap.filter((el) => el != bonus);
+                let bonusData = {
+                    indexX: bonus.indexX,
+                    indexY: bonus.indexY,
+                }
+
+                this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
+            }
+        })
+
+        switch (this.direction) {
+            case "up":
+                this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
+                break;
+            case "down":
+                this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
+                break;
+            case "left":
+                this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
+                break;
+            case "right":
+                this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
+                break;
+        }
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
         }
@@ -227,4 +276,5 @@ export class CurrentPlayer extends Player {
             cause: cause
         });
     }
+
 }

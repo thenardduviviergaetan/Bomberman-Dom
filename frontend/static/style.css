@@ -390,6 +390,11 @@ body {
   height: 32px;
 }
 
+.block-cover {
+  position: absolute;
+  z-index: 40;
+}
+
 @keyframes stagger-right {
   from {
     opacity: 0;

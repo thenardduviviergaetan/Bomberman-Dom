@@ -64,7 +64,7 @@ export function initSquareCollision(posX, posY, map) {
     const mY = indexY - 1 >= 0;
     const gX = indexX + 1 < maxX;
     const gY = indexY + 1 < maxY;
-    const cross = {
+    const square = {
         "top-left": mY && check && mX ? getBorder(map.children[indexY - 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
         "top": mY && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
         "top-right": mY && check && gX ? getBorder(map.children[indexY - 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
@@ -73,16 +73,19 @@ export function initSquareCollision(posX, posY, map) {
         "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
         "right": gX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
 
-        "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
-        "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY - 1, indexX) : undefined,
-        "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
+        "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY + 1, indexX - 1) : undefined,
+        "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY + 1, indexX) : undefined,
+        "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY + 1, indexX + 1) : undefined,
     };
-    return cross;
+    return square;
 }
 
-function getBorder(obj, posY, posX) {
+export function getBorder(obj, posY, posX) {
     return {
         type: obj.props.class,
+        bonus: obj.props.bonus,
+        children: obj.children,
+        parent: obj.parent,
         borderLeft: posX * FRAME_WIDTH,
         borderRight: (posX + 1) * FRAME_WIDTH,
         borderUp: posY * FRAME_WIDTH,

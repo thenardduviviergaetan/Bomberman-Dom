@@ -1,11 +1,17 @@
 import Component from "../component.js";
+import Bonus from "./bonus.js";
+import { getBorder } from '../function.js'
+
 
 const TILE_TYPES = {
     WALL: 1,
     BLOCK: 2,
     PATH: 3,
     SPAWN: 0,
-    SAFE_ZONE: 4
+    SAFE_ZONE: 4,
+    BONUS_1: 5,
+    BONUS_2: 6,
+    BONUS_3: 7
 }
 
 export default class Map extends Component {
@@ -14,6 +20,7 @@ export default class Map extends Component {
         this.atlas = atlas;
         this.tileSize = 32;
         this.tileSetImage = 'url(./framework/components/game/assets/world1-32x32.png)'
+        this.bonusMap = []
         this.initMap();
         return this;
     }
@@ -46,6 +53,13 @@ export default class Map extends Component {
                     case TILE_TYPES.SAFE_ZONE:
                         (y > 0 && (this.atlas[y - 1][x] === 1 || this.atlas[y - 1][x] === 2)) ? block = shadow : block = path;
                         break;
+                    case TILE_TYPES.BONUS_1:
+                    case TILE_TYPES.BONUS_2:
+                    case TILE_TYPES.BONUS_3:
+                        block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
+                        this.bonusMap.push(getBorder(block.children[0], y, x))
+                        // this.bonusMap.push(getBorder(block, y, x))
+                        break
                     default:
                         break;
                 }
@@ -55,5 +69,12 @@ export default class Map extends Component {
             }
             this.addElement(lineMap);
         }
+    }
+
+    removeBonus(bonusData) {  //FIXME
+        // console.log("BONUS DATA:", bonusData);
+        const top = this.children[bonusData.indexY - 1].children[bonusData.indexX]
+        this.children[bonusData.indexY].children[bonusData.indexX] = top.props.class === "block" || top.props.class === "wall" ? this.shadow : this.path;
+        this.update()
     }
 }

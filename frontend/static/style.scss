@@ -441,6 +441,11 @@ body {
     // background-color: $primary-color;
 }
 
+.block-cover{
+    position: absolute;
+    z-index: 40;
+}
+
 @keyframes stagger-right {
     from {
         opacity: 0;
