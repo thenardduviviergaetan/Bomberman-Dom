@@ -172,7 +172,7 @@ export class CurrentPlayer extends Player {
     }
 
     speedUp() {
-        this.speed++;
+        this.speed += 0.2;
     }
     moveCurrent() {
         const playerGround = checkGround(this);
@@ -184,10 +184,8 @@ export class CurrentPlayer extends Player {
         const oldPosY = this.posY;
 
 
-        // console.log("PLAYER:",this.parent.bonusMap);
         this.parent.bonusMap.forEach(bonus => {
             if (checkTrigger(this, bonus) && bonus.parent.children.length == 1) {
-                // console.log("BONUS:", bonus);
                 switch (bonus.bonus) {
                     case "bomb":
                         console.log("BOMB BONUS");
@@ -214,8 +212,6 @@ export class CurrentPlayer extends Player {
             }
         })
 
-        // this.posY += this.direction === "up" && !playerGround.groundUp ? -this.speed : this.direction === "down" && !playerGround.groundDown ? this.speed : 0;
-        // this.posX += this.direction === "left" && !playerGround.groundLeft ? -this.speed : this.direction === "right" && !playerGround.groundRight ? this.speed : 0;
         switch (this.direction) {
             case "up":
                 this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
