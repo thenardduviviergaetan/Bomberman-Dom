@@ -254,6 +254,15 @@ export class CurrentPlayer extends Player {
 
         this.parent.bonusMap.forEach((bonus) => {
             if (checkTrigger(this, bonus) && bonus.parent.children.length == 1) {
+                let bonusData = {
+                    indexX: bonus.indexX,
+                    indexY: bonus.indexY,
+                };
+
+                setTimeout(() => {
+                    this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
+                }, 100);
+
                 switch (bonus.bonus) {
                     case "bomb":
                         console.log("BOMB BONUS");
@@ -271,12 +280,6 @@ export class CurrentPlayer extends Player {
                         break;
                 }
                 this.parent.bonusMap = this.parent.bonusMap.filter((el) => el != bonus);
-                let bonusData = {
-                    indexX: bonus.indexX,
-                    indexY: bonus.indexY,
-                };
-
-                this.ws.sendMessage({ type: "bonus", sender: this.username, data: bonusData });
             }
         });
 

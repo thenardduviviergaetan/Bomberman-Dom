@@ -87,6 +87,6 @@ export default class Map extends Component {
     async removeBonus(bonusData) {
         const top = this.children[bonusData.indexY - 1].children[bonusData.indexX]
         this.children[bonusData.indexY].children[bonusData.indexX] = top.props.class === "block" || top.props.class === "wall" ? this.shadow : this.path;
-        this.update()
+        await this.update()
     }
 }
