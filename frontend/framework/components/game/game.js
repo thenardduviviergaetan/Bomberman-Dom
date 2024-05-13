@@ -47,7 +47,6 @@ export default class Game extends Component {
                             player.die();
                         }
                     })
-         
                     break;
                 case "degats":
                     this.readyPlayers.forEach((player, index) => {
@@ -154,14 +153,11 @@ export default class Game extends Component {
             } else {
                 if (playerLi.props.className === this.currentPlayer.username) {
                     this.currentPlayer.isAlive = false;
-                    // this.currentPlayer.props.style = `${this.currentPlayer.props.style} opacity:40%;`
                     this.currentPlayer.playerDeath()
                 }
 
                 playerLi.children = [`${playerLi.props.className} : dead`];
                 playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
-                // this.map.delete(playerLi.props.className);
-                //TODO fix the dead player that can move and plant bombs
             }
         })
         this.livesContainer.update();
