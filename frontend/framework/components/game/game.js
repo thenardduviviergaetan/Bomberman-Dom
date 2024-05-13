@@ -26,7 +26,7 @@ export default class Game extends Component {
         this.playerMoveQueue = []
         this.lives = [3, 3, 3, 3];
         this.ws.onClose(() => this.stop = true)
-        this.ws.onMessage((message) => {
+        this.ws.onMessage(async (message) => {
             switch (message.type) {
                 case "map":
                     this.initMap(message)
@@ -57,7 +57,7 @@ export default class Game extends Component {
                     });
                     break;
                 case "bonus":
-                    this.map.removeBonus(message.data);
+                    await this.map.removeBonus(message.data);
                     break
                 case "leave":
                     this.map.delete(message.sender);
