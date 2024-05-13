@@ -21,15 +21,16 @@ export default class Game extends Component {
         this.stop = false;
         this.size = 19;
         this.atlas = this.ws.sendMessage({ type: "map" });
-
+        this.livesContainer = new Component("div", {id:"lives-container",style:"position:absolute;"});
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
-
-        this.ws.onClose(()=>this.stop = true)
+        this.lives = [3, 3, 3, 3];
+        this.ws.onClose(() => this.stop = true)
         this.ws.onMessage((message) => {
             switch (message.type) {
                 case "map":
                     this.initMap(message)
+                    this.initLives();
                     break;
                 case "move":
                     this.updatePlayers(message)
@@ -46,6 +47,13 @@ export default class Game extends Component {
                     break;
                 case "degats":
                     console.log(message);
+                    console.log(this.readyPlayers);
+                    this.readyPlayers.forEach((player, index) => {
+                        if (message.sender === player.props.id) {
+                            this.lives[index]--;
+                            this.updateLives();
+                        }
+                    });
                     break;
                 case "bonus":
                     // console.log("WS MSG:", message);
@@ -108,6 +116,30 @@ export default class Game extends Component {
         this.playerMoveQueue.push({ player, direction: message.direction, position: message.position })
     }
 
+    initLives() {
+        const text = new Component("p", {id:"title"},["Lives remaining :"])
+        const livesList = new Component("ul", { id: "lives-list"});
+        this.readyPlayers.forEach((player, index) => {
+            const playerLife = new Component("li", { id: player.props.id }, [`${player.props.id} : ${this.lives[index]}`]);
+            livesList.addElement(playerLife);
+        })
+        this.livesContainer.addElement(text,livesList);
+        this.addElement(this.livesContainer);
+        this.update();
+    }
+
+    updateLives(){
+        const list = this.livesContainer.children[1].children;
+        list.forEach((player, index) => {
+            if (this.lives[index] > 0) {
+                player.children = [`${player.props.id} : ${this.lives[index]}`];
+            } else {
+                player.children = [`${player.props.id} : dead`];
+                player.props.style = "color:#ff5abb; text-decoration:line-through;";
+            }
+        })
+        this.livesContainer.update();
+    }
     gameLoop(timestamp) {
         this.fpsCounter()
         const deltaTime = timestamp - this.lastTime

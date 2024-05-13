@@ -58,13 +58,13 @@ export class Player extends Component {
 
     }
 
-    addLife(nb) {
-        this.life += nb;
-    }
+    // addLife(nb) {
+    //     this.life += nb;
+    // }
 
-    rmLife(nb) {
-        this.life -= nb;
-    }
+    // rmLife(nb) {
+    //     this.life -= nb;
+    // }
 
     draw() {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px);`;
@@ -263,7 +263,7 @@ export class CurrentPlayer extends Player {
         const time = new Date().getTime();
         if (time - this.cooldownDegats > 1500) {
             this.cooldownDegats = time;
-            this.rmLife(1);
+            // this.rmLife(1);
             if (this.life <= 0) {
                 this.playerDeath("blast");
             } else {
@@ -275,6 +275,7 @@ export class CurrentPlayer extends Player {
             }
         }
     }
+
     playerDeath(cause) {
         this.ws.sendMessage({
             type: "death",
