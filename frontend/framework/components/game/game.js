@@ -3,7 +3,7 @@ import Map from "./map.js";
 import { CurrentPlayer, Player } from "./player.js";
 import TabBomb from "./bomb.js";
 import { checkTrigger } from "./collisions.js";
-import { getBorder } from '../function.js'
+import { getBorder } from '../function.js';
 
 const FRAMERATE = 1000 / 120;
 const positions = [
@@ -11,7 +11,7 @@ const positions = [
     { top: -64, left: 608 - 64 },
     { top: -608 + 32, left: 608 - 64 },
     { top: -64, left: 32 }
-]
+];
 
 export default class Game extends Component {
     constructor(props, ws, username, readyPlayers) {
@@ -33,7 +33,7 @@ export default class Game extends Component {
                     this.initLives();
                     break;
                 case "move":
-                    this.updatePlayers(message)
+                    this.updatePlayers(message);
                     break;
                 case "end":
                     this.stop = true;
@@ -57,7 +57,6 @@ export default class Game extends Component {
                     });
                     break;
                 case "bonus":
-                    // console.log("WS MSG:", message);
                     this.map.removeBonus(message.data);
                     break
                 case "leave":
@@ -66,24 +65,26 @@ export default class Game extends Component {
                 default:
                     break;
             }
-        })
+        });
 
+        this.lastTime = 0;
 
-        this.lastTime = 0
+        this.fps = document.getElementById("fps");
+        this.lastUpdateTime = performance.now();
+        this.frameCount = 0;
 
-        this.fps = document.getElementById("fps")
-        this.lastUpdateTime = performance.now()
-        this.frameCount = 0
-
-        this.gameLoop()
+        this.gameLoop();
     }
 
+    /**
+     * Initializes the map with the received message.
+     * @param {Object} message - The message containing the map data.
+     */
     initMap(message) {
-        this.atlas = message.body
-        this.map = new Map(this.atlas)
+        this.atlas = message.body;
+        this.map = new Map(this.atlas);
 
         this.readyPlayers.forEach((player, index) => {
-
             const props = {
                 id: player.children[0],
                 className: "player-sprite",
@@ -91,34 +92,45 @@ export default class Game extends Component {
                     top: positions[index].top,
                     left: positions[index].left,
                 },
-                index: index
-            }
+                index: index,
+            };
 
             if (player.children[0] !== this.username) {
-                const newPlayer = new Player(props)
-                this.map.addElement(newPlayer)
-                this.readyPlayers[index] = newPlayer
+                const newPlayer = new Player(props);
+                this.map.addElement(newPlayer);
+                this.readyPlayers[index] = newPlayer;
             } else {
                 this.currentPlayer = new CurrentPlayer(
                     props,
                     this.ws,
                     this.username,
-                    this.map)
+                    this.map
+                );
 
-                this.map.addElement(this.currentPlayer)
-                this.readyPlayers[index] = this.currentPlayer
+                this.map.addElement(this.currentPlayer);
+                this.readyPlayers[index] = this.currentPlayer;
             }
-        })
+        });
+
         this.tabBomb = new TabBomb(this.map, this.currentPlayer);
-        this.map.addElement(this.tabBomb)
-        this.addElement(this.map)
-        console.log(this.map.bonusMap);
-        this.update()
+        this.map.addElement(this.tabBomb);
+        this.addElement(this.map);
+        this.update();
     }
 
+    /**
+     * Updates the player's movement based on the received message.
+     * @param {Object} message - The message containing the player's movement data.
+     */
     updatePlayers(message) {
-        const player = this.readyPlayers.find(player => player.props.id === message.sender)
-        this.playerMoveQueue.push({ player, direction: message.direction, position: message.position })
+        const player = this.readyPlayers.find(
+            (player) => player.props.id === message.sender
+        );
+        this.playerMoveQueue.push({
+            player,
+            direction: message.direction,
+            position: message.position,
+        });
     }
 
     initLives() {
@@ -152,35 +164,45 @@ export default class Game extends Component {
         this.livesContainer.update();
     }
     gameLoop(timestamp) {
-        this.fpsCounter()
-        const deltaTime = timestamp - this.lastTime
+        this.fpsCounter();
+        const deltaTime = timestamp - this.lastTime;
         if (deltaTime >= FRAMERATE) {
-            this.lastTime = timestamp
-            this.updateState()
+            this.lastTime = timestamp;
+            this.updateState();
         }
         if (this.stop) {
-            console.log("stop");
             this.fps.textContent = "";
-            return
+            return;
         }
-        requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
+        requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
     }
 
+    /**
+     * Updates the game state.
+     */
     async updateState() {
         if (this.tabBomb !== undefined) this.tabBomb.tick();
-        await Promise.all(this.playerMoveQueue.map(player => {
-            player.player.move(player.direction, player.position)
-        }));
+        await Promise.all(
+            this.playerMoveQueue.map((player) =>
+                player.player.move(player.direction, player.position)
+            )
+        );
         this.playerMoveQueue = [];
     }
 
+    /**
+     * Calculates and displays the frames per second (FPS) count.
+     */
     fpsCounter() {
-        const now = performance.now()
+        const now = performance.now();
         if (now - this.lastUpdateTime >= 1000) {
-            this.fps.textContent = `FPS: ${this.frameCount}`
-            this.frameCount = 0
-            this.lastUpdateTime = now
+            const fpsText = `FPS: ${this.frameCount}`;
+            if (this.fps.textContent !== fpsText) {
+                this.fps.textContent = fpsText;
+            }
+            this.frameCount = 0;
+            this.lastUpdateTime = now;
         }
-        this.frameCount++
+        this.frameCount++;
     }
 }

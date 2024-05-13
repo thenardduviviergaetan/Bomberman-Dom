@@ -2,7 +2,7 @@ import Component from "../component.js";
 import Bonus from "./bonus.js";
 import { getBorder } from '../function.js'
 
-
+// Tile types enumeration
 const TILE_TYPES = {
     WALL: 1,
     BLOCK: 2,
@@ -14,7 +14,14 @@ const TILE_TYPES = {
     BONUS_3: 7
 }
 
+/**
+ * Represents the game map component.
+ */
 export default class Map extends Component {
+    /**
+     * Constructs a new instance of the Map component.
+     * @param {Array} atlas - The map atlas.
+     */
     constructor(atlas) {
         super("div", { class: "map-container", id: "map" })
         this.atlas = atlas;
@@ -25,6 +32,9 @@ export default class Map extends Component {
         return this;
     }
 
+    /**
+     * Initializes the game map.
+     */
     initMap() {
         const wall = new Component("div", { class: "wall", style: `background-image: ${this.tileSetImage}; background-position: -${32}px -${0}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
         const path = new Component("div", { class: "path", style: `background-image: ${this.tileSetImage}; background-position: -${0}px -${32}px; width: ${this.tileSize}px; height: ${this.tileSize}px` });
@@ -58,7 +68,6 @@ export default class Map extends Component {
                     case TILE_TYPES.BONUS_3:
                         block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
                         this.bonusMap.push(getBorder(block.children[0], y, x))
-                        // this.bonusMap.push(getBorder(block, y, x))
                         break
                     default:
                         break;
@@ -71,8 +80,11 @@ export default class Map extends Component {
         }
     }
 
-    removeBonus(bonusData) {  //FIXME
-        // console.log("BONUS DATA:", bonusData);
+    /**
+     * Removes a bonus from the game map.
+     * @param {Object} bonusData - The bonus data.
+     */
+    removeBonus(bonusData) {
         const top = this.children[bonusData.indexY - 1].children[bonusData.indexX]
         this.children[bonusData.indexY].children[bonusData.indexX] = top.props.class === "block" || top.props.class === "wall" ? this.shadow : this.path;
         this.update()

@@ -427,6 +427,10 @@ body {
   z-index: 40;
 }
 
+.bomb, .fire {
+  will-change: transform;
+}
+
 @keyframes stagger-right {
   from {
     opacity: 0;
