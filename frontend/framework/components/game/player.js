@@ -110,6 +110,12 @@ export class Player extends Component {
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
         this.updateStyle(this.props.style);
     }
+
+    async die(){
+        this.props.style = `${this.props.style} opacity: 0.4;`
+        this.updateStyle(this.props.style);
+        
+    }
 }
 
 // CurrentPlayer class
@@ -146,8 +152,6 @@ export class CurrentPlayer extends Player {
         this.speed = MOVEMENT_SIZE;
         window.addEventListener("keydown", debounce(async (event) => {
             // if (!this.isAlive) window.removeEventListener('keydown',this);
-            // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
-            //if Temporaire pour tester
             if (TEMP[event.key]) {
                 switch (event.key) {
                     case "ù":
@@ -356,17 +360,10 @@ export class CurrentPlayer extends Player {
      * Notifies the server of the player's death.
      * @param {string} cause - The cause of the player's death.
      */
-    async playerDeath(cause) {
+    playerDeath() {
         this.ws.sendMessage({
             type: "death",
             sender: this.username,
-            cause: cause
         });
     }
-
-    // die(){
-    //     window.removeEventListener('keydown');
-    //     window.removeEventListener('keyup');
-    // }
-
 }

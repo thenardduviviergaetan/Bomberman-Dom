@@ -39,17 +39,18 @@ export default class Game extends Component {
                     this.stop = true;
                     break;
                 case "bomb":
-                    // console.log(message)
                     this.tabBomb.newBomb(message);
                     break;
                 case "death":
-                    console.log(message);
+                    this.readyPlayers.forEach((player, index) => {
+                        if (message.sender === player.props.id) {
+                            player.die();
+                        }
+                    })
+         
                     break;
                 case "degats":
-                    console.log(message);
-                    console.log(this.readyPlayers);
                     this.readyPlayers.forEach((player, index) => {
-                        console.log("player ==", player);
                         if (message.sender === player.props.id) {
                             this.lives[index]--;
                             this.updateLives();
@@ -153,7 +154,8 @@ export default class Game extends Component {
             } else {
                 if (playerLi.props.className === this.currentPlayer.username) {
                     this.currentPlayer.isAlive = false;
-                    this.currentPlayer.props.style = `${this.currentPlayer.props.style} opacity:40%;`
+                    // this.currentPlayer.props.style = `${this.currentPlayer.props.style} opacity:40%;`
+                    this.currentPlayer.playerDeath()
                 }
 
                 playerLi.children = [`${playerLi.props.className} : dead`];
