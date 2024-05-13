@@ -15,6 +15,10 @@ export default class Chat extends Component {
 
     #init() {
         const input = new Input({ id: "chat-input", placeholder: "Enter message", type: "text", name: "input" });
+        input.actionListener('focus',()=>this.ws.sendMessage({type:"lock"}))
+        input.actionListener('blur',()=>this.ws.sendMessage({type:"unlock"}))
+        // input.actionListener('onfocus',()=>console.log("locked"))
+        // input.actionListener('onblur',()=>console.log("unlocked"))
         const form = new Form({ id: "chat-form" }, input);
         form.actionListener('submit', (e) => {
             const data = getFormValues(e).input;

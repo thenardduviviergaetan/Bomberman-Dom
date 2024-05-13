@@ -96,7 +96,7 @@ export class CurrentPlayer extends Player {
         this.isMoving = false;
         this.parent = parent;
         this.frameID = null;
-
+        this.lock = false;
         this.bombCooldown = 0;
         this.maxBombNumber = 1;
         this.bombNumber = 0;
@@ -104,7 +104,13 @@ export class CurrentPlayer extends Player {
         this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
         // this.speedBonus = 0;
-
+        this.ws.onMessage((message)=>{
+            if (message.type === "lock"){
+                this.lock = true;
+            } else if (message.type === "unlock"){
+                this.lock = false;
+            }
+        });
         this.speed = MOVEMENT_SIZE;
 
         window.addEventListener("keydown", debounce((event) => {
@@ -142,7 +148,7 @@ export class CurrentPlayer extends Player {
                 this.bombCooldown = new Date().getTime() + 1500;
                 return;
             } else if (DROP_BOMB[event.key]) return;
-            this.direction = DIRECTION_MAP[event.key];
+            if (!this.lock) this.direction = DIRECTION_MAP[event.key];
             if (!this.isMoving) this.updatePosition();
         }), 500)
 
