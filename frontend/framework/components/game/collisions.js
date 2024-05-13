@@ -3,8 +3,12 @@ import { initSquareCollision } from "../function.js";
 const FRAME_WIDTH = 32;
 const keys = ["top-left", "top", "top-right", "left", "in", "right", "bottom-left", "bottom", "bottom-right"];
 const solid = new Set(["wall", "block", "covered"]);
-// const solid = ["wall", "block", "covered"];
 
+/**
+ * Checks the ground collision for the player.
+ * @param {Object} player - The player object.
+ * @returns {Object} - The ground collision information.
+ */
 export function checkGround(player) {
     const groundObj = {
         groundLeft: false,
@@ -15,11 +19,11 @@ export function checkGround(player) {
         up: 0,
         groundDown: false,
         down: 0
-    }
+    };
     const playerBorder = getPlayerBorder(player);
-    const square = initSquareCollision(player.posX, player.posY, player.parent)
+    const square = initSquareCollision(player.posX, player.posY, player.parent);
     keys.forEach(key => {
-        const blockBorder = square[key]
+        const blockBorder = square[key];
         if (blockBorder === undefined || !solid.has(blockBorder.type)) return;
         switch (key) {
             case "top":
@@ -28,8 +32,6 @@ export function checkGround(player) {
             case "left":
                 left(groundObj, blockBorder, playerBorder, player.speed);
                 break;
-            // case "in":
-            //     break;
             case "right":
                 right(groundObj, blockBorder, playerBorder, player.speed);
                 break;
@@ -44,6 +46,12 @@ export function checkGround(player) {
     return groundObj;
 }
 
+/**
+ * Checks the trigger collision for the player.
+ * @param {Object} player - The player object.
+ * @param {Object} objBorder - The object border.
+ * @returns {boolean} - Whether the trigger collision occurred or not.
+ */
 export function checkTrigger(player, objBorder) {
     const playerBorder = getPlayerBorder(player);
 
@@ -55,39 +63,84 @@ export function checkTrigger(player, objBorder) {
     return triggerTop && triggerBottom && triggerLeft && triggerRight;
 }
 
+/**
+ * Calculates the player's border positions.
+ * @param {Object} player - The player object.
+ * @returns {Object} - The player's border positions.
+ */
 function getPlayerBorder(player) {
     return {
         left: player.posX + 8,
         right: player.posX + FRAME_WIDTH - 8,
         up: player.posY - FRAME_WIDTH + 640 + 8,
         down: player.posY + 640,
-    }
+    };
 }
 
+/**
+ * Handles the top collision.
+ * @param {Object} groundObj - The ground object.
+ * @param {Object} blockBorder - The block border object.
+ * @param {Object} playerBorder - The player's border positions.
+ * @param {number} playerSpeed - The player's speed.
+ */
 const top = (groundObj, blockBorder, playerBorder, playerSpeed) => {
     if (!groundObj.groundUp && blockBorder.borderDown - 12 > playerBorder.up - playerSpeed) {
         groundObj.groundUp = true;
         groundObj.up = blockBorder.borderDown - 12 - playerBorder.up;
     }
-}
-const bottom = (groundObj, blockBorder, playerBorder,playerSpeed) => {
+};
+
+/**
+ * Handles the bottom collision.
+ * @param {Object} groundObj - The ground object.
+ * @param {Object} blockBorder - The block border object.
+ * @param {Object} playerBorder - The player's border positions.
+ * @param {number} playerSpeed - The player's speed.
+ */
+const bottom = (groundObj, blockBorder, playerBorder, playerSpeed) => {
     if (!groundObj.groundDown && blockBorder.borderUp < playerBorder.down + playerSpeed) {
         groundObj.groundDown = true;
         groundObj.down = playerBorder.down - blockBorder.borderUp;
     }
-}
-const left = (groundObj, blockBorder, playerBorder,playerSpeed) => {
+};
+
+/**
+ * Handles the left collision.
+ * @param {Object} groundObj - The ground object.
+ * @param {Object} blockBorder - The block border object.
+ * @param {Object} playerBorder - The player's border positions.
+ * @param {number} playerSpeed - The player's speed.
+ */
+const left = (groundObj, blockBorder, playerBorder, playerSpeed) => {
     if (!groundObj.groundLeft && blockBorder.borderRight > playerBorder.left - playerSpeed) {
         groundObj.groundLeft = true;
         groundObj.left = blockBorder.borderRight - playerBorder.left;
     }
-}
-const right = (groundObj, blockBorder, playerBorder,playerSpeed) => {
+};
+
+/**
+ * Handles the right collision.
+ * @param {Object} groundObj - The ground object.
+ * @param {Object} blockBorder - The block border object.
+ * @param {Object} playerBorder - The player's border positions.
+ * @param {number} playerSpeed - The player's speed.
+ */
+const right = (groundObj, blockBorder, playerBorder, playerSpeed) => {
     if (!groundObj.groundRight && blockBorder.borderLeft < playerBorder.right + playerSpeed) {
         groundObj.groundRight = true;
         groundObj.right = blockBorder.borderLeft - playerBorder.right;
     }
-}
+};
+
+/**
+ * Handles the corner collision.
+ * @param {string} corner - The corner type.
+ * @param {Object} groundObj - The ground object.
+ * @param {Object} blockBorder - The block border object.
+ * @param {Object} playerBorder - The player's border positions.
+ * @param {number} playerSpeed - The player's speed.
+ */
 const corner = (corner, groundObj, blockBorder, playerBorder, playerSpeed) => {
     switch (corner) {
         case "top-right":
@@ -130,6 +183,5 @@ const corner = (corner, groundObj, blockBorder, playerBorder, playerSpeed) => {
                 groundObj.down = !groundObj.groundDown ? playerBorder.down - blockBorder.borderUp : groundObj.down;
             }
             break;
-
     }
-}
+};
