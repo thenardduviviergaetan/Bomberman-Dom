@@ -145,7 +145,7 @@ export class CurrentPlayer extends Player {
         });
         this.speed = MOVEMENT_SIZE;
         window.addEventListener("keydown", debounce(async (event) => {
-            if (!this.isAlive) event.removeEventListener('keydown',this);
+            // if (!this.isAlive) window.removeEventListener('keydown',this);
             // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
             //if Temporaire pour tester
             if (TEMP[event.key]) {
@@ -171,7 +171,7 @@ export class CurrentPlayer extends Player {
                 }
                 return;
             }
-            if (DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) {
+            if ((DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive) {
                 this.bombNumber++;
                 await this.dropBomb();
                 this.bombCooldown = new Date().getTime() + 1500;
@@ -182,7 +182,7 @@ export class CurrentPlayer extends Player {
         }), 500);
 
         window.addEventListener("keyup", debounce((event) => {
-            if (!this.isAlive) event.removeEventListener('keyup',this);
+            // if (!this.isAlive) window.removeEventListener('keyup',this);
             if (this.direction === DIRECTION_MAP[event.key]) {
                 this.direction = null;
             }

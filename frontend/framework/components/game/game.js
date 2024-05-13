@@ -151,13 +151,14 @@ export default class Game extends Component {
             if (this.lives[index] > 0) {
                 playerLi.children = [`${playerLi.props.className} : ${this.lives[index]}`];
             } else {
-                if (playerLi.props.className === this.currentPlayer) {
+                if (playerLi.props.className === this.currentPlayer.username) {
                     this.currentPlayer.isAlive = false;
+                    this.currentPlayer.props.style = `${this.currentPlayer.props.style} opacity:40%;`
                 }
 
                 playerLi.children = [`${playerLi.props.className} : dead`];
                 playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
-                this.map.delete(playerLi.props.className);
+                // this.map.delete(playerLi.props.className);
                 //TODO fix the dead player that can move and plant bombs
             }
         })
