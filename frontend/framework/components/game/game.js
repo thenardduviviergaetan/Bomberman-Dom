@@ -5,7 +5,7 @@ import TabBomb from "./bomb.js";
 import { checkTrigger } from "./collisions.js";
 import { getBorder } from '../function.js'
 
-const FRAMERATE = 1000 / 60;
+const FRAMERATE = 1000 / 120;
 const positions = [
     { top: -608 + 32, left: 32 },
     { top: -64, left: 608 - 64 },
@@ -21,7 +21,7 @@ export default class Game extends Component {
         this.stop = false;
         this.size = 19;
         this.atlas = this.ws.sendMessage({ type: "map" });
-        this.livesContainer = new Component("div", {id:"lives-container",style:"position:absolute;"});
+        this.livesContainer = new Component("div", { id: "lives-container", style: "position:absolute;" });
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
         this.lives = [3, 3, 3, 3];
@@ -49,6 +49,7 @@ export default class Game extends Component {
                     console.log(message);
                     console.log(this.readyPlayers);
                     this.readyPlayers.forEach((player, index) => {
+                        console.log("player ==", player);
                         if (message.sender === player.props.id) {
                             this.lives[index]--;
                             this.updateLives();
@@ -58,6 +59,10 @@ export default class Game extends Component {
                 case "bonus":
                     // console.log("WS MSG:", message);
                     this.map.removeBonus(message.data);
+                    break
+                case "leave":
+                    this.map.delete(message.sender);
+                    break
                 default:
                     break;
             }
@@ -117,25 +122,31 @@ export default class Game extends Component {
     }
 
     initLives() {
-        const text = new Component("p", {id:"title"},["Lives remaining :"])
-        const livesList = new Component("ul", { id: "lives-list"});
+        const text = new Component("p", { id: "title" }, ["Lives remaining :"])
+        const livesList = new Component("ul", { id: "lives-list" });
         this.readyPlayers.forEach((player, index) => {
-            const playerLife = new Component("li", { id: player.props.id }, [`${player.props.id} : ${this.lives[index]}`]);
+            const playerLife = new Component("li", { className: player.props.id }, [`${player.props.id} : ${this.lives[index]}`]);
             livesList.addElement(playerLife);
         })
-        this.livesContainer.addElement(text,livesList);
+        this.livesContainer.addElement(text, livesList);
         this.addElement(this.livesContainer);
         this.update();
     }
 
-    updateLives(){
+    updateLives() {
         const list = this.livesContainer.children[1].children;
-        list.forEach((player, index) => {
+        list.forEach((playerLi, index) => {
             if (this.lives[index] > 0) {
-                player.children = [`${player.props.id} : ${this.lives[index]}`];
+                playerLi.children = [`${playerLi.props.className} : ${this.lives[index]}`];
             } else {
-                player.children = [`${player.props.id} : dead`];
-                player.props.style = "color:#ff5abb; text-decoration:line-through;";
+                if (playerLi.props.className === this.currentPlayer) {
+                    this.currentPlayer.isAlive = false;
+                }
+
+                playerLi.children = [`${playerLi.props.className} : dead`];
+                playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
+                this.map.delete(playerLi.props.className);
+                //TODO fix the dead player that can move and plant bombs
             }
         })
         this.livesContainer.update();
@@ -157,7 +168,9 @@ export default class Game extends Component {
 
     async updateState() {
         if (this.tabBomb !== undefined) this.tabBomb.tick();
-        await Promise.all(this.playerMoveQueue.map(player => player.player.move(player.direction, player.position)));
+        await Promise.all(this.playerMoveQueue.map(player => {
+            player.player.move(player.direction, player.position)
+        }));
         this.playerMoveQueue = [];
     }
 

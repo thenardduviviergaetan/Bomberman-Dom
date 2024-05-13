@@ -107,12 +107,12 @@ func (h *Hub) Run() {
 					client.send <- message
 				}
 			case "lock":
-				fmt.Println("LOCKED ==", message)
+				fmt.Println("LOCKED ==", string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}
 			case "unlock":
-				fmt.Println("UNLOCKED ==", message)
+				fmt.Println("UNLOCKED ==", string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}

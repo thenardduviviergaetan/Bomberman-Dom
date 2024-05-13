@@ -10,7 +10,7 @@ export default class Component {
      * @param {Object} props - The properties of the component.
      * @param {Array} children - The child components of the component.
      */
-    constructor(tag, props = {}, children = [], parent=null) {
+    constructor(tag, props = {}, children = [], parent = null) {
         this.tag = tag;
         this.props = props;
         this.children = children;
@@ -24,8 +24,8 @@ export default class Component {
     addClassName(...classList) {
         this.props.className += ' ' + classList.join(" ")
     }
-    rmClassName(cl){
-        this.props.className = this.props.className.split(" ").filter((el) => { return el !== cl}).join(" ");
+    rmClassName(cl) {
+        this.props.className = this.props.className.split(" ").filter((el) => { return el !== cl }).join(" ");
     }
     /**
      * Adds child components to the component.
@@ -35,11 +35,11 @@ export default class Component {
         this.children.push(...children);
     }
 
-    removeElement(...children){
+    removeElement(...children) {
         this.children = this.children.filter((child) => !children.includes(child))
     }
 
-    async replaceChildren(c1, c2){
+    async replaceChildren(c1, c2) {
         this.children = this.children.filter((c) => c !== c1)
         this.addElement(c2)
     }
@@ -92,23 +92,29 @@ export default class Component {
         };
     }
 
-    clear(){
+
+    delete(child) {
+        this.children = this.children.filter(element => element.props.id !== child)
+        this.update();
+    }
+
+    clear() {
         this.children = [];
         this.update();
     }
 
-    clone(){
+    clone() {
         const clone = new Component(this.tag, this.props, this.children)
         clone.children = this.children.map((child) => child.clone())
         clone.parent = this.parent
         return clone
     }
 
-    updateStyle(style){
+    updateStyle(style) {
         document.getElementById(this.props.id).style = style;
     }
 
-    getParent(){
+    getParent() {
         return this.parent;
     }
 }

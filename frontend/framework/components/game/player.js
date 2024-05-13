@@ -103,17 +103,18 @@ export class CurrentPlayer extends Player {
         this.bombType = 0;
         this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
+        this.isAlive = true; 
         // this.speedBonus = 0;
-        this.ws.onMessage((message)=>{
-            if (message.type === "lock"){
+        this.ws.onMessage((message) => {
+            if (message.type === "lock") {
                 this.lock = true;
-            } else if (message.type === "unlock"){
+            } else if (message.type === "unlock") {
                 this.lock = false;
             }
         });
         this.speed = MOVEMENT_SIZE;
-
         window.addEventListener("keydown", debounce((event) => {
+            if (!this.isAlive) event.removeEventListener('keydown',this);
             // console.log(event.key , DROP_BOMB[event.key] && (this.bombCooldown - new Date().getTime() <= 0))
             //if Temporaire pour tester
             if (TEMP[event.key]) {
@@ -143,9 +144,9 @@ export class CurrentPlayer extends Player {
                 return;
             }
             if (DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) {
-                this.bombNumber++;
-                this.dropBomb();
-                this.bombCooldown = new Date().getTime() + 1500;
+                    this.bombNumber++;
+                    this.dropBomb();
+                    this.bombCooldown = new Date().getTime() + 1500;
                 return;
             } else if (DROP_BOMB[event.key]) return;
             if (!this.lock) this.direction = DIRECTION_MAP[event.key];
@@ -153,6 +154,7 @@ export class CurrentPlayer extends Player {
         }), 500)
 
         window.addEventListener("keyup", debounce((event) => {
+            if (!this.isAlive) event.removeEventListener('keyup',this);
             if (this.direction === DIRECTION_MAP[event.key]) {
                 this.direction = null;
             }
@@ -283,5 +285,10 @@ export class CurrentPlayer extends Player {
             cause: cause
         });
     }
+
+    // die(){
+    //     window.removeEventListener('keydown');
+    //     window.removeEventListener('keyup');
+    // }
 
 }
