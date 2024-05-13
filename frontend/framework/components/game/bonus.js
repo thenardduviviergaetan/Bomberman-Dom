@@ -24,8 +24,15 @@ export default class Bonus extends Component {
         this.bonusType = bonusType;
         this.cover = new Component("div", {
             class: "block-cover",
-            style: `background-color: red; width: ${this.tileSize}px; height: ${this.tileSize}px`
+            style: `background-image: ${this.tileSetImage
+                }; background-position: -${32}px -${32}px; width: ${this.tileSize
+                }px; height: ${this.tileSize
+                }px`
         });
+        // this.cover = new Component("div", {
+        //     class: "block-cover",
+        //     style: `background-color: red; width: ${this.tileSize}px; height: ${this.tileSize}px`
+        // });
 
         // Create the bonus image based on the bonus type
         switch (this.bonusType) {
