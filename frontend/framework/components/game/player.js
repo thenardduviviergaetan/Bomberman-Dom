@@ -92,8 +92,9 @@ export class Player extends Component {
         this.animate(direction);
         const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
-        throttle(this.updateStyle(this.props.style), 200);
-        // this.updateStyle(this.props.style);
+        // throttle(this.updateStyle(this.props.style), 200);
+
+        this.updateStyle(this.props.style);
     }
 
     die() {

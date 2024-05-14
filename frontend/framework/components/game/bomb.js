@@ -319,6 +319,7 @@ class BombPool {
     create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
         let bomb = new Bomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
         this.pool.push(bomb);
+        return bomb;
     }
 
     getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
@@ -327,8 +328,7 @@ class BombPool {
             bomb.reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
             return bomb;
         } else {
-            this.create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
-            return this.getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent)
+            return this.create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
         }
     }
 }
