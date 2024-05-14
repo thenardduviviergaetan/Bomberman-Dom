@@ -67,7 +67,13 @@ export default class Map extends Component {
                     case TILE_TYPES.BONUS_2:
                     case TILE_TYPES.BONUS_3:
                         block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
-                        this.bonusMap.push(getBorder(block.children[0], y, x))
+                        const bonusBorder = getBorder(block.children[0], y, x)
+                        bonusBorder.borderLeft += 8;
+                        bonusBorder.borderRight -= 8;
+                        bonusBorder.borderUp += 8;
+                        bonusBorder.borderDown -= 8;
+                        this.bonusMap.push(bonusBorder)
+                        // this.bonusMap.push(getBorder(block.children[0], y, x))
                         break
                     default:
                         break;
