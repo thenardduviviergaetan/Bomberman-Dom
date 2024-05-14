@@ -84,10 +84,10 @@ export default class TabBomb extends Component {
     /**
      * Update the bombs and blasts in the component
      */
-    tick() {
+    tick(deltaTime) {
         let tabExplodeBomb = [];
         const newChild = this.children.filter((child) => {
-            if (child.tick()) {
+            if (child.tick(deltaTime)) {
                 if (child instanceof Bomb) tabExplodeBomb.push(child);
                 return false;
             } else {
@@ -118,7 +118,7 @@ export default class TabBomb extends Component {
 
 // Define the Bomb component
 class Bomb extends Component {
-    constructor(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+    constructor(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime=3000) {
         super(
             "div",
             {
@@ -138,21 +138,24 @@ class Bomb extends Component {
         this.props.style = `${spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
         this.spriteAnimation = spriteAnimation;
         this.spriteAnimationLength = spriteAnimation.length;
-        this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
+        this.timer = 0
+        this.bombTimer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
         this.boundUpdate = this.update.bind(this);
         this.dirty = true;
+        this.fuseTime = fuseTime;
     }
 
     /**
      * Update the bomb animation frame
      * @returns {boolean} - Whether the bomb animation is completed or not
-     */
-    tick() {
-        let time = Date.now();
-        if (time - this.dateCreateBomb > this.timer) {
+    */
+    tick(deltaTime) {
+        this.timer += deltaTime;
+        while (this.timer >= this.bombTimer) {
             this.animationId++;
-            this.dateCreateBomb = time;
+            this.timer -= this.bombTimer;
             if (this.animationId > this.spriteAnimationLength - 1) {
+                this.timer = 0;
                 return true;
             } else {
                 this.props.style = `${this.spriteAnimation[this.animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
@@ -162,8 +165,8 @@ class Bomb extends Component {
         }
         return false;
     }
-
-    reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+    reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime = 3000) {
+        this.parent = parent;
         this.bombType = bombType;
         this.sender = sender;
         this.posX = parseInt((posX + 16) / 32) * 32;
@@ -174,8 +177,11 @@ class Bomb extends Component {
         this.props.style = `${spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
         this.spriteAnimation = spriteAnimation;
         this.spriteAnimationLength = spriteAnimation.length;
-        this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
+        this.timer = 0
+        this.bombTimer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
+        this.boundUpdate = this.update.bind(this);
         this.dirty = true;
+        this.fuseTime = fuseTime;
     }
 }
 
@@ -192,6 +198,7 @@ class Blast extends Component {
         this.animationId = 0;
         this.blastRange = blastRange;
         this.timer = parseInt(timer / 4);
+        this.deltaTime = this.deltaTime
         this.aLive = Date.now();
         this.boundUpdate = this.update.bind(this);
         this.initBlast();
@@ -315,8 +322,8 @@ class BombPool {
      * @param {Object} parent - The parent component of the bomb.
      * @returns {Object} - The created bomb.
      */
-    create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
-        let bomb = new Bomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+    create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime = 3000) {
+        let bomb = new Bomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime);
         this.pool.push(bomb);
         return bomb;
     }
@@ -333,13 +340,13 @@ class BombPool {
      * @param {Object} parent - The parent component of the bomb.
      * @returns {Object} - The bomb.
      */
-    getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+    getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime = 3000) {
         if (this.pool.length > 10) {
             const bomb = this.pool.shift();
-            bomb.reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+            bomb.reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime);
             return bomb;
         } else {
-            return this.create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+            return this.create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent, fuseTime);
         }
     }
 }

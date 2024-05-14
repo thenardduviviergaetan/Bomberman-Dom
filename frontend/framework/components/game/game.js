@@ -3,7 +3,7 @@ import Map from "./map.js";
 import { CurrentPlayer, Player, PlayerMovePool } from "./player.js";
 import TabBomb from "./bomb.js";
 
-const FRAMERATE = 1000 / 60;
+const FRAMERATE = 1000 / 120;
 const positions = [
     { top: -608 + 32, left: 32 },
     { top: -64, left: 608 - 64 },
@@ -184,10 +184,10 @@ export default class Game extends Component {
         requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
         this.fpsCounter();
         const deltaTime = timestamp - this.lastTime;
-        if (deltaTime >= FRAMERATE) {
-            this.lastTime = timestamp;
-            this.updateState();
-        }
+        // if (deltaTime >= FRAMERATE) {
+        this.lastTime = timestamp;
+        this.updateState(deltaTime);
+        // }
         if (this.count === this.readyPlayers.length - 1) {
             this.count = 0;
             setTimeout(() => {
@@ -203,8 +203,10 @@ export default class Game extends Component {
     /**
      * Updates the game state.
      */
-    updateState() {
-        if (this.tabBomb !== undefined) this.tabBomb.tick();
+    updateState(deltaTime) {
+        // if (this.tabBomb !== undefined) this.tabBomb.tick();
+        if (this.tabBomb !== undefined) this.tabBomb.tick(deltaTime);
+
 
         let moveCounts = {};
         let nextPlayerMoveQueue = [];
@@ -228,7 +230,7 @@ export default class Game extends Component {
 
         this.playerMoveQueue = nextPlayerMoveQueue;
         moveCounts = {};
-        
+
     }
 
     /**
