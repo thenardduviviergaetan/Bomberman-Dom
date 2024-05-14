@@ -57,6 +57,7 @@ export default class GameManager {
         endButton.actionListener('click',()=>this.ws.sendMessage({ type: "end" }))
         this.ws.onMessage(message => {
             if (message.type === "end") {
+                this.winner = message.sender;
                 this.ws.close();
                 container.clear(); //this is to clear the map which does not remove with app.clear()
                 this.app.clear();
@@ -102,7 +103,7 @@ export default class GameManager {
 
         const container = new Component("div", { id: "container" });
 
-        const endMenu = new EndMenu(leaveButton, restart, this.username);//Change "this.username" by the winner
+        const endMenu = new EndMenu(leaveButton, restart, this.winner);//Change "this.username" by the winner
         container.addElement(endMenu)
         this.app.addComponent(container)
         this.render()

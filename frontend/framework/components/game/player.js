@@ -344,16 +344,12 @@ export class CurrentPlayer extends Player {
         if (time - this.cooldownDegats > 1500) {
             this.cooldownDegats = time;
             // this.rmLife(1);
-            if (this.life <= 0) {
-                await this.playerDeath("blast");
-            } else {
                 this.ws.sendMessage({
                     type: "degats",
                     sender: this.username,
                     nb: 1
                 });
             }
-        }
     }
 
     /**

@@ -26,6 +26,7 @@ export default class Game extends Component {
         this.playerMoveQueue = []
         this.leavers = []
         this.lives = [3, 3, 3, 3];
+        this.count = 0;
         this.ws.onClose(() => this.stop = true)
         this.ws.onMessage(async (message) => {
             switch (message.type) {
@@ -43,8 +44,11 @@ export default class Game extends Component {
                     this.tabBomb.newBomb(message);
                     break;
                 case "death":
+                    console.log("message ==", message);
+                    this.count++
                     this.readyPlayers.forEach((player) => {
                         if (message.sender === player.props.id) {
+                            console.log("this.count",this.count);
                             player.die();
                         }
                     })
@@ -61,6 +65,7 @@ export default class Game extends Component {
                     await this.map.removeBonus(message.data);
                     break
                 case "leave":
+                    this.count++;
                     this.leavers.push(message.sender)
                     this.updateLives();
                     this.map.delete(message.sender);
@@ -153,8 +158,9 @@ export default class Game extends Component {
         list.forEach((playerLi, index) => {
             if (this.lives[index] > 0 && !this.leavers.includes(playerLi.props.className)) {
                 playerLi.children = [`${playerLi.props.className} : ${this.lives[index]}`];
+                this.winner = playerLi.props.className;
             } else {
-                if (playerLi.props.className === this.currentPlayer.username) {
+                if (playerLi.props.className === this.currentPlayer.username && this.currentPlayer.isAlive) {
                     this.currentPlayer.isAlive = false;
                     this.currentPlayer.playerDeath()
                 }
@@ -171,6 +177,12 @@ export default class Game extends Component {
         if (deltaTime >= FRAMERATE) {
             this.lastTime = timestamp;
             this.updateState();
+        }
+        if (this.count === this.readyPlayers.length -1){
+            this.count = 0;
+            setTimeout(() => {
+                this.ws.sendMessage({type:"end", sender:this.winner});
+            }, 2000);
         }
         if (this.stop) {
             this.fps.textContent = "";
