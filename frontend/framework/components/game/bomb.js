@@ -299,8 +299,9 @@ class Fire extends Component {
      * @param {number} animationId - The current animation frame ID
      */
     tick(animationId) {
-        if (animationId !== this.lastAnimationId && animationId < this.spriteAnimationLength) {
-            this.props.style = `${this.spriteAnimation[animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
+        const newStyle = `${this.spriteAnimation[animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
+        if (animationId !== this.lastAnimationId && animationId < this.spriteAnimationLength && this.props.style !== newStyle) {
+            this.props.style = newStyle;
             this.lastAnimationId = animationId;
             this.dirty = true;
         }
@@ -323,8 +324,8 @@ class BombPool {
     }
 
     getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
-        if (this.pool.length > 0) {
-            const bomb = this.pool.pop();
+        if (this.pool.length > 10) {
+            const bomb = this.pool.shift();
             bomb.reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
             return bomb;
         } else {
