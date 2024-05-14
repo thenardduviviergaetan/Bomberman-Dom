@@ -107,6 +107,9 @@ export default class TabBomb extends Component {
             requestAnimationFrame(this.update.bind(this))
         }
     }
+    returnBomb(){
+        return this.children.filter((child) => child instanceof Bomb);
+    }
 }
 
 // Define the Bomb component

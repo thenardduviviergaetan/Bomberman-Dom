@@ -91,14 +91,48 @@ export function initSquareCollision(posX, posY, map) {
         "top-left": mY && check && mX ? getBorder(map.children[indexY - 1].children[indexX - 1], indexY - 1, indexX - 1) : undefined,
         "top": mY && check ? getBorder(map.children[indexY - 1].children[indexX], indexY - 1, indexX) : undefined,
         "top-right": mY && check && gX ? getBorder(map.children[indexY - 1].children[indexX + 1], indexY - 1, indexX + 1) : undefined,
+        
         "left": mX && check ? getBorder(map.children[indexY].children[indexX - 1], indexY, indexX - 1) : undefined,
         "in": check ? getBorder(map.children[indexY].children[indexX], indexY, indexX) : undefined,
         "right": gX && check ? getBorder(map.children[indexY].children[indexX + 1], indexY, indexX + 1) : undefined,
+        
         "bottom-left": gY && check && mX ? getBorder(map.children[indexY + 1].children[indexX - 1], indexY + 1, indexX - 1) : undefined,
         "bottom": gY && check ? getBorder(map.children[indexY + 1].children[indexX], indexY + 1, indexX) : undefined,
         "bottom-right": gY && check && gX ? getBorder(map.children[indexY + 1].children[indexX + 1], indexY + 1, indexX + 1) : undefined,
     };
-
+    map.tabBomb.returnBomb().forEach((bomb) => {
+        const bombX = bomb.posX / 32;
+        const bombY = bomb.posY / 32;
+        switch (true) {
+            case (bombY === indexY - 1) && (bombX === indexX - 1):
+                square["top-left"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY - 1) && (bombX === indexX):
+                square["top"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY - 1) && (bombX === indexX + 1):
+                square["top-right"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY) && (bombX === indexX - 1):
+                square["left"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY) && (bombX === indexX):
+                square["in"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY) && (bombX === indexX + 1):
+                square["right"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY + 1) && (bombX === indexX - 1):
+                square["bottom-left"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY + 1) && (bombX === indexX):
+                square["bottom"] = getBorder(bomb, bombY, bombX);
+                break;
+            case (bombY === indexY + 1) && (bombX === indexX + 1):
+                square["bottom-right"] = getBorder(bomb, bombY, bombX);
+                break;
+        }
+    });
     return square;
 }
 

@@ -121,6 +121,7 @@ export default class Game extends Component {
         });
 
         this.tabBomb = new TabBomb(this.map, this.currentPlayer);
+        this.map.tabBomb = this.tabBomb;
         this.map.addElement(this.tabBomb);
         this.addElement(this.map);
         this.update();

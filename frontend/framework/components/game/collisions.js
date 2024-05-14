@@ -2,7 +2,7 @@ import { initSquareCollision } from "../function.js";
 
 const FRAME_WIDTH = 32;
 const keys = ["top-left", "top", "top-right", "left", "in", "right", "bottom-left", "bottom", "bottom-right"];
-const solid = new Set(["wall", "block", "covered"]);
+const solid = new Set(["wall", "block", "covered", "bomb"]);
 
 /**
  * Checks the ground collision for the player.
@@ -24,7 +24,7 @@ export function checkGround(player) {
     const square = initSquareCollision(player.posX, player.posY, player.parent);
     keys.forEach(key => {
         const blockBorder = square[key];
-        if (blockBorder === undefined || !solid.has(blockBorder.type)) return;
+        if (blockBorder === undefined || !solid.has(blockBorder.type) || blockBorder.type === "bomb" && player.canEscape) return;
         switch (key) {
             case "top":
                 top(groundObj, blockBorder, playerBorder, player.speed);
