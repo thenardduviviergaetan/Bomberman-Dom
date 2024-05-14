@@ -24,6 +24,7 @@ export default class Game extends Component {
         this.livesContainer = new Component("div", { id: "lives-container", style: "position:absolute;" });
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
+        this.leavers = []
         this.lives = [3, 3, 3, 3];
         this.ws.onClose(() => this.stop = true)
         this.ws.onMessage(async (message) => {
@@ -60,6 +61,8 @@ export default class Game extends Component {
                     await this.map.removeBonus(message.data);
                     break
                 case "leave":
+                    this.leavers.push(message.sender)
+                    this.updateLives();
                     this.map.delete(message.sender);
                     break
                 default:
@@ -148,7 +151,7 @@ export default class Game extends Component {
     updateLives() {
         const list = this.livesContainer.children[1].children;
         list.forEach((playerLi, index) => {
-            if (this.lives[index] > 0) {
+            if (this.lives[index] > 0 && !this.leavers.includes(playerLi.props.className)) {
                 playerLi.children = [`${playerLi.props.className} : ${this.lives[index]}`];
             } else {
                 if (playerLi.props.className === this.currentPlayer.username) {
@@ -156,7 +159,7 @@ export default class Game extends Component {
                     this.currentPlayer.playerDeath()
                 }
 
-                playerLi.children = [`${playerLi.props.className} : dead`];
+                playerLi.children = this.leavers.includes(playerLi.props.className) ? [`${playerLi.props.className} : left`] : [`${playerLi.props.className} : dead`];
                 playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
             }
         })

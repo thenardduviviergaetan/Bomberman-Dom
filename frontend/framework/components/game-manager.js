@@ -11,7 +11,7 @@ export default class GameManager {
         this.app = new Framework();
         this.ws;
         this.username = "";
-
+        this.winner = "";
     }
 
     async launchMenu() {
