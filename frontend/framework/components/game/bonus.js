@@ -54,7 +54,21 @@ export default class Bonus extends Component {
                 this.bonusImage = new Component("div", {
                     class: "bonus-item",
                     'bonus': "speed",
+                    style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30;background-position: -${32}px -${0}px;`
+                }, "", this);
+                break;
+            case 4:
+                this.bonusImage = new Component("div", {
+                    class: "bonus-item",
+                    'bonus': "escape",
                     style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30;background-position: -${48}px -${0}px;`
+                }, "", this);
+                break;
+            case 5:
+                this.bonusImage = new Component("div", {
+                    class: "bonus-item",
+                    'bonus': "life",
+                    style: `background-image: ${this.image}; width: ${16}px; height: ${16}px; z-index: 30;background-position: -${64}px -${0}px;`
                 }, "", this);
                 break;
             default:

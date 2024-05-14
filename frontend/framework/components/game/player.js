@@ -111,10 +111,10 @@ export class Player extends Component {
         this.updateStyle(this.props.style);
     }
 
-    async die(){
+    async die() {
         this.props.style = `${this.props.style} opacity: 0.4;`
         this.updateStyle(this.props.style);
-        
+
     }
 }
 
@@ -140,8 +140,10 @@ export class CurrentPlayer extends Player {
         this.bombType = 0;
         this.blastRangeBonus = 0;
         this.cooldownDegats = 0;
-        this.isAlive = true; 
-        // this.speedBonus = 0;
+        this.isAlive = true;
+        this.canEscape = false;
+        this.speed = MOVEMENT_SIZE;
+
         this.ws.onMessage((message) => {
             if (message.type === "lock") {
                 this.lock = true;
@@ -149,7 +151,7 @@ export class CurrentPlayer extends Player {
                 this.lock = false;
             }
         });
-        this.speed = MOVEMENT_SIZE;
+        
         window.addEventListener("keydown", debounce(async (event) => {
             // if (!this.isAlive) window.removeEventListener('keydown',this);
             if (TEMP[event.key]) {
@@ -244,6 +246,14 @@ export class CurrentPlayer extends Player {
         this.speed += 0.2;
     }
 
+    activeEscape() {
+        this.canEscape = true;
+    }
+
+    addLife(nb) {
+        this.life += nb;
+    }
+
     /**
      * Moves the current player.
      */
@@ -257,8 +267,9 @@ export class CurrentPlayer extends Player {
         const oldPosY = this.posY;
 
         this.parent.bonusMap.forEach((bonus) => {
-            if (checkTrigger(this, bonus) && bonus.parent.children.length == 1) {
+            if (checkTrigger(this, bonus) && bonus.parent.children.length == 1 && this.isAlive) {
                 let bonusData = {
+                    bonus: bonus.bonus,
                     indexX: bonus.indexX,
                     indexY: bonus.indexY,
                 };
@@ -279,6 +290,14 @@ export class CurrentPlayer extends Player {
                     case "speed":
                         console.log("SPEED BONUS");
                         this.speedUp();
+                        break;
+                    case "escape":
+                        console.log("ESCAPE BONUS");
+                        this.activeEscape();
+                        break;
+                    case "life":
+                        console.log("LIFE BONUS");
+                        this.addLife(1);
                         break;
                     default:
                         break;
@@ -343,13 +362,12 @@ export class CurrentPlayer extends Player {
         const time = new Date().getTime();
         if (time - this.cooldownDegats > 1500) {
             this.cooldownDegats = time;
-            // this.rmLife(1);
-                this.ws.sendMessage({
-                    type: "degats",
-                    sender: this.username,
-                    nb: 1
-                });
-            }
+            this.ws.sendMessage({
+                type: "degats",
+                sender: this.username,
+                nb: 1
+            });
+        }
     }
 
     /**

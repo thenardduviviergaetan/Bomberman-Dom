@@ -11,7 +11,9 @@ const TILE_TYPES = {
     SAFE_ZONE: 4,
     BONUS_1: 5,
     BONUS_2: 6,
-    BONUS_3: 7
+    BONUS_3: 7,
+    BONUS_4: 8,
+    BONUS_5: 9
 }
 
 /**
@@ -66,6 +68,8 @@ export default class Map extends Component {
                     case TILE_TYPES.BONUS_1:
                     case TILE_TYPES.BONUS_2:
                     case TILE_TYPES.BONUS_3:
+                    case TILE_TYPES.BONUS_4:
+                    case TILE_TYPES.BONUS_5:
                         block = new Bonus(this.atlas, this.tileSize, this.tileSetImage, type - TILE_TYPES.BONUS_1 + 1)
                         const bonusBorder = getBorder(block.children[0], y, x)
                         bonusBorder.borderLeft += 8;

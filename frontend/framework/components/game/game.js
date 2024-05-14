@@ -54,15 +54,15 @@ export default class Game extends Component {
                     })
                     break;
                 case "degats":
-                    this.readyPlayers.forEach((player, index) => {
-                        if (message.sender === player.props.id) {
-                            this.lives[index]--;
-                            this.updateLives();
-                        }
-                    });
+                    this.lives[this.readyPlayers.findIndex(player => player.props.id === message.sender)]--;
+                    this.updateLives();
                     break;
                 case "bonus":
                     await this.map.removeBonus(message.data);
+                    if (message.data.bonus === "life") {
+                        this.lives[this.readyPlayers.findIndex(player => player.props.id === message.sender)]++;
+                        this.updateLives();
+                    }
                     break
                 case "leave":
                     this.count++;
