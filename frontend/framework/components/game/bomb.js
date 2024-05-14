@@ -50,11 +50,12 @@ const ANIMATION_FRAME_BLAST = {
 
 // Define the TabBomb component
 export default class TabBomb extends Component {
-    constructor(parent, curentPlayer) {
+    constructor(parent, currentPlayer) {
         super("div", { id: "TabBomb" }, []);
         this.tabSpriteBomb = new TabSprite("./framework/components/game/assets/bomb-32x32.png", 32, 160, 96).tab;
         this.parent = parent;
-        this.curentPlayer = curentPlayer;
+        this.currentPlayer = currentPlayer;
+        this.boundUpdate = this.update.bind(this);
     }
 
     /**
@@ -62,10 +63,6 @@ export default class TabBomb extends Component {
      * @param {Object} BombMessage - The bomb message containing bomb details
      */
     newBomb(BombMessage) {
-        // const bombSprite = [];
-        // ANIMATION_FRAME_BOMB[BombMessage.bombType].tab.forEach(idsprite => {
-        //     bombSprite.push(this.tabSpriteBomb[idsprite]);
-        // });
         const bombSprite = ANIMATION_FRAME_BOMB[BombMessage.bombType].tab.map(idsprite => this.tabSpriteBomb[idsprite]);
 
         this.addElement(
@@ -100,11 +97,12 @@ export default class TabBomb extends Component {
         if (newChild.length !== this.children.length) {
             this.children = newChild;
             tabExplodeBomb.forEach((bomb) => {
-                if (this.curentPlayer.username === bomb.sender) this.curentPlayer.bombExplode();
+                if (this.currentPlayer.username === bomb.sender) this.currentPlayer.bombExplode();
                 this.addElement(new Blast(bomb.posX, bomb.posY, ANIMATION_FRAME_BOMB[bomb.bombType].flame, bomb.blastRange, ANIMATION_FRAME_BOMB[bomb.bombType].blastTimer, this));
             });
             // this.update();
-            requestAnimationFrame(this.update.bind(this))
+            // requestAnimationFrame(this.update.bind(this))
+            requestAnimationFrame(this.boundUpdate)
         }
     }
     returnBomb(){
@@ -132,9 +130,10 @@ class Bomb extends Component {
         this.blastRange = blastRange;
         this.animationId = 0;
         this.props.style = `${spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
-        // this.props.style = `${spriteAnimation[0].style} top: ${this.posY}px; left: ${this.posX}px;`;
         this.spriteAnimation = spriteAnimation;
+        this.spriteAnimationLength = spriteAnimation.length;
         this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
+        this.boundUpdate = this.update.bind(this);
     }
 
     /**
@@ -142,17 +141,19 @@ class Bomb extends Component {
      * @returns {boolean} - Whether the bomb animation is completed or not
      */
     tick() {
-        let time = new Date().getTime();
+        // let time = new Date().getTime();
+        let time = Date.now();
         if (time - this.dateCreateBomb > this.timer) {
             this.animationId++;
             this.dateCreateBomb = time;
-            if (this.animationId > this.spriteAnimation.length - 1) {
+            if (this.animationId > this.spriteAnimationLength - 1) {
                 return true;
             } else {
                 this.props.style = `${this.spriteAnimation[this.animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
                 // this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`;
                 // this.update();
-                requestAnimationFrame(this.update.bind(this))
+                // requestAnimationFrame(this.update.bind(this))
+                requestAnimationFrame(this.boundUpdate)
             }
         }
         return false;
@@ -163,7 +164,7 @@ class Bomb extends Component {
 class Blast extends Component {
     constructor(posX, posY, typeflame, blastRange, timer, parent) {
         super("div", { id: `${parent.props.id}blast` }, []);
-        this.dateCreateBomb = new Date().getTime();
+        this.dateCreateBomb = Date.now();
         this.posX = posX;
         this.posY = posY;
         this.typeflame = typeflame;
@@ -172,7 +173,8 @@ class Blast extends Component {
         this.animationId = 0;
         this.blastRange = blastRange;
         this.timer = parseInt(timer / 4);
-        this.aLive = new Date().getTime();
+        this.aLive = Date.now();
+        this.boundUpdate = this.update.bind(this);
         this.initBlast();
     }
 
@@ -186,9 +188,10 @@ class Blast extends Component {
             cross[key].forEach((blockBorder, index) => {
                 let spkey = index < cross[key].length - 1 ? "mid" : "end";
                 const spriteAnimation = [];
-                ANIMATION_FRAME_BLAST[key][spkey].forEach(idsprite => {
-                    spriteAnimation.push(this.typeflame === "yellow" ? yellowFlammeSprite[idsprite] : blueFlammeSprite[idsprite]);
-                });
+                const animationLength = ANIMATION_FRAME_BLAST[key][spkey].length;
+                for (let i = 0; i < animationLength; i++) {
+                    spriteAnimation.push(this.typeflame === "yellow" ? yellowFlammeSprite[ANIMATION_FRAME_BLAST[key][spkey][i]] : blueFlammeSprite[ANIMATION_FRAME_BLAST[key][spkey][i]]);
+                }
                 this.addElement(new Fire(blockBorder.borderLeft, blockBorder.borderUp, spriteAnimation, blockBorder, this.parent, key));
                 if (blockBorder.type === "block") {
                     const top = map.children[blockBorder.indexY - 1].children[blockBorder.indexX];
@@ -199,9 +202,12 @@ class Blast extends Component {
                 }
                 if (blockBorder.type === "covered") {
                     const bonus = map.children[blockBorder.indexY].children[blockBorder.indexX];
-                    if (Array.from(bonus.children).some(child => child.props.class === "block-cover")) {
-                        bonus.children = Array.from(bonus.children).filter(child => child.props.class !== "block-cover");
-                        bonus.props.class = "bonus";
+                    for (let i = 0; i < bonus.children.length; i++) {
+                        if (bonus.children[i].props.class === "block-cover") {
+                            bonus.children.splice(i, 1);
+                            bonus.props.class = "bonus";
+                            break;
+                        }
                     }
                     map.update();
                 }
@@ -214,7 +220,7 @@ class Blast extends Component {
      * @returns {boolean} - Whether the blast animation is completed or not
      */
     tick() {
-        const time = new Date().getTime();
+        const time = Date.now();
         let updateFrame = false;
         if (time - this.aLive >= this.timer) {
             updateFrame = true;
@@ -226,8 +232,7 @@ class Blast extends Component {
             } else {
                 this.animationId++;
                 this.children.forEach(fire => fire.tick(this.animationId));
-                // this.update();
-                requestAnimationFrame(this.update.bind(this))
+                requestAnimationFrame(this.boundUpdate);
             }
         }
         return false;
@@ -237,15 +242,16 @@ class Blast extends Component {
 // Define the Fire component
 class Fire extends Component {
     constructor(posX, posY, spriteAnimation, border, parent, key) {
-        super("div", {class: "fire"}, []);
+        super("div", { class: "fire" }, []);
         this.posX = posX;
         this.posY = posY;
         this.spriteAnimation = spriteAnimation;
+        this.spriteAnimationLength = spriteAnimation.length;
         this.border = border;
         this.parent = parent;
         this.key = key;
         this.props.style = `${this.spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
-        // this.props.style = `${this.spriteAnimation[0].style} top: ${this.posY}px; left: ${this.posX}px;`;
+        this.lastAnimationId = 0;
     }
 
     /**
@@ -253,10 +259,13 @@ class Fire extends Component {
      * @param {number} animationId - The current animation frame ID
      */
     tick(animationId) {
-        this.props.style = `${this.spriteAnimation[animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
-        // this.props.style = `${this.spriteAnimation[animationId].style} top: ${this.posY}px; left: ${this.posX}px;`;
-        if (checkTrigger(this.parent.curentPlayer, this.border)) {
-            this.parent.curentPlayer.triggerBlast();
+        if (animationId !== this.lastAnimationId && animationId < this.spriteAnimationLength) {
+            this.props.style = `${this.spriteAnimation[animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
+            this.lastAnimationId = animationId;
+        }
+        const currentPlayer = this.parent.currentPlayer;
+        if (checkTrigger(currentPlayer, this.border)) {
+            currentPlayer.triggerBlast();
         }
     }
 }
