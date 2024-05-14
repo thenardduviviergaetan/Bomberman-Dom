@@ -56,6 +56,7 @@ export default class TabBomb extends Component {
         this.parent = parent;
         this.currentPlayer = currentPlayer;
         this.boundUpdate = this.update.bind(this);
+        this.bombPool = new BombPool();
     }
 
     /**
@@ -65,18 +66,31 @@ export default class TabBomb extends Component {
     newBomb(BombMessage) {
         const bombSprite = ANIMATION_FRAME_BOMB[BombMessage.bombType].tab.map(idsprite => this.tabSpriteBomb[idsprite]);
 
-        this.addElement(
-            new Bomb(
-                BombMessage.bombType,
-                BombMessage.sender,
-                BombMessage.position.x,
-                BombMessage.position.y,
-                BombMessage.date,
-                bombSprite,
-                BombMessage.blastRangeBonus + ANIMATION_FRAME_BOMB[BombMessage.bombType].blastRange,
-                this,
-            )
+        // this.addElement(
+        //     new Bomb(
+        //         BombMessage.bombType,
+        //         BombMessage.sender,
+        //         BombMessage.position.x,
+        //         BombMessage.position.y,
+        //         BombMessage.date,
+        //         bombSprite,
+        //         BombMessage.blastRangeBonus + ANIMATION_FRAME_BOMB[BombMessage.bombType].blastRange,
+        //         this,
+        //     )
+        // );
+
+        let bomb = this.bombPool.getBomb(
+            BombMessage.bombType,
+            BombMessage.sender,
+            BombMessage.position.x,
+            BombMessage.position.y,
+            BombMessage.date,
+            bombSprite,
+            BombMessage.blastRangeBonus + ANIMATION_FRAME_BOMB[BombMessage.bombType].blastRange,
+            this,
         );
+
+        this.addElement(bomb);
         this.update();
     }
 
@@ -100,6 +114,14 @@ export default class TabBomb extends Component {
                 if (this.currentPlayer.username === bomb.sender) this.currentPlayer.bombExplode();
                 this.addElement(new Blast(bomb.posX, bomb.posY, ANIMATION_FRAME_BOMB[bomb.bombType].flame, bomb.blastRange, ANIMATION_FRAME_BOMB[bomb.bombType].blastTimer, this));
             });
+
+            this.children.forEach((child) => {
+                if (child.dirty) {
+                    this.update();
+                    child.dirty = false;
+                }
+            })
+
             // this.update();
             // requestAnimationFrame(this.update.bind(this))
             requestAnimationFrame(this.boundUpdate)
@@ -134,6 +156,7 @@ class Bomb extends Component {
         this.spriteAnimationLength = spriteAnimation.length;
         this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
         this.boundUpdate = this.update.bind(this);
+        this.dirty = true;
     }
 
     /**
@@ -153,10 +176,26 @@ class Bomb extends Component {
                 // this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`;
                 // this.update();
                 // requestAnimationFrame(this.update.bind(this))
+                this.dirty = true;
                 requestAnimationFrame(this.boundUpdate)
             }
         }
         return false;
+    }
+
+    reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+        this.bombType = bombType;
+        this.sender = sender;
+        this.posX = parseInt((posX + 16) / 32) * 32;
+        this.posY = parseInt((posY + 26) / 32) * 32;
+        this.dateCreateBomb = date;
+        this.blastRange = blastRange;
+        this.animationId = 0;
+        this.props.style = `${spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
+        this.spriteAnimation = spriteAnimation;
+        this.spriteAnimationLength = spriteAnimation.length;
+        this.timer = parseInt(ANIMATION_FRAME_BOMB[this.bombType].bombTimer / ANIMATION_FRAME_BOMB[this.bombType].tab.length);
+        this.dirty = true;
     }
 }
 
@@ -252,6 +291,7 @@ class Fire extends Component {
         this.key = key;
         this.props.style = `${this.spriteAnimation[0].style} transform: translate(${this.posX}px, ${this.posY}px);`;
         this.lastAnimationId = 0;
+        this.dirty = true;
     }
 
     /**
@@ -262,10 +302,33 @@ class Fire extends Component {
         if (animationId !== this.lastAnimationId && animationId < this.spriteAnimationLength) {
             this.props.style = `${this.spriteAnimation[animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
             this.lastAnimationId = animationId;
+            this.dirty = true;
         }
         const currentPlayer = this.parent.currentPlayer;
         if (checkTrigger(currentPlayer, this.border)) {
             currentPlayer.triggerBlast();
+        }
+    }
+}
+
+class BombPool {
+    constructor() {
+        this.pool = [];
+    }
+
+    create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+        let bomb = new Bomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+        this.pool.push(bomb);
+    }
+
+    getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
+        if (this.pool.length > 0) {
+            const bomb = this.pool.pop();
+            bomb.reset(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+            return bomb;
+        } else {
+            this.create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
+            return this.getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent)
         }
     }
 }

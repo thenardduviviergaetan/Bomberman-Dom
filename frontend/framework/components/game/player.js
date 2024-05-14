@@ -1,6 +1,7 @@
 import Component from "../component.js";
-import { debounce } from "../../engine/utils.js";
+import { debounce, throttle } from "../../engine/utils.js";
 import { checkGround, checkTrigger } from "./collisions.js";
+
 
 // Constants
 const FRAME_COUNT = 3;
@@ -34,16 +35,6 @@ const DROP_BOMB = {
     " ": true
 };
 
-// Temporary keys for testing
-const TEMP = {
-    "ù": true,
-    "$": true,
-    "=": true,
-    ")": true,
-    "(": true,
-    "-": true,
-};
-
 // Player class
 export class Player extends Component {
     /**
@@ -69,13 +60,6 @@ export class Player extends Component {
         this.cycleIndex = 0;
     }
 
-    // addLife(nb) {
-    //     this.life += nb;
-    // }
-
-    // rmLife(nb) {
-    //     this.life -= nb;
-    // }
 
     /**
      * Draws the player on the screen.
@@ -88,7 +72,7 @@ export class Player extends Component {
      * Animates the player based on the current direction.
      * @param {string} direction - The current direction of the player.
      */
-    async animate(direction) {
+    animate(direction) {
         this.animationCounter++;
         if (this.animationCounter % ANIMATION_FRAME_RATE === 0 || direction !== this.prevDirection) {
             this.prevDirection = direction;
@@ -102,16 +86,17 @@ export class Player extends Component {
      * @param {string} direction - The direction to move the player.
      * @param {Object} position - The new position of the player.
      */
-    async move(direction, position) {
+    move(direction, position) {
         this.posX = position.x;
         this.posY = position.y;
-        await this.animate(direction);
+        this.animate(direction);
         const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
-        this.updateStyle(this.props.style);
+        throttle(this.updateStyle(this.props.style), 200);
+        // this.updateStyle(this.props.style);
     }
 
-    async die() {
+    die() {
         this.props.style = `${this.props.style} opacity: 0.4;`
         this.updateStyle(this.props.style);
 
@@ -144,6 +129,14 @@ export class CurrentPlayer extends Player {
         this.canEscape = false;
         this.speed = MOVEMENT_SIZE;
 
+        this.keys = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+        }
+
+
         this.ws.onMessage((message) => {
             if (message.type === "lock") {
                 this.lock = true;
@@ -151,48 +144,35 @@ export class CurrentPlayer extends Player {
                 this.lock = false;
             }
         });
-        
-        window.addEventListener("keydown", debounce(async (event) => {
+
+        window.addEventListener("keydown", ((event) => {
             // if (!this.isAlive) window.removeEventListener('keydown',this);
-            if (TEMP[event.key]) {
-                switch (event.key) {
-                    case "ù":
-                        this.addMaxBombNumber();
-                        break;
-                    case "$":
-                        this.rmMaxBombNumber();
-                        break;
-                    case "=":
-                        this.addBlastRange(1);
-                        break;
-                    case ")":
-                        this.resetBlastRange();
-                        break;
-                    case "(":
-                        this.bombType++;
-                        break;
-                    case "-":
-                        this.bombType--;
-                        break;
-                }
-                return;
+            if (DIRECTION_MAP[event.key] && !this.lock) {
+                console.log(DIRECTION_MAP[event.key]);
+                console.log(this.keys);
+                this.keys[DIRECTION_MAP[event.key]] = true;
+                if (!this.isMoving) this.updatePosition();
+                // this.updatePosition();
             }
-            if ((DROP_BOMB[event.key] && ((this.bombCooldown - new Date().getTime() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive) {
+            if ((DROP_BOMB[event.key] && ((this.bombCooldown - Date.now() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive) {
                 this.bombNumber++;
-                await this.dropBomb();
-                this.bombCooldown = new Date().getTime() + 1500;
+                this.dropBomb();
+                this.bombCooldown = Date.now() + 1500;
                 return;
             } else if (DROP_BOMB[event.key]) return;
-            if (!this.lock) this.direction = DIRECTION_MAP[event.key];
-            if (!this.isMoving) this.updatePosition();
-        }), 500);
+            // if (!this.lock) this.direction = DIRECTION_MAP[event.key];
+        }));
 
-        window.addEventListener("keyup", debounce((event) => {
+        window.addEventListener("keyup", ((event) => {
             // if (!this.isAlive) window.removeEventListener('keyup',this);
-            if (this.direction === DIRECTION_MAP[event.key]) {
-                this.direction = null;
+            // if (this.direction === DIRECTION_MAP[event.key]) {
+            //     this.direction = null;
+            // }
+            if (DIRECTION_MAP[event.key]) {
+                this.keys[DIRECTION_MAP[event.key]] = false;
+                    this.direction = null;
             }
-        }), 500);
+        }));
     }
 
     /**
@@ -257,11 +237,11 @@ export class CurrentPlayer extends Player {
     /**
      * Moves the current player.
      */
-    async moveCurrent() {
+    moveCurrent() {
         const playerGround = checkGround(this);
         if (!this.direction) {
             this.isMoving = false;
-            return;
+        //     return;
         }
         const oldPosX = this.posX;
         const oldPosY = this.posY;
@@ -306,20 +286,42 @@ export class CurrentPlayer extends Player {
             }
         });
 
-        switch (this.direction) {
-            case "up":
-                this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
-                break;
-            case "down":
-                this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
-                break;
-            case "left":
-                this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
-                break;
-            case "right":
-                this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
-                break;
+        if (this.keys.up){
+            this.direction = "up";
+            this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
         }
+
+        if (this.keys.down){
+            this.direction = "down";
+            this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
+        }
+
+        if (this.keys.left){
+            this.direction = "left";
+            this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
+        }
+
+        if (this.keys.right){
+            this.direction = "right";
+            this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
+        }
+
+
+        // switch (this.direction) {
+        //     case "up":
+        //         this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
+        //         break;
+        //     case "down":
+        //         this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
+        //         break;
+        //     case "left":
+        //         this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
+        //         break;
+        //     case "right":
+        //         this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
+        //         break;
+        // }
+        console.log(this.posX, this.posY);
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
         }
@@ -327,8 +329,8 @@ export class CurrentPlayer extends Player {
 
     /**
      * Updates the position of the current player.
-     */
-    async updatePosition() {
+    */
+    updatePosition() {
         this.isMoving = true;
         const oldPosX = this.posX;
         const oldPosY = this.posY;
@@ -336,7 +338,7 @@ export class CurrentPlayer extends Player {
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.frameID = requestAnimationFrame(() => this.updatePosition());
         } else {
-            cancelAnimationFrame(this.frameID);
+            // cancelAnimationFrame(this.frameID);
             this.isMoving = false;
         }
     }
@@ -344,13 +346,13 @@ export class CurrentPlayer extends Player {
     /**
      * Drops a bomb at the current player's position.
      */
-    async dropBomb() {
+    dropBomb() {
         this.ws.sendMessage({
             type: "bomb",
             bombType: this.bombType,
             sender: this.username,
             position: { "x": this.posX, "y": this.posY + 608 },
-            date: new Date().getTime(),
+            date: Date.now(),
             blastRangeBonus: this.blastRangeBonus
         });
     }
@@ -358,8 +360,8 @@ export class CurrentPlayer extends Player {
     /**
      * Triggers the blast when the player is hit by a bomb.
      */
-    async triggerBlast() {
-        const time = new Date().getTime();
+    triggerBlast() {
+        const time = Date.now();
         if (time - this.cooldownDegats > 1500) {
             this.cooldownDegats = time;
             this.ws.sendMessage({
@@ -379,5 +381,43 @@ export class CurrentPlayer extends Player {
             type: "death",
             sender: this.username,
         });
+    }
+}
+
+
+class PlayerMove {
+    constructor() {
+        this.player = null;
+        this.direction = null;
+        this.position = null;
+    }
+
+    setMove(player, direction, position) {
+        this.player = player;
+        this.direction = direction;
+        this.position = position;
+    }
+
+    reset() {
+        this.player = null;
+        this.direction = null;
+        this.position = null;
+    }
+}
+
+export class PlayerMovePool {
+    constructor() {
+        this.pool = [];
+    }
+
+    getMove(player, direction, position) {
+        let move = this.pool.length > 0 ? this.pool.pop() : new PlayerMove();
+        move.setMove(player, direction, position);
+        return move;
+    }
+
+    returnMove(move) {
+        move.reset();
+        this.pool.push(move);
     }
 }

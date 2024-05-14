@@ -1,9 +1,7 @@
 import Component from "../component.js";
 import Map from "./map.js";
-import { CurrentPlayer, Player } from "./player.js";
+import { CurrentPlayer, Player, PlayerMovePool } from "./player.js";
 import TabBomb from "./bomb.js";
-import { checkTrigger } from "./collisions.js";
-import { getBorder } from '../function.js';
 
 const FRAMERATE = 1000 / 60;
 const positions = [
@@ -24,11 +22,12 @@ export default class Game extends Component {
         this.livesContainer = new Component("div", { id: "lives-container", style: "position:absolute;" });
         this.readyPlayers = readyPlayers
         this.playerMoveQueue = []
+        this.playerMovePool = new PlayerMovePool()
         this.leavers = []
         this.lives = [3, 3, 3, 3];
         this.count = 0;
         this.ws.onClose(() => this.stop = true)
-        this.ws.onMessage(async (message) => {
+        this.ws.onMessage((message) => {
             switch (message.type) {
                 case "map":
                     this.initMap(message)
@@ -44,11 +43,9 @@ export default class Game extends Component {
                     this.tabBomb.newBomb(message);
                     break;
                 case "death":
-                    console.log("message ==", message);
                     this.count++
                     this.readyPlayers.forEach((player) => {
                         if (message.sender === player.props.id) {
-                            console.log("this.count",this.count);
                             player.die();
                         }
                     })
@@ -58,7 +55,7 @@ export default class Game extends Component {
                     this.updateLives();
                     break;
                 case "bonus":
-                    await this.map.removeBonus(message.data);
+                    this.map.removeBonus(message.data);
                     if (message.data.bonus === "life") {
                         this.lives[this.readyPlayers.findIndex(player => player.props.id === message.sender)]++;
                         this.updateLives();
@@ -135,11 +132,13 @@ export default class Game extends Component {
         const player = this.readyPlayers.find(
             (player) => player.props.id === message.sender
         );
-        this.playerMoveQueue.push({
-            player,
-            direction: message.direction,
-            position: message.position,
-        });
+        // this.playerMoveQueue.push({
+        //     player,
+        //     direction: message.direction,
+        //     position: message.position,
+        // });
+        const move = this.playerMovePool.getMove(player, message.direction, message.position);
+        this.playerMoveQueue.push(move);
     }
 
     initLives() {
@@ -156,9 +155,15 @@ export default class Game extends Component {
 
     updateLives() {
         const list = this.livesContainer.children[1].children;
+        let changesMade = false;
+
         list.forEach((playerLi, index) => {
             if (this.lives[index] > 0 && !this.leavers.includes(playerLi.props.className)) {
-                playerLi.children = [`${playerLi.props.className} : ${this.lives[index]}`];
+                const newContent = `${playerLi.props.className} : ${this.lives[index]}`;
+                if (playerLi.children[0] !== newContent) {
+                    playerLi.children = [newContent];
+                    changesMade = true;
+                }
                 this.winner = playerLi.props.className;
             } else {
                 if (playerLi.props.className === this.currentPlayer.username && this.currentPlayer.isAlive) {
@@ -166,43 +171,69 @@ export default class Game extends Component {
                     this.currentPlayer.playerDeath()
                 }
 
-                playerLi.children = this.leavers.includes(playerLi.props.className) ? [`${playerLi.props.className} : left`] : [`${playerLi.props.className} : dead`];
-                playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
+                const newContent = this.leavers.includes(playerLi.props.className) ? `${playerLi.props.className} : left` : `${playerLi.props.className} : dead`;
+                if (playerLi.children[0] !== newContent) {
+                    playerLi.children = [newContent];
+                    playerLi.props.style = "color:#ff5abb; text-decoration:line-through;";
+                    changesMade = true;
+                }
             }
         })
-        this.livesContainer.update();
+
+        // Only update the DOM if changes were made
+        if (changesMade) {
+            this.livesContainer.update();
+        }
     }
     gameLoop(timestamp) {
+        requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
         this.fpsCounter();
         const deltaTime = timestamp - this.lastTime;
         if (deltaTime >= FRAMERATE) {
             this.lastTime = timestamp;
             this.updateState();
         }
-        if (this.count === this.readyPlayers.length -1){
+        if (this.count === this.readyPlayers.length - 1) {
             this.count = 0;
             setTimeout(() => {
-                this.ws.sendMessage({type:"end", sender:this.winner});
+                this.ws.sendMessage({ type: "end", sender: this.winner });
             }, 2000);
         }
         if (this.stop) {
             this.fps.textContent = "";
             return;
         }
-        requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
     }
 
     /**
      * Updates the game state.
      */
-    async updateState() {
+    updateState() {
         if (this.tabBomb !== undefined) this.tabBomb.tick();
-        await Promise.all(
-            this.playerMoveQueue.map((player) =>
-                player.player.move(player.direction, player.position)
-            )
-        );
-        this.playerMoveQueue = [];
+
+        let moveCounts = {};
+        let nextPlayerMoveQueue = [];
+
+        while (this.playerMoveQueue.length > 0) {
+            const move = this.playerMoveQueue.shift();
+            const playerId = move.player.props.id;
+
+            if (!moveCounts[playerId]) {
+                moveCounts[playerId] = 0;
+            }
+
+            if (moveCounts[playerId] < 5) {
+                move.player.move(move.direction, move.position);
+                moveCounts[playerId]++;
+            } else {
+                nextPlayerMoveQueue.push(move);
+            }
+            this.playerMovePool.returnMove(move);
+        }
+
+        this.playerMoveQueue = nextPlayerMoveQueue;
+        moveCounts = {};
+        
     }
 
     /**
@@ -211,12 +242,9 @@ export default class Game extends Component {
     fpsCounter() {
         const now = performance.now();
         if (now - this.lastUpdateTime >= 1000) {
-            const fpsText = `FPS: ${this.frameCount}`;
-            if (this.fps.textContent !== fpsText) {
-                this.fps.textContent = fpsText;
-            }
-            this.frameCount = 0;
-            this.lastUpdateTime = now;
+            this.fps.textContent = `FPS: ${this.frameCount}`
+            this.frameCount = 0
+            this.lastUpdateTime = now
         }
         this.frameCount++;
     }
