@@ -39,7 +39,7 @@ export default class Component {
         this.children = this.children.filter((child) => !children.includes(child))
     }
 
-    async replaceChildren(c1, c2) {
+    replaceChildren(c1, c2) {
         this.children = this.children.filter((c) => c !== c1)
         this.addElement(c2)
     }
@@ -49,17 +49,17 @@ export default class Component {
      * Override this method in subclasses to define what the component renders.
      * @returns {Promise<string>} A promise that resolves to the rendered HTML string.
      */
-    async render() {
+    render() {
         return '';
     }
 
 
-    async updateDOM(callback = () => { }) {
+    updateDOM(callback = () => { }) {
         this.oldNode = this.domNode
         callback()
         const patches = diff(this.oldNode, this)
         const rootNode = document.getElementById(this.props.id)
-        await patch(rootNode, patches);
+        patch(rootNode, patches);
         this.domNode = render(this);
     }
 
@@ -68,7 +68,7 @@ export default class Component {
      * @param {any} data - The new data to update the component with.
      * @returns {Promise<void>} A promise that resolves when the update is complete.
      */
-    async update() {
+    update() {
         // const oldVNode = this.vNode;
         // this.vNode = await this.render();
         // const patches = diff(oldVNode, this.vNode);
