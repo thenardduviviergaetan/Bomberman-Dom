@@ -3,7 +3,7 @@ import Map from "./map.js";
 import { CurrentPlayer, Player, PlayerMovePool } from "./player.js";
 import TabBomb from "./bomb.js";
 
-const FRAMERATE = 1000 / 120;
+const FRAMERATE = 1000 / 60;
 const positions = [
     { top: -608 + 32, left: 32 },
     { top: -64, left: 608 - 64 },
@@ -132,11 +132,6 @@ export default class Game extends Component {
         const player = this.readyPlayers.find(
             (player) => player.props.id === message.sender
         );
-        // this.playerMoveQueue.push({
-        //     player,
-        //     direction: message.direction,
-        //     position: message.position,
-        // });
         const move = this.playerMovePool.getMove(player, message.direction, message.position);
         this.playerMoveQueue.push(move);
     }

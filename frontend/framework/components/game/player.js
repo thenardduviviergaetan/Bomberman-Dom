@@ -92,8 +92,6 @@ export class Player extends Component {
         this.animate(direction);
         const { offsetX, offsetY } = ANIMATION_FRAMES[direction][this.frameIndex];
         this.props.style = `${this.props.style} transform: translate(${this.posX}px, ${this.posY}px); background-position: -${offsetX}px -${offsetY}px;`;
-        // throttle(this.updateStyle(this.props.style), 200);
-
         this.updateStyle(this.props.style);
     }
 
@@ -147,28 +145,19 @@ export class CurrentPlayer extends Player {
         });
 
         window.addEventListener("keydown", ((event) => {
-            // if (!this.isAlive) window.removeEventListener('keydown',this);
             if (DIRECTION_MAP[event.key] && !this.lock) {
-                console.log(DIRECTION_MAP[event.key]);
-                console.log(this.keys);
                 this.keys[DIRECTION_MAP[event.key]] = true;
                 if (!this.isMoving) this.updatePosition();
-                // this.updatePosition();
             }
-            if ((DROP_BOMB[event.key] && ((this.bombCooldown - Date.now() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive) {
+            if ((DROP_BOMB[event.key] && ((this.bombCooldown - Date.now() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive && !this.lock) {
                 this.bombNumber++;
                 this.dropBomb();
                 this.bombCooldown = Date.now() + 1500;
                 return;
             } else if (DROP_BOMB[event.key]) return;
-            // if (!this.lock) this.direction = DIRECTION_MAP[event.key];
         }));
 
         window.addEventListener("keyup", ((event) => {
-            // if (!this.isAlive) window.removeEventListener('keyup',this);
-            // if (this.direction === DIRECTION_MAP[event.key]) {
-            //     this.direction = null;
-            // }
             if (DIRECTION_MAP[event.key]) {
                 this.keys[DIRECTION_MAP[event.key]] = false;
                     this.direction = null;
@@ -242,7 +231,6 @@ export class CurrentPlayer extends Player {
         const playerGround = checkGround(this);
         if (!this.direction) {
             this.isMoving = false;
-        //     return;
         }
         const oldPosX = this.posX;
         const oldPosY = this.posY;
@@ -261,23 +249,18 @@ export class CurrentPlayer extends Player {
 
                 switch (bonus.bonus) {
                     case "bomb":
-                        console.log("BOMB BONUS");
                         this.addMaxBombNumber();
                         break;
                     case "blast":
-                        console.log("BLAST BONUS");
                         this.addBlastRange(1);
                         break;
                     case "speed":
-                        console.log("SPEED BONUS");
                         this.speedUp();
                         break;
                     case "escape":
-                        console.log("ESCAPE BONUS");
                         this.activeEscape();
                         break;
                     case "life":
-                        console.log("LIFE BONUS");
                         this.addLife(1);
                         break;
                     default:
@@ -307,22 +290,6 @@ export class CurrentPlayer extends Player {
             this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
         }
 
-
-        // switch (this.direction) {
-        //     case "up":
-        //         this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
-        //         break;
-        //     case "down":
-        //         this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
-        //         break;
-        //     case "left":
-        //         this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
-        //         break;
-        //     case "right":
-        //         this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
-        //         break;
-        // }
-        console.log(this.posX, this.posY);
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.ws.sendMessage({ type: "move", sender: this.username, direction: this.direction, position: { x: this.posX, y: this.posY } });
         }
@@ -385,20 +352,48 @@ export class CurrentPlayer extends Player {
     }
 }
 
-
+/**
+ * Represents a player move.
+ */
 class PlayerMove {
+    /**
+     * Constructs a new PlayerMove instance.
+     */
     constructor() {
+        /**
+         * The player associated with the move.
+         * @type {Player}
+         */
         this.player = null;
+        
+        /**
+         * The direction of the move.
+         * @type {string}
+         */
         this.direction = null;
+        
+        /**
+         * The new position of the player.
+         * @type {Object}
+         */
         this.position = null;
     }
 
+    /**
+     * Sets the player, direction, and position of the move.
+     * @param {Player} player - The player associated with the move.
+     * @param {string} direction - The direction of the move.
+     * @param {Object} position - The new position of the player.
+     */
     setMove(player, direction, position) {
         this.player = player;
         this.direction = direction;
         this.position = position;
     }
 
+    /**
+     * Resets the player, direction, and position of the move.
+     */
     reset() {
         this.player = null;
         this.direction = null;
@@ -406,17 +401,40 @@ class PlayerMove {
     }
 }
 
+/**
+ * Represents a pool of player moves.
+ */
 export class PlayerMovePool {
+    /**
+     * Constructs a new PlayerMovePool instance.
+     */
     constructor() {
+        /**
+         * The pool of player moves.
+         * @type {PlayerMove[]}
+         */
         this.pool = [];
     }
 
+    /**
+     * Gets a player move from the pool.
+     * If the pool is empty, a new PlayerMove instance is created.
+     * @param {Player} player - The player associated with the move.
+     * @param {string} direction - The direction of the move.
+     * @param {Object} position - The new position of the player.
+     * @returns {PlayerMove} The player move.
+     */
     getMove(player, direction, position) {
         let move = this.pool.length > 0 ? this.pool.pop() : new PlayerMove();
         move.setMove(player, direction, position);
         return move;
     }
 
+    /**
+     * Returns a player move to the pool.
+     * The move is reset before being added back to the pool.
+     * @param {PlayerMove} move - The player move to return.
+     */
     returnMove(move) {
         move.reset();
         this.pool.push(move);

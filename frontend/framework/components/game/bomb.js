@@ -66,19 +66,6 @@ export default class TabBomb extends Component {
     newBomb(BombMessage) {
         const bombSprite = ANIMATION_FRAME_BOMB[BombMessage.bombType].tab.map(idsprite => this.tabSpriteBomb[idsprite]);
 
-        // this.addElement(
-        //     new Bomb(
-        //         BombMessage.bombType,
-        //         BombMessage.sender,
-        //         BombMessage.position.x,
-        //         BombMessage.position.y,
-        //         BombMessage.date,
-        //         bombSprite,
-        //         BombMessage.blastRangeBonus + ANIMATION_FRAME_BOMB[BombMessage.bombType].blastRange,
-        //         this,
-        //     )
-        // );
-
         let bomb = this.bombPool.getBomb(
             BombMessage.bombType,
             BombMessage.sender,
@@ -121,9 +108,6 @@ export default class TabBomb extends Component {
                     child.dirty = false;
                 }
             })
-
-            // this.update();
-            // requestAnimationFrame(this.update.bind(this))
             requestAnimationFrame(this.boundUpdate)
         }
     }
@@ -164,7 +148,6 @@ class Bomb extends Component {
      * @returns {boolean} - Whether the bomb animation is completed or not
      */
     tick() {
-        // let time = new Date().getTime();
         let time = Date.now();
         if (time - this.dateCreateBomb > this.timer) {
             this.animationId++;
@@ -173,9 +156,6 @@ class Bomb extends Component {
                 return true;
             } else {
                 this.props.style = `${this.spriteAnimation[this.animationId].style} transform: translate(${this.posX}px, ${this.posY}px);`;
-                // this.props.style = `${this.spriteAnimation[this.animationId].style} top: ${this.posY}px; left: ${this.posX}px;`;
-                // this.update();
-                // requestAnimationFrame(this.update.bind(this))
                 this.dirty = true;
                 requestAnimationFrame(this.boundUpdate)
             }
@@ -312,17 +292,47 @@ class Fire extends Component {
     }
 }
 
+/**
+ * Represents a pool of bombs.
+ */
 class BombPool {
+    /**
+     * Creates a new instance of BombPool.
+     */
     constructor() {
         this.pool = [];
     }
 
+    /**
+     * Creates a new bomb and adds it to the pool.
+     * @param {number} bombType - The type of the bomb.
+     * @param {string} sender - The sender of the bomb.
+     * @param {number} posX - The x position of the bomb.
+     * @param {number} posY - The y position of the bomb.
+     * @param {number} date - The creation date of the bomb.
+     * @param {Array} spriteAnimation - The sprite animation frames of the bomb.
+     * @param {number} blastRange - The blast range of the bomb.
+     * @param {Object} parent - The parent component of the bomb.
+     * @returns {Object} - The created bomb.
+     */
     create(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
         let bomb = new Bomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent);
         this.pool.push(bomb);
         return bomb;
     }
 
+    /**
+     * Gets a bomb from the pool or creates a new one if the pool is empty.
+     * @param {number} bombType - The type of the bomb.
+     * @param {string} sender - The sender of the bomb.
+     * @param {number} posX - The x position of the bomb.
+     * @param {number} posY - The y position of the bomb.
+     * @param {number} date - The creation date of the bomb.
+     * @param {Array} spriteAnimation - The sprite animation frames of the bomb.
+     * @param {number} blastRange - The blast range of the bomb.
+     * @param {Object} parent - The parent component of the bomb.
+     * @returns {Object} - The bomb.
+     */
     getBomb(bombType, sender, posX, posY, date, spriteAnimation, blastRange, parent) {
         if (this.pool.length > 10) {
             const bomb = this.pool.shift();

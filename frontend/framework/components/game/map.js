@@ -77,7 +77,6 @@ export default class Map extends Component {
                         bonusBorder.borderUp += 8;
                         bonusBorder.borderDown -= 8;
                         this.bonusMap.push(bonusBorder)
-                        // this.bonusMap.push(getBorder(block.children[0], y, x))
                         break
                     default:
                         break;
