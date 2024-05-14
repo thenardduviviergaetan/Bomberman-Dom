@@ -5,7 +5,7 @@ import TabBomb from "./bomb.js";
 import { checkTrigger } from "./collisions.js";
 import { getBorder } from '../function.js';
 
-const FRAMERATE = 1000 / 60;
+const FRAMERATE = 1000 / 120;
 const positions = [
     { top: -608 + 32, left: 32 },
     { top: -64, left: 608 - 64 },
