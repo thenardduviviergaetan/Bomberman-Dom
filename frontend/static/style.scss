@@ -236,6 +236,8 @@ body {
 
 #game {
     display: flex;
+    position: relative;
+    flex-direction: column-reverse;
     justify-content: center;
     align-items: center;
     width: 650px;
@@ -251,20 +253,23 @@ body {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        align-items: center;
         top: 40px;
-        width: 70%;
+        left: -200px;
+        width: 30%;
 
         p {
+            text-align: center;
             padding: 10px;
             color: black;
             font-weight: bold;
+            margin-bottom: 10px;
         }
 
         ul {
             display: flex;
+            align-items: center;
             justify-content: space-around;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: wrap;
             width: 100%;
 
@@ -483,7 +488,8 @@ body {
     z-index: 40;
 }
 
-.bomb, .fire{
+.bomb,
+.fire {
     will-change: transform;
 }
 

@@ -140,7 +140,7 @@ export default class Game extends Component {
         const text = new Component("p", { id: "title" }, ["Lives remaining :"])
         const livesList = new Component("ul", { id: "lives-list" });
         this.readyPlayers.forEach((player, index) => {
-            const playerLife = new Component("li", { className: player.props.id }, [`${player.props.id} : ${this.lives[index]}`]);
+            const playerLife = new Component("li", { className: player.props.id, style: `${this.username === player.props.id ? "background-color:rgba(63, 240, 0, .7);" : ""}` }, [`${player.props.id} : ${this.lives[index]}`]);
             livesList.addElement(playerLife);
         })
         this.livesContainer.addElement(text, livesList);
@@ -204,33 +204,32 @@ export default class Game extends Component {
      * Updates the game state.
      */
     updateState(deltaTime) {
-        // if (this.tabBomb !== undefined) this.tabBomb.tick();
         if (this.tabBomb !== undefined) this.tabBomb.tick(deltaTime);
-
 
         let moveCounts = {};
         let nextPlayerMoveQueue = [];
 
         while (this.playerMoveQueue.length > 0) {
             const move = this.playerMoveQueue.shift();
-            const playerId = move.player.props.id;
+            if (move.player) {
 
-            if (!moveCounts[playerId]) {
-                moveCounts[playerId] = 0;
-            }
+                const playerId = move.player.props.id;
 
-            if (moveCounts[playerId] < 5) {
-                move.player.move(move.direction, move.position);
-                moveCounts[playerId]++;
-            } else {
-                nextPlayerMoveQueue.push(move);
+                if (!moveCounts[playerId]) {
+                    moveCounts[playerId] = 0;
+                }
+
+                if (moveCounts[playerId] < 5) {
+                    move.player.move(move.direction, move.position);
+                    moveCounts[playerId]++;
+                } else {
+                    nextPlayerMoveQueue.push(move);
+                }
+                this.playerMovePool.returnMove(move);
             }
-            this.playerMovePool.returnMove(move);
         }
-
         this.playerMoveQueue = nextPlayerMoveQueue;
         moveCounts = {};
-
     }
 
     /**

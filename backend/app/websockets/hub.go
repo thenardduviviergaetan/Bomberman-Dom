@@ -89,12 +89,10 @@ func (h *Hub) Run() {
 					client.send <- message
 				}
 			case "death":
-				fmt.Println(string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}
 			case "degats":
-				fmt.Println(string(message))
 				for _, client := range h.Clients {
 					client.send <- message
 				}
@@ -188,7 +186,6 @@ func (h *Hub) UnregisterClient(client *Client) {
 
 // removeElement removes the specified clientDisconnected from the connected slice and returns the updated slice.
 func removeElement(connected []string, clientDisconnected string) []string {
-	fmt.Println("connected before: ", connected)
 	var newTab []string
 	for _, user := range connected {
 		if clientDisconnected != user {
@@ -197,6 +194,5 @@ func removeElement(connected []string, clientDisconnected string) []string {
 	}
 	newConnected := []string{}
 	newConnected = append(newConnected, newTab...)
-	fmt.Println("connected after: ", newConnected)
 	return newConnected
 }
