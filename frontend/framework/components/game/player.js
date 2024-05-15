@@ -256,18 +256,23 @@ export class CurrentPlayer extends Player {
 
                 switch (bonus.bonus) {
                     case "bomb":
+                        console.log("bomb");
                         this.addMaxBombNumber();
                         break;
                     case "blast":
+                        console.log("blast");
                         this.addBlastRange(1);
                         break;
                     case "speed":
+                        console.log("speed");
                         this.speedUp();
                         break;
                     case "escape":
+                        console.log("escape");
                         this.activeEscape();
                         break;
                     case "life":
+                        console.log("life");
                         this.addLife(1);
                         break;
                     default:

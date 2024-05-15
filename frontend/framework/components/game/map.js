@@ -93,9 +93,10 @@ export default class Map extends Component {
      * Removes a bonus from the game map.
      * @param {Object} bonusData - The bonus data.
      */
-    async removeBonus(bonusData) {
+    removeBonus(bonusData) {
         const top = this.children[bonusData.indexY - 1].children[bonusData.indexX]
         this.children[bonusData.indexY].children[bonusData.indexX] = top.props.class === "block" || top.props.class === "wall" ? this.shadow : this.path;
-        await this.update()
+        this.bonusMap = this.bonusMap.filter(bonus => bonus.indexX !== bonusData.indexX || bonus.indexY !== bonusData.indexY)
+        this.update()
     }
 }
