@@ -145,22 +145,29 @@ export class CurrentPlayer extends Player {
         });
 
         window.addEventListener("keydown", ((event) => {
-            if (DIRECTION_MAP[event.key] && !this.lock) {
-                this.keys[DIRECTION_MAP[event.key]] = true;
-                if (!this.isMoving) this.updatePosition();
+            const direction = DIRECTION_MAP[event.key];
+            const dropBomb = DROP_BOMB[event.key];
+
+            if (direction && !this.lock) {
+                this.keys[direction] = true;
+                if (!this.isMoving) {
+                    this.direction = direction;
+                    this.updatePosition();
+                }
             }
-            if ((DROP_BOMB[event.key] && ((this.bombCooldown - Date.now() <= 0) || this.bombNumber < this.maxBombNumber)) && this.isAlive && !this.lock) {
+
+            if (dropBomb && ((this.bombCooldown - Date.now() <= 0) || this.bombNumber < this.maxBombNumber) && this.isAlive && !this.lock) {
                 this.bombNumber++;
                 this.dropBomb();
                 this.bombCooldown = Date.now() + 1500;
-                return;
-            } else if (DROP_BOMB[event.key]) return;
+            }
         }));
 
         window.addEventListener("keyup", ((event) => {
-            if (DIRECTION_MAP[event.key]) {
-                this.keys[DIRECTION_MAP[event.key]] = false;
-                    this.direction = null;
+            const direction = DIRECTION_MAP[event.key];
+            if (direction) {
+                this.direction = null;
+                this.keys[direction] = false;
             }
         }));
     }
@@ -270,22 +277,22 @@ export class CurrentPlayer extends Player {
             }
         });
 
-        if (this.keys.up){
+        if (this.keys.up) {
             this.direction = "up";
             this.posY += !playerGround.groundUp ? -this.speed : playerGround.up;
         }
 
-        if (this.keys.down){
+        if (this.keys.down) {
             this.direction = "down";
             this.posY += !playerGround.groundDown ? this.speed : playerGround.down;
         }
 
-        if (this.keys.left){
+        if (this.keys.left) {
             this.direction = "left";
             this.posX += !playerGround.groundLeft ? -this.speed : playerGround.left;
         }
 
-        if (this.keys.right){
+        if (this.keys.right) {
             this.direction = "right";
             this.posX += !playerGround.groundRight ? this.speed : playerGround.right;
         }
@@ -306,7 +313,7 @@ export class CurrentPlayer extends Player {
         if (this.posX !== oldPosX || this.posY !== oldPosY) {
             this.frameID = requestAnimationFrame(() => this.updatePosition());
         } else {
-            // cancelAnimationFrame(this.frameID);
+            cancelAnimationFrame(this.frameID);
             this.isMoving = false;
         }
     }
@@ -365,13 +372,13 @@ class PlayerMove {
          * @type {Player}
          */
         this.player = null;
-        
+
         /**
          * The direction of the move.
          * @type {string}
          */
         this.direction = null;
-        
+
         /**
          * The new position of the player.
          * @type {Object}
